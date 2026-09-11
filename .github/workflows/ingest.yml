@@ -1,0 +1,69 @@
+name: ingest
+
+# The market's clock. Two cadences because the two channels move at different
+# speeds: raw discovery finds brand-new repositories within the hour, while the
+# curated catalogs only change when a maintainer merges a PR.
+on:
+  schedule:
+    - cron: '17 * * * *'      # hourly: discovery + harvest + merge
+    - cron: '7 */6 * * *'     # every 6h: deeper re-check of catalog sources
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths: [ 'ingest/**', 'db/**', '.github/workflows/ingest.yml' ]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ingest
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Harvest, merge, rank
+        env:
+          # Raises the GitHub search limit from 10 to 30 requests/minute; the
+          # discovery probe makes one request per candidate repository.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node ingest/index.mjs
+
+      - name: Load the queryable database
+        run: |
+          node ingest/load-sqlite.mjs --db data/market.sql --apply
+          sqlite3 data/market.db < data/market.sql 2>/dev/null || true
+          sqlite3 data/market.db 'SELECT COUNT(*) FROM plugins;' 2>/dev/null || true
+
+      - name: Report
+        run: |
+          node -e "
+            const c = require('./data/catalog.json');
+            console.log('plugins', c.count, '| updated', c.updated);
+            console.log('kinds', JSON.stringify(c.stats.byTargetKind));
+            console.log('top5', c.plugins.slice(0,5).map(p => p.name + '(' + p.score + ')').join(', '));
+          "
+
+      - name: Commit the refreshed catalog
+        run: |
+          # Keep a root-level plugins.json too: it is the stable path external
+          # consumers (and the desktop shell's DSHM_REGISTRY_URL) already point
+          # at, so the market can move its artifacts without breaking them.
+          cp data/plugins.json plugins.json
+          git config user.name 'dsh-market[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data plugins.json
+          if git diff --cached --quiet; then
+            echo 'no change'
+          else
+            git commit -m "chore(data): refresh catalog ($(node -p "require('./data/catalog.json').count") plugins)"
+            git push
+          fi
