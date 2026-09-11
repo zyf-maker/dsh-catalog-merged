@@ -7,7 +7,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { buildIdentityIndex, candidateKeys, parseRepo } from '../ingest/identity.mjs'
-import { normalize, classifyTarget, betterRecord } from '../ingest/normalize.mjs'
+import { normalize, classifyTarget, betterRecord, npmNameOfSpec } from '../ingest/normalize.mjs'
 import { inspectManifest, planRepair, ISSUE } from '../ingest/compat.mjs'
 
 const record = (fields) => ({
@@ -36,6 +36,95 @@ test('npm and repo keys fold into one class when a record carries both', () => {
   const repoOnly = record({ repoPath: 'nexu-io/open-design', name: 'open-design' })
   const index = buildIdentityIndex([withBoth, repoOnly])
   assert.equal(index.idFor(withBoth), index.idFor(repoOnly))
+})
+
+test('a monorepo keeps every package: 19 siblings are not collapsed into one', () => {
+  // The production regression this exists for: zhu1090093659/dsh-web publishes
+  // 19 packages and the equivalence-class merge reduced them to a single entry.
+  const packages = [
+    'dsh-pet', 'dsh-ssh', 'dsh-i18n', 'dsh-usage', 'dsh-doctor', 'dsh-liangshen',
+    'dsh-remote-web-ui', 'dsh-session-archive', 'dsh-client-ui-git-graph',
+    'dsh-client-ui-task-board', 'dsh-client-ui-skill-explorer', 'dsh-client-ui-market',
+    'dsh-client-ui-plugin-manager', 'dsh-client-ui-web-ui-settings', 'dsh-client-ui-skin-center',
+    'dsh-client-ui-session-id', 'dsh-client-ui-community-plugins', 'dsh-tool-describe-image', 'dsh-web-all',
+  ].map((name) => record({ npm: `@linxin666/${name}`, repoPath: 'zhu1090093659/dsh-web', name }))
+  const index = buildIdentityIndex(packages)
+  const ids = new Set(packages.map((p) => index.idFor(p)))
+  assert.equal(ids.size, 19, 'every package in a monorepo must keep its own identity')
+  assert.equal(index.ambiguousRepos, 1, 'the shared repository must be reported as ambiguous')
+})
+
+test('a monorepo whose packages are named only in the install command keeps all of them', () => {
+  // The second half of the production regression: 1024 Store declares no `npm`
+  // field, only a command, so every one of its entries lost its package identity
+  // and fell back to the shared repository key — collapsing through the fallback
+  // rather than through the merge. Identity must come from whatever names the
+  // package, and a command names it.
+  const names = ['dsh-pet', 'dsh-ssh', 'dsh-i18n', 'dsh-usage', 'dsh-web-all']
+  const records = names.map((name) => normalize({
+    id: `zhu1090093659/dsh-web/packages/${name}`,
+    name, owner: 'zhu1090093659', url: 'https://github.com/zhu1090093659/dsh-web',
+    repository: 'dsh-web', category: 'ui', description: { en: name, zh: name },
+    install: `dsh plugin --profile web add @linxin666/${name}`, stars: 10,
+  }, 'deepseek1024'))
+  for (const [i, record] of records.entries()) {
+    assert.equal(record.npm, `@linxin666/${names[i]}`, 'the package name is derived from the command')
+  }
+  const index = buildIdentityIndex(records)
+  assert.equal(new Set(records.map((r) => index.idFor(r))).size, names.length,
+    'command-only siblings must stay distinct')
+})
+
+test('npmNameOfSpec reads every shape the ecosystem publishes', () => {
+  assert.equal(npmNameOfSpec('@linxin666/dsh-pet'), '@linxin666/dsh-pet')
+  assert.equal(npmNameOfSpec('@linxin666/dsh-pet@1.2.3'), '@linxin666/dsh-pet')
+  assert.equal(npmNameOfSpec('dsh-codex-connect@alpha'), 'dsh-codex-connect')
+  assert.equal(npmNameOfSpec('npm:dsh-plugins-store'), 'dsh-plugins-store')
+  assert.equal(npmNameOfSpec('github:o/r'), null)
+  assert.equal(npmNameOfSpec('https://github.com/o/r/releases/download/v1/p.tgz'), null)
+})
+
+test('a 7-day npm figure is accepted as downloads without inventing install counts', () => {
+  const plugin = normalize({
+    name: 'x', owner: 'o', install: 'dsh plugin --profile web add x',
+    stars: 5, npmDownloads7d: 900, installs30d: 40,
+  }, 'deepseek1024')
+  assert.equal(plugin.downloads, 900, 'same metric (npm downloads), different window')
+  assert.equal(plugin.score, 5 * 1000 + 900, 'harness installs are not added to downloads')
+})
+
+test('a repo-only listing joins the package only when the repo hosts exactly one', () => {
+  const onlyChild = record({ npm: 'solo-pkg', repoPath: 'o/solo', name: 'solo' })
+  const repoListing = record({ repoPath: 'o/solo', name: 'solo' })
+  assert.equal(buildIdentityIndex([onlyChild, repoListing]).idFor(repoListing), 'npm:solo-pkg')
+
+  const a = record({ npm: 'pkg-a', repoPath: 'o/mono', name: 'a' })
+  const b = record({ npm: 'pkg-b', repoPath: 'o/mono', name: 'b' })
+  const monoListing = record({ repoPath: 'o/mono', name: 'mono' })
+  const index = buildIdentityIndex([a, b, monoListing])
+  assert.equal(index.idFor(monoListing), 'repo:o/mono',
+    'an ambiguous repository listing must not be attributed to one arbitrary package')
+  assert.notEqual(index.idFor(a), index.idFor(b))
+})
+
+test('a subpath-qualified repository is distinct from the repository root', () => {
+  const root = record({ npm: 'root-pkg', repoPath: 'o/mono', repoSubpath: null, name: 'root' })
+  const child = record({ npm: 'child-pkg', repoPath: 'o/mono', repoSubpath: 'packages/child', name: 'child' })
+  const index = buildIdentityIndex([root, child])
+  assert.notEqual(index.idFor(root), index.idFor(child))
+  // Two *different* repositories share nothing; the same repo+subpath does.
+  const sameSub = record({ repoPath: 'o/mono', repoSubpath: 'packages/child', name: 'child' })
+  assert.equal(index.idFor(child), index.idFor(sameSub))
+})
+
+test('the id a record resolves to is consistent with its own npm field', () => {
+  // The broken merge could emit `id=npm:a` beside `npm=b`; identity must be a
+  // function of the record, never of whatever else happened to be in its class.
+  const a = record({ npm: '@scope/one', repoPath: 'o/mono', name: 'one' })
+  const b = record({ npm: '@scope/two', repoPath: 'o/mono', name: 'two' })
+  const index = buildIdentityIndex([a, b])
+  assert.equal(index.idFor(a), 'npm:@scope/one')
+  assert.equal(index.idFor(b), 'npm:@scope/two')
 })
 
 test('the class representative does not depend on input order', () => {
