@@ -13,6 +13,7 @@
  */
 import { parseRepo, repoFromUrl, NPM_NAME } from './identity.mjs'
 import { DENY_REPOS, DENY_TYPES } from './sources.mjs'
+import { classify } from './classify.mjs'
 
 /** Composite ranking weight: stars dominate, downloads break ties and lift. */
 export const STARS_WEIGHT = 1000
@@ -217,14 +218,29 @@ export function normalize(raw, sourceId, requireType) {
   // reorder the leaderboard on its own.
   const downloads = numberOf(pick(raw, 'downloads', 'downloads30d', 'download', 'downloadCount', 'npmDownloads', 'npmDownloads7d'))
 
+  // The raw category is kept for provenance; the canonical one is what the UI
+  // filters on. 55 raw categories, with 2340 plugins parked in a non-answer
+  // bucket (`cordis-plugin`), is not a filter — so classification reads the
+  // plugin's own text to place what the raw catalog could not.
+  const description = descriptionOf(raw)
+  const rawCategory = categoryOf(raw)
+  const classified = classify({
+    rawCategory,
+    name,
+    description,
+    topics: Array.isArray(pick(raw, 'topics')) ? raw.topics : [],
+  })
+
   return {
     name,
     owner: String(pick(raw, 'owner') ?? (repo === null ? '' : repo.path.split('/')[0])).trim(),
     url,
     repoPath: repo?.path ?? null,
     repoSubpath: repo?.subpath ?? null,
-    category: categoryOf(raw),
-    description: descriptionOf(raw),
+    category: classified.category,
+    categorySource: classified.source,
+    rawCategory,
+    description,
     npm: npm === null ? null : String(npm),
     tarball: tarball === null ? null : String(tarball),
     install: target.command,
