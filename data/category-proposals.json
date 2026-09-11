@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-11T15:39:48.080Z",
+  "updated": "2026-09-11T16:28:27.368Z",
   "note": "Evidence for category discovery. `automatic` entries were created by the pipeline; `promotable` entries need a human to add them to category-labels.json with \"promote\": true, because measurement showed cross-cutting tokens describe what a plugin integrates with rather than what it is.",
   "thresholds": {
     "leftoverMinMembers": 25,
@@ -80,13 +80,13 @@
     },
     {
       "term": "opencode",
-      "members": 62,
+      "members": 61,
       "leftover": 1,
       "spread": 15,
       "share": 0.016,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 1) or >=120 members across >=6 categories (has 62/15)",
+      "why": "needs >=25 unclassified (has 1) or >=120 members across >=6 categories (has 61/15)",
       "samples": [
         "dsh-opencode-go-quota",
         "dsh-opencode-go-usage",
@@ -394,6 +394,21 @@
       ]
     },
     {
+      "term": "bot",
+      "members": 32,
+      "leftover": 0,
+      "spread": 9,
+      "share": 0,
+      "channels": [],
+      "qualifies": "below-threshold",
+      "why": "needs >=25 unclassified (has 0) or >=120 members across >=6 categories (has 32/9)",
+      "samples": [
+        "dsh-sxs-anti-bot-http",
+        "dsh-bot-mode",
+        "dsh-message-gateway"
+      ]
+    },
+    {
       "term": "video",
       "members": 32,
       "leftover": 3,
@@ -406,21 +421,6 @@
         "dsh-plugin-video-player",
         "dsh-video-understand",
         "dsh-video-tools"
-      ]
-    },
-    {
-      "term": "bot",
-      "members": 31,
-      "leftover": 0,
-      "spread": 8,
-      "share": 0,
-      "channels": [],
-      "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 0) or >=120 members across >=6 categories (has 31/8)",
-      "samples": [
-        "dsh-sxs-anti-bot-http",
-        "dsh-bot-mode",
-        "dsh-message-gateway"
       ]
     },
     {
