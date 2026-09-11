@@ -30,6 +30,12 @@ jobs:
         with:
           node-version: 22
 
+      - name: Test
+        # Before the harvest, not after: a broken import or a drifted repair rule
+        # should fail in seconds rather than after a run has spent its network
+        # budget, and the loader is only exercised here.
+        run: node --test tests/
+
       - name: Harvest, merge, rank
         env:
           # Raises the GitHub search limit from 10 to 30 requests/minute; the
