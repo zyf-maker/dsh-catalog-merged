@@ -94,16 +94,27 @@ jobs:
             console.log('top5', c.plugins.slice(0,5).map(p => p.name + '(' + p.score + ')').join(', '));
           "
 
+      - name: Publish the root registry copy
+        # External consumers — and the desktop shell's `DSHM_REGISTRY_URL` — read
+        # the ROOT `plugins.json`, while the pipeline writes `data/plugins.json`.
+        # The copy is made HERE, before verification. The first version made it
+        # inside the commit step, so the check validated the copy left by the
+        # previous run: it passed the fresh file, failed the stale one, and left
+        # "which of the two is the market actually reading" ambiguous. Generate,
+        # copy, verify, commit — in that order.
+        run: cp data/plugins.json plugins.json
+
       - name: Verify the market will accept the catalog
         # The published catalog was unusable once: 3895 entries carried an empty
         # category and dshmarket refuses the whole file over one of them, so the
         # market window said "插件目录加载失败 — catalog plugin 140 carries no usable
         # category". The pipeline already asserts this before writing; this step
-        # applies the same check to the committed artifact, which is the thing
-        # consumers actually fetch.
+        # applies the same check to both committed artifacts, which are the things
+        # consumers actually fetch, and proves the two are the same bytes.
         run: |
           node ingest/validate-catalog.mjs --catalog data/plugins.json
           node ingest/validate-catalog.mjs --catalog plugins.json
+          cmp data/plugins.json plugins.json
 
       - name: Commit the refreshed catalog
         run: |
