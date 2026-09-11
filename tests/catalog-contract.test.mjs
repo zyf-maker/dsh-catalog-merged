@@ -18,6 +18,7 @@ import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { contractPluginCategories, entryProblems, validateCatalog, assertCatalogAcceptable } from '../ingest/catalog-contract.mjs'
 import { normalize, UNCATEGORIZED } from '../ingest/normalize.mjs'
+import { CATEGORY_IDS } from '../ingest/classify.mjs'
 
 const installed = join(process.env.DSH_HOME ?? join('D:', 'software', 'deepseek', 'dsh-data'),
   'profiles', 'web', 'node_modules', 'dshmarket', 'lib', 'registry.js')
@@ -57,9 +58,13 @@ test('normalize never emits an empty category', async () => {
     assert.notEqual(plugin.category, '', `${raw.name} must not carry an empty category`)
     assert.equal(pluginCategories({ category: plugin.category }).length, 1,
       `${raw.name} must satisfy the market's own rule`)
+    // Every category is now a taxonomy id: the auto-classifier replaced the
+    // free-text field, so an unknown or empty raw value lands in a real bucket
+    // rather than in a placeholder the UI would have to interpret.
+    assert.ok(CATEGORY_IDS.has(plugin.category), `${raw.name} got "${plugin.category}", not a taxonomy id`)
   }
-  assert.equal(normalize(cases[2], 'test').category, UNCATEGORIZED)
-  assert.equal(normalize(cases[4], 'test').category, 'memory', 'a real category is normalized, not replaced')
+  assert.equal(normalize(cases[2], 'test').category, 'other', 'nothing to go on lands in other')
+  assert.equal(normalize(cases[4], 'test').category, 'memory', 'a real category is folded into the taxonomy')
 })
 
 test('the emitted catalog passes the market validator end to end', async () => {
