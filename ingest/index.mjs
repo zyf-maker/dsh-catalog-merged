@@ -22,7 +22,11 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { SEED_SOURCES, HARVEST_SOURCES, discoverSources } from './sources.mjs'
 import { harvesterFor } from './harvest.mjs'
 import { normalize, betterRecord, byRank, UNCATEGORIZED } from './normalize.mjs'
-import { CATEGORIES, GENERIC_CATEGORIES, categoryCounts } from './classify.mjs'
+import { CATEGORIES, GENERIC_CATEGORIES, categoryCounts, classify } from './classify.mjs'
+import {
+  DEFAULT_OPTIONS as CATEGORY_OPTIONS, dictionaryFor, discoverCategories, loadLabels, loadState,
+  mergeDiscovered, rulesFor, saveState, termPattern,
+} from './categories.mjs'
 import { buildIdentityIndex } from './identity.mjs'
 import { AdmissionCache, verifyAll } from './admission.mjs'
 import { planRepair } from './compat.mjs'
@@ -44,8 +48,21 @@ export async function runIngest({
   token = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN ?? undefined,
   log = (message) => console.log(message),
   fetchImpl = fetch,
+  /** Threshold overrides for category discovery; see `categories.mjs`. */
+  categoryOptions = {},
 } = {}) {
   const started = Date.now()
+
+  // --------------------------------------------------- persisted categories
+  // Loaded before harvesting, because a category created on an earlier run is part
+  // of how records are classified — not something applied afterwards. Reading it
+  // here is what makes discovery additive instead of a second pass every time.
+  const categoriesPath = join(out, 'categories.json')
+  const labelsPath = join(out, 'category-labels.json')
+  let categoryState = loadState(categoriesPath)
+  const categoryLabels = loadLabels(labelsPath)
+  let discoveredRules = rulesFor(categoryState)
+  log(`categories: ${discoveredRules.length} discovered rule(s) from ${categoryState.updated ?? 'a fresh state'}`)
 
   // -------------------------------------------------------------- discovery
   let sources = [...SEED_SOURCES]
@@ -72,7 +89,7 @@ export async function runIngest({
     sourceHealth.push(health(source, result.ok, result.items.length, result.ms, result.error ?? null))
     if (!result.ok) log(`  ! ${result.error}`)
     for (const { raw, sourceId, requireType } of result.items) {
-      const record = normalize(raw, sourceId, requireType)
+      const record = normalize(raw, sourceId, requireType, { discovered: discoveredRules })
       if (record !== null) records.push(record)
     }
   }
@@ -199,20 +216,84 @@ export async function runIngest({
     log(`  rejected by reason: ${JSON.stringify(admissionStats.byReason)}`)
   }
 
+  // ------------------------------------------------- category discovery
+  // Runs over the emitted set, so a category is created for plugins the market
+  // actually shows. Whatever it creates is applied to this run immediately — a
+  // category that only takes effect next run would leave the sidebar and the
+  // catalog disagreeing for an hour.
+  const updated = new Date().toISOString()
+  const categoryRun = { created: [], revived: [], retired: [], updated: [], proposals: [] }
+  if (categoryOptions.discover !== false) {
+    categoryRun.proposals = discoverCategories(admitted, {
+      ...CATEGORY_OPTIONS,
+      ...categoryOptions,
+      knownCategoryIds: CATEGORIES.map((c) => c.id),
+    })
+    const merged = mergeDiscovered(categoryState, categoryRun.proposals, {
+      now: updated,
+      options: { ...CATEGORY_OPTIONS, ...categoryOptions },
+      labels: categoryLabels,
+      // Retirement is decided from THIS catalog, not from the count stored last
+      // run: a category can stop qualifying because its term became a stopword or
+      // because curation started covering it, and in both cases the stored count
+      // is stale by definition.
+      membersOf: (term) => {
+        const pattern = termPattern(term)
+        return admitted.filter((p) => pattern.test(`${p.name} ${p.description?.en ?? ''} ${p.description?.zh ?? ''} ${(p.topics ?? []).join(' ')}`)).length
+      },
+    })
+    categoryState = merged.state
+    categoryRun.created = merged.created
+    categoryRun.revived = merged.revived
+    categoryRun.retired = merged.retired
+    categoryRun.updated = merged.updated
+    saveState(categoriesPath, categoryState)
+    discoveredRules = rulesFor(categoryState)
+    log(`categories: ${categoryRun.proposals.length} proposal(s), ${categoryRun.created.length} created, ${categoryRun.revived.length} revived, ${categoryRun.retired.length} retired`)
+    if (categoryRun.created.length > 0) log(`  created: ${categoryRun.created.join(', ')}`)
+
+    // Re-place what the new buckets claim. Only entries still in `other` are
+    // revisited: a plugin the curated rules placed is not re-litigated by an
+    // emergent rule, which keeps curation authoritative.
+    if (categoryRun.created.length > 0 || categoryRun.revived.length > 0) {
+      let moved = 0
+      for (const plugin of admitted) {
+        if (plugin.category !== 'other') continue
+        const again = classify({
+          rawCategory: plugin.rawCategory,
+          name: plugin.name,
+          description: plugin.description,
+          topics: plugin.topics ?? [],
+          discovered: discoveredRules,
+        })
+        if (again.category !== 'other') {
+          plugin.category = again.category
+          plugin.categorySource = 'discovered'
+          moved += 1
+        }
+      }
+      if (moved > 0) log(`  re-placed ${moved} leftover plugin(s) into discovered categories`)
+    }
+  }
+
   // ------------------------------------------------------------- rank/emit
   const plugins = admitted.sort(byRank)
-  const updated = new Date().toISOString()
   const byKind = plugins.reduce((acc, p) => { acc[p.targetKind] = (acc[p.targetKind] ?? 0) + 1; return acc }, {})
   const multiSource = plugins.filter((p) => p.sources.length > 1).length
   const duplicatesCollapsed = records.length - classes.size
   /**
-   * Category statistics, counted over the FINAL set and in taxonomy order: a count
-   * taken before admission would advertise plugins the market does not show, and a
-   * dictionary ordered by frequency would reshuffle itself on every run.
+   * Category statistics, counted over the FINAL set, in taxonomy order, with the
+   * discovered buckets before `other`: a count taken before admission would
+   * advertise plugins the market does not show, and a dictionary ordered by
+   * frequency would reshuffle itself on every run.
    */
-  const inTaxonomy = categoryCounts(plugins)
+  const discoveredDictionary = dictionaryFor(categoryState)
+  const inTaxonomy = categoryCounts(plugins, Object.entries(discoveredDictionary).map(([id, meta]) => ({ id, en: meta.en, zh: meta.zh })))
   const categories = Object.fromEntries(
-    inTaxonomy.filter((c) => c.count > 0).map(({ id, en, zh, count }) => [id, { en, zh, count }]),
+    inTaxonomy.filter((c) => c.count > 0).map(({ id, en, zh, count }) => {
+      const auto = discoveredDictionary[id]
+      return [id, auto === undefined ? { en, zh, count } : { en, zh, count, auto: true }]
+    }),
   )
   const byCategory = Object.fromEntries(inTaxonomy.filter((c) => c.count > 0).map((c) => [c.id, c.count]))
   /** How each placement happened, so "自动归类" is measurable rather than claimed. */
@@ -232,6 +313,19 @@ export async function runIngest({
     // because it is what a reader would otherwise have to browse by hand.
     unclassified: plugins.filter((p) => p.category === 'other').length,
     bySource: byCategorySource,
+    /**
+     * What discovery did this run. `created: []` over many runs is the mechanism
+     * working, not failing: the thresholds are set so a category is created only
+     * when the evidence is a real cluster, and the leftovers are one-offs.
+     */
+    discovery: {
+      thresholds: { ...CATEGORY_OPTIONS, ...categoryOptions, knownCategoryIds: undefined },
+      proposals: categoryRun.proposals.map((p) => ({ term: p.term, members: p.members, channel: p.channel, share: p.share })),
+      created: categoryRun.created,
+      revived: categoryRun.revived,
+      retired: categoryRun.retired,
+      active: Object.keys(discoveredDictionary).length,
+    },
   }
 
   const stats = {
