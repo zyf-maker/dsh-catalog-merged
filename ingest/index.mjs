@@ -76,8 +76,9 @@ export async function runIngest({
   }
 
   // ------------------------------------------------------ identity folding
-  // Over the whole corpus at once, because the evidence that two keys denote one
-  // plugin is a record carrying both — and that record may come from any source.
+  // Over the whole corpus at once, because the evidence that a repository and
+  // an npm package denote one plugin is a record carrying both — and whether
+  // that evidence is usable depends on how many packages claim the repository.
   const identity = buildIdentityIndex(records)
   /** @type {Map<string, {id: string, winner: object, sources: Set<string>, members: object[]}>} */
   const classes = new Map()
@@ -132,18 +133,30 @@ export async function runIngest({
   // The same read also answers the compatibility question, so one probe serves
   // admission and repair planning instead of two network passes.
   let admitted = merged
-  const admissionStats = { checked: 0, admitted: 0, rejected: 0, unproven: 0, repaired: 0, cached: 0, byReason: {} }
+  const admissionStats = { checked: 0, admitted: 0, rejected: 0, unproven: 0, repaired: 0, cached: 0, expired: 0, byReason: {} }
+  /**
+   * The cache key for one plugin's admission verdict.
+   *
+   * `added` doubles as the revision: for GitHub topics it is the last push date,
+   * so a changed repository gets a different key and is re-asked at once. An
+   * entry with no revision keeps a constant key and is re-asked once the verdict
+   * expires (see VERDICT_MAX_AGE_MS).
+   *
+   * Defined once and used for both the write and the read: two copies of this
+   * expression is how a lookup silently stops matching its own writes.
+   */
+  const admissionKeyOf = (plugin) => `${plugin.repoPath}@${plugin.added === '' ? 'unversioned' : plugin.added}`
   if (admission) {
     const candidates = merged.filter((p) => p.needsEvidence && p.repoPath !== null)
     const cache = new AdmissionCache(join(out, 'admission-cache.json'))
     const verdicts = await verifyAll(
-      candidates.map((p) => ({ repoPath: p.repoPath, subpath: p.repoSubpath, cacheKey: `${p.repoPath}@${p.added}` })),
+      candidates.map((p) => ({ repoPath: p.repoPath, subpath: p.repoSubpath, cacheKey: admissionKeyOf(p) })),
       { cache, token, log, fetchImpl },
     )
     admitted = []
     for (const plugin of merged) {
       if (!plugin.needsEvidence || plugin.repoPath === null) { admitted.push(plugin); continue }
-      const verdict = verdicts.get(`${plugin.repoPath}@${plugin.added}`)
+      const verdict = verdicts.get(admissionKeyOf(plugin))
       admissionStats.checked += 1
       if (verdict?.ok === true) {
         plugin.installable = true
@@ -176,9 +189,10 @@ export async function runIngest({
     // Verdicts for repositories that errored are not cached, so the next run
     // asks again instead of remembering a network failure as a fact.
     cache.save(candidates
-      .filter((p) => verdicts.get(`${p.repoPath}@${p.added}`)?.reason !== 'probe-error')
-      .map((p) => `${p.repoPath}@${p.added}`))
+      .filter((p) => verdicts.get(admissionKeyOf(p))?.reason !== 'probe-error')
+      .map(admissionKeyOf))
     admissionStats.cached = cache.stats.hits
+    admissionStats.expired = cache.stats.expired
     log(`admission: ${admissionStats.checked} inferred targets checked, ${admissionStats.admitted} admitted, ${admissionStats.rejected} rejected, ${admissionStats.unproven} unproven (kept), ${admissionStats.repaired} repaired`)
     log(`  rejected by reason: ${JSON.stringify(admissionStats.byReason)}`)
   }
@@ -197,6 +211,10 @@ export async function runIngest({
     identityClasses: classes.size,
     duplicatesCollapsed,
     targetlessClasses: targetless,
+    // Repositories whose links were refused because more than one package claims
+    // them. Reported because it is the number that decides whether the merge is
+    // collapsing siblings (a low count) or being correctly conservative.
+    ambiguousRepos: identity.ambiguousRepos,
     rawEntries: rawTotal,
     sources: sourceHealth.length,
     multiSource,
@@ -273,7 +291,7 @@ export async function runIngest({
   write(previousPath, plugins.map((p) => p.id))
 
   log(`merged ${plugins.length} plugins from ${rawTotal} raw entries across ${sourceHealth.length} sources`)
-  log(`  identity: ${records.length} records -> ${classes.size} classes (${duplicatesCollapsed} duplicates collapsed, ${targetless} classes had no install target)`)
+  log(`  identity: ${records.length} records -> ${classes.size} classes (${duplicatesCollapsed} duplicates collapsed, ${targetless} without an install target, ${identity.ambiguousRepos} ambiguous repos left unlinked)`)
   log(`  target kinds: ${Object.entries(byKind).map(([k, v]) => `${k}=${v}`).join(' ')}`)
   log(`  multi-source: ${multiSource}`)
   log(`  wrote ${out}/{catalog,plugins,sources,rankings,health}.json in ${Date.now() - started}ms`)
