@@ -39,15 +39,29 @@ jobs:
 
       - name: Load the queryable database
         run: |
+          # `sqlite3` is not on the runner image, and the previous step hid that
+          # behind `2>/dev/null || true` — so the shell still created an empty
+          # market.db through its own redirect and the run committed a 0-byte
+          # database as if it had succeeded. Install it, and let a real failure
+          # fail the job.
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq sqlite3
           node ingest/load-sqlite.mjs --db data/market.sql --apply
-          sqlite3 data/market.db < data/market.sql 2>/dev/null || true
-          sqlite3 data/market.db 'SELECT COUNT(*) FROM plugins;' 2>/dev/null || true
+          rm -f data/market.db
+          sqlite3 data/market.db < data/market.sql
+          size=$(stat -c%s data/market.db)
+          plugins=$(sqlite3 data/market.db 'SELECT COUNT(*) FROM plugins;')
+          echo "market.db: ${size} bytes, ${plugins} plugins"
+          test "$size" -gt 0
+          test "$plugins" -gt 0
 
       - name: Report
         run: |
           node -e "
             const c = require('./data/catalog.json');
             console.log('plugins', c.count, '| updated', c.updated);
+            console.log('identity:', c.stats.normalized, 'records ->', c.stats.identityClasses, 'classes (', c.stats.duplicatesCollapsed, 'duplicates collapsed )');
+            console.log('admission:', JSON.stringify(c.stats.admission));
             console.log('kinds', JSON.stringify(c.stats.byTargetKind));
             console.log('top5', c.plugins.slice(0,5).map(p => p.name + '(' + p.score + ')').join(', '));
           "
