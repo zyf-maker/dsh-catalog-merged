@@ -25,6 +25,20 @@ test('the taxonomy is a closed set with bilingual labels', () => {
   assert.equal(new Set(CATEGORIES.map((c) => c.id)).size, CATEGORIES.length, 'ids are unique')
 })
 
+test('English labels stay short enough for the navigation column', () => {
+  // The index column is 168-240px. `Market & plugin management` was 26 characters
+  // and does not fit, and a wrapped or ellipsised category name loses the meaning it
+  // exists to carry — so the English labels are one word each.
+  for (const entry of CATEGORIES) {
+    assert.ok(entry.en.length <= 14, `"${entry.en}" (${entry.en.length} chars) is too long for the index`)
+    assert.equal(/\s/.test(entry.en), false, `"${entry.en}" should be a single word`)
+  }
+  // Chinese labels were already short; keep them that way.
+  for (const entry of CATEGORIES) {
+    assert.ok(entry.zh.length <= 8, `"${entry.zh}" is too long for the index`)
+  }
+})
+
 test('a generic raw category never decides on its own', () => {
   for (const generic of ['cordis-plugin', '插件', 'uncategorized', 'plugin']) {
     assert.ok(GENERIC_CATEGORIES.has(generic), `${generic} must be treated as a non-answer`)
