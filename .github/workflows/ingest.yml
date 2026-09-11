@@ -63,7 +63,19 @@ jobs:
           git add data plugins.json
           if git diff --cached --quiet; then
             echo 'no change'
-          else
-            git commit -m "chore(data): refresh catalog ($(node -p "require('./data/catalog.json').count") plugins)"
-            git push
+            exit 0
           fi
+          git commit -m "chore(data): refresh catalog ($(node -p "require('./data/catalog.json').count") plugins)"
+          # The data commit races every other writer to main (a person pushing,
+          # a second scheduled run): rebase and retry rather than losing the
+          # whole harvest to a non-fast-forward rejection.
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "pushed on attempt $attempt"
+              exit 0
+            fi
+            git pull --rebase --autostash origin main || true
+            sleep $((attempt * 3))
+          done
+          echo 'could not push the refreshed catalog after 5 attempts' >&2
+          exit 1
