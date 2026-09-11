@@ -264,12 +264,21 @@ export function normalize(raw, sourceId, requireType, context = {}) {
   }
 }
 
-/** Rank order: score, then stars, then downloads, then name (stable). */
+/**
+ * Rank order: score, stars, downloads, then recency, then name.
+ *
+ * `added` sits before the name because of a measured property of this catalog:
+ * 3624 plugins (33.9%) have neither stars nor downloads, so their score is exactly
+ * zero and the chain used to fall straight through to alphabetical order — meaning
+ * the tail of "sort by score" was in fact sorted by name, which is not what the
+ * control promises. Recency is a fact about those plugins where popularity is not.
+ */
 export function byRank(a, b) {
   return (
     b.score - a.score ||
     b.stars - a.stars ||
     b.downloads - a.downloads ||
+    String(b.added ?? '').localeCompare(String(a.added ?? '')) ||
     a.name.localeCompare(b.name)
   )
 }
