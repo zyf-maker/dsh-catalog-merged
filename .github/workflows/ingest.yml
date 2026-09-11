@@ -1,12 +1,23 @@
 name: ingest
 
-# The market's clock. Two cadences because the two channels move at different
-# speeds: raw discovery finds brand-new repositories within the hour, while the
-# curated catalogs only change when a maintainer merges a PR.
+# How often the market re-reads the world, and why six hours.
+#
+# The cadence is set by the fastest upstream, not by taste: the quickest source
+# (Oh-My-DSH's topic scrape) refreshes every 4 hours, the curated catalogs change
+# about daily, and the 1024 Store snapshot is served from a 15-minute KV cache of
+# data a maintainer job writes out of band. Polling faster than 4 hours would
+# re-read files that cannot have changed; polling daily would leave the fastest
+# source up to a day stale and make "new plugins" announcements arrive in
+# batches. Six hours is the smallest interval that never lags any source
+# materially, and it costs four runs a day (~90s each).
+#
+# Work that must NOT happen this often is bounded in code instead of by a second
+# cron: admission probes are cached by repository revision, and a verdict expires
+# after seven days so a repository that fixes its manifest is picked up without
+# anyone clearing anything.
 on:
   schedule:
-    - cron: '17 * * * *'      # hourly: discovery + harvest + merge
-    - cron: '7 */6 * * *'     # every 6h: deeper re-check of catalog sources
+    - cron: '17 */6 * * *'
   workflow_dispatch:
   push:
     branches: [ main ]
