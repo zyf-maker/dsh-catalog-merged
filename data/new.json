@@ -1,108 +1,210 @@
 {
-  "updated": "2026-09-11T09:29:34.817Z",
-  "count": 6,
+  "updated": "2026-09-11T14:33:21.312Z",
+  "count": 12,
   "plugins": [
     {
       "rank": 1,
-      "id": "npm:@memtensor/memos-local-plugin",
-      "name": "memos-local-plugin",
-      "owner": "MemTensor",
-      "url": "https://github.com/MemTensor/MemOS",
-      "category": "memory",
+      "id": "npm:@struktoai/mirage-dsh",
+      "name": "mirage-dsh",
+      "owner": "strukto-ai",
+      "url": "https://github.com/strukto-ai/mirage",
+      "category": "security",
       "description": {
-        "en": "Provides persistent, evolving memory for AI agents with hybrid retrieval and cross-task skill reuse, cutting token usage significantly.",
-        "zh": "为AI代理提供持久化、自进化的记忆系统，支持混合检索与跨任务技能复用，显著节省令牌开销。"
+        "en": "Swap DSH's fs/shell providers for a mirage virtual workspace: file tools and shell commands act on mounted resources (RAM, disk, S3, Redis, Postgres, Slack, Gmail, Notion) instead of the host disk.",
+        "zh": "把 DSH 的 fs/shell 提供者换成 mirage 虚拟工作区：文件工具与 shell 命令作用于挂载的资源（RAM/磁盘/S3/Redis/Postgres/Slack/Gmail/Notion）而非宿主磁盘。"
       },
-      "install": "dsh plugin --profile web add @memtensor/memos-local-plugin",
+      "install": "dsh plugin add @struktoai/mirage-dsh",
       "targetKind": "npm",
-      "stars": 11283,
-      "downloads": 799,
-      "score": 11283799
+      "stars": 3623,
+      "downloads": 0,
+      "score": 3623000
     },
     {
       "rank": 2,
-      "id": "npm:@zilliz/memsearch-dsh",
-      "name": "memsearch-dsh",
-      "owner": "zilliztech",
-      "url": "https://github.com/zilliztech/memsearch",
-      "category": "memory",
+      "id": "npm:open-managed-agents",
+      "name": "open-managed-agents",
+      "owner": "openma-ai",
+      "url": "https://github.com/openma-ai/open-managed-agents",
+      "category": "tools",
       "description": {
-        "en": "Shared Markdown memory for DSH and other coding agents, with automatic capture, pre-step context injection, searchable recall, and a review panel.",
-        "zh": "供 DSH 与其他编程 Agent 共享的 Markdown 记忆，支持自动捕获、步骤前上下文注入、搜索召回与审阅面板。"
+        "en": "Self-hosted Claude Managed Agents API platform (Cloudflare Workers)",
+        "zh": "Claude Managed Agents API 的开源自托管平台（Cloudflare Workers）"
       },
-      "install": "dsh plugin --profile web add @zilliz/memsearch-dsh",
+      "install": "dsh plugin add open-managed-agents",
       "targetKind": "npm",
-      "stars": 2589,
-      "downloads": 166,
-      "score": 2589166
+      "stars": 272,
+      "downloads": 0,
+      "score": 272000
     },
     {
       "rank": 3,
-      "id": "npm:@cloudbase/dsh-plugin",
-      "name": "dsh-plugin",
-      "owner": "TencentCloudBase",
-      "url": "https://github.com/TencentCloudBase/CloudBase-AI-Toolkit",
-      "category": "tools",
+      "id": "repo:axelfreeman/marketing-mindset",
+      "name": "marketing-mindset",
+      "owner": "axelfreeman",
+      "url": "https://github.com/axelfreeman/marketing-mindset",
+      "category": "agent",
       "description": {
-        "en": "Provides CloudBase backend services including database, authentication, and function execution for AI agents.",
-        "zh": "为AI代理提供云开发后端服务，涵盖数据库、认证和函数执行。"
+        "en": "The marketing OS for AI agents — think like a marketer first, get tactics as the output.",
+        "zh": ""
       },
-      "install": "dsh plugin --profile web add @cloudbase/dsh-plugin",
-      "targetKind": "npm",
-      "stars": 1103,
-      "downloads": 323,
-      "score": 1103323
+      "install": "dsh plugin add github:axelfreeman/marketing-mindset",
+      "targetKind": "github",
+      "stars": 34,
+      "downloads": 0,
+      "score": 34000
     },
     {
       "rank": 4,
-      "id": "npm:dsh-thoughtdag",
-      "name": "dsh-thoughtdag",
-      "owner": "chenxiachan",
-      "url": "https://github.com/chenxiachan/thoughtdag",
-      "category": "tools",
+      "id": "repo:justgenius-s/dsh-desktop",
+      "name": "DSH-Desktop",
+      "owner": "JustGenius-s",
+      "url": "https://github.com/JustGenius-s/DSH-Desktop",
+      "category": "dev",
       "description": {
-        "en": "Adds an editable context canvas to the DeepSeek Harness web UI. Open local agent sessions as graphs, connect selected material to a question, and run canvas questions with the harness's models or agent. Includes local conversation lookup tools.",
-        "zh": "在 DeepSeek Harness Web 界面中加入可编辑的上下文画布。将本地 Agent 会话打开为图，把选定材料连入问题，并使用 Harness 的模型或 Agent 在画布上提问。附带本地会话检索工具。"
+        "en": "DSH-Desktop",
+        "zh": "DSH-Desktop"
       },
-      "install": "dsh plugin --profile web add dsh-thoughtdag",
-      "targetKind": "npm",
-      "stars": 426,
-      "downloads": 578,
-      "score": 426578
+      "install": "dsh plugin --profile web add github:JustGenius-s/DSH-Desktop",
+      "targetKind": "github",
+      "stars": 21,
+      "downloads": 0,
+      "score": 21000
     },
     {
       "rank": 5,
-      "id": "npm:dsh-access-gate",
-      "name": "dsh-access-gate",
-      "owner": "bamboostrip",
-      "url": "https://github.com/bamboostrip/dsh-access-gate",
-      "category": "cordis-plugin",
+      "id": "repo:sz1698/dsh-bg-new",
+      "name": "dsh-bg-new",
+      "owner": "sz1698",
+      "url": "https://github.com/sz1698/dsh-bg-new",
+      "category": "theme",
       "description": {
-        "en": "DSH plugin: password gate for remote (non-loopback) /api access (passwordless by default), unblock the loopback-pinned privileged endpoints, restore everything on uninstall, and give the local 127.0.0.1 user the native OS folder picker for workspace selec",
-        "zh": "为 DeepSeek Harness 提供远程访问认证门禁，保护你的服务不被未授权使用。"
+        "en": "DSH 网页界面换背景：侧栏「壁纸」按钮弹出右侧抽屉，支持系统预设/纯色/渐变/图片/视频，滚轮+拖动小图同时管缩放与定位，毛玻璃质感，本地媒体伺服不走云端。DSH web background & wallpaper plugin with drawer UI, glassmorphism and local media serving.",
+        "zh": "untranslated"
       },
-      "install": "dsh plugin add github:bamboostrip/dsh-access-gate",
+      "install": "dsh plugin add github:sz1698/dsh-bg-new",
       "targetKind": "github",
-      "stars": 2,
+      "stars": 19,
       "downloads": 0,
-      "score": 2000
+      "score": 19000
     },
     {
       "rank": 6,
-      "id": "npm:@dsh-agent-toolkit/token-usage",
-      "name": "@dsh-agent-toolkit/token-usage",
-      "owner": "esonxie",
-      "url": "git+https://github.com/EsonXie/dsh-agent-toolkit.git",
-      "category": "插件",
+      "id": "repo:cofy-x/dsh-cron",
+      "name": "dsh-cron",
+      "owner": "cofy-x",
+      "url": "https://github.com/cofy-x/dsh-cron",
+      "category": "agent",
       "description": {
-        "en": "DeepSeek Harness plugin: per-day token usage statistics — 13-week heatmap, stacked daily chart, /token-usage command",
-        "zh": "把五个Agent生产力功能打包成一个插件，装好就能用，省心省力。"
+        "en": "Scheduled tasks (cron) for DeepSeek Harness: model- and human-callable scheduling that fires followup/inject into agent sessions",
+        "zh": ""
       },
-      "install": "dsh plugin --profile web add @dsh-agent-toolkit/token-usage",
+      "install": "dsh plugin add github:cofy-x/dsh-cron",
+      "targetKind": "github",
+      "stars": 4,
+      "downloads": 0,
+      "score": 4000
+    },
+    {
+      "rank": 7,
+      "id": "repo:howardzhangdqs/dsh-recap",
+      "name": "dsh-recap",
+      "owner": "Howardzhangdqs",
+      "url": "https://github.com/Howardzhangdqs/dsh-recap",
+      "category": "agent",
+      "description": {
+        "en": "DSH recap plugin: distills every model request (turn:step) into one sentence, rendered inline in the conversation flow",
+        "zh": ""
+      },
+      "install": "dsh plugin add github:Howardzhangdqs/dsh-recap",
+      "targetKind": "github",
+      "stars": 3,
+      "downloads": 0,
+      "score": 3000
+    },
+    {
+      "rank": 8,
+      "id": "npm:@rooode/dsh-suite",
+      "name": "@rooode/dsh-suite",
+      "owner": "rooode",
+      "url": "https://www.npmjs.com/package/@rooode/dsh-suite",
+      "category": "dev",
+      "description": {
+        "en": "DeepSeek Harness 一键全功能增强套件 (自动化调度 + WebStorm Git 提交对比 + 代码文档多标签预览 + 对话快捷栏)",
+        "zh": ""
+      },
+      "install": "dsh plugin --profile web add @rooode/dsh-suite",
       "targetKind": "npm",
       "stars": 0,
-      "downloads": 921,
-      "score": 921
+      "downloads": 2633,
+      "score": 2633
+    },
+    {
+      "rank": 9,
+      "id": "npm:@cueai/dsh-omni-reader",
+      "name": "@cueai/dsh-omni-reader",
+      "owner": "huhoo",
+      "url": "https://www.npmjs.com/package/@cueai/dsh-omni-reader",
+      "category": "security",
+      "description": {
+        "en": "DSH bundle: registers the audited Cue Omni Reader MCP server so its tools surface as mcp__omni__* in any DeepSeek Harness profile.",
+        "zh": ""
+      },
+      "install": "dsh plugin --profile web add @cueai/dsh-omni-reader",
+      "targetKind": "npm",
+      "stars": 0,
+      "downloads": 999,
+      "score": 999
+    },
+    {
+      "rank": 10,
+      "id": "npm:dsh-plugin-moments",
+      "name": "dsh-plugin-moments",
+      "owner": "weihea8",
+      "url": "git+https://github.com/yunyunyunyunsuan/dsh-plugin-moments.git",
+      "category": "fun",
+      "description": {
+        "en": "AI 的朋友圈 —— DeepSeek 蓝色大肥鱼每天根据真实任务自动发朋友圈的 DSH 插件：LLM 生成文案（严格基于事实清单）、真实终端/代码九宫格、表情包自拍、仿微信 UI、可点赞评论，AI 会用人设回你。",
+        "zh": ""
+      },
+      "install": "dsh plugin --profile web add dsh-plugin-moments",
+      "targetKind": "npm",
+      "stars": 0,
+      "downloads": 897,
+      "score": 897
+    },
+    {
+      "rank": 11,
+      "id": "npm:@cueai/dsh-omni-reader-guard",
+      "name": "@cueai/dsh-omni-reader-guard",
+      "owner": "huhoo",
+      "url": "https://www.npmjs.com/package/@cueai/dsh-omni-reader-guard",
+      "category": "tools",
+      "description": {
+        "en": "DSH bundle: a tools/pre-execute guard that blocks SSRF (private/loopback/link-local/metadata) and enforces an allow-list or explicit consent for the Cue Omni Reader parse tool.",
+        "zh": ""
+      },
+      "install": "dsh plugin --profile web add @cueai/dsh-omni-reader-guard",
+      "targetKind": "npm",
+      "stars": 0,
+      "downloads": 825,
+      "score": 825
+    },
+    {
+      "rank": 12,
+      "id": "repo:esonxie/dsh-agent-toolkit",
+      "name": "dsh-agent-toolkit",
+      "owner": "EsonXie",
+      "url": "https://github.com/EsonXie/dsh-agent-toolkit",
+      "category": "agent",
+      "description": {
+        "en": "Deepseek Harness工具集",
+        "zh": "把五个Agent生产力功能打包成一个插件，装好就能用，省心省力。"
+      },
+      "install": "dsh plugin --profile web add github:EsonXie/dsh-agent-toolkit",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
     }
   ]
 }
