@@ -1,23 +1,193 @@
 {
-  "updated": "2026-09-11T16:28:27.368Z",
-  "count": 1,
+  "updated": "2026-09-11T20:59:00.948Z",
+  "count": 11,
   "plugins": [
     {
       "rank": 1,
-      "id": "npm:dsh-browser-playwright",
-      "name": "dsh-browser-playwright",
-      "owner": "chenyuheee",
-      "url": "https://www.npmjs.com/package/dsh-browser-playwright",
-      "category": "vision",
+      "id": "repo:yunado/dsh-qwen38-local-qol",
+      "name": "dsh-qwen38-local-qol",
+      "owner": "Yunado",
+      "url": "https://github.com/Yunado/dsh-qwen38-local-qol",
+      "category": "agent",
       "description": {
-        "en": "Playwright-powered browser capability for DeepSeek Harness: accessibility-snapshot interaction with stable element refs, session-scoped browser sessions, screenshots as attachments.",
+        "en": "DeepSeek Harness QoL plugin for the local Qwen3.8 line (27B/Flash-Next): per-request thinking budgets, a compaction backend that stops burning the output cap on thinking, and a settings tab. 本地 Qwen3.8 线的 DSH QoL 插件：逐请求 thinking 预算、不再把输出帽烧在 thinking 上的压缩后端、设置 tab。",
         "zh": ""
       },
-      "install": "dsh plugin --profile web add dsh-browser-playwright",
+      "install": "dsh plugin add github:Yunado/dsh-qwen38-local-qol",
+      "targetKind": "github",
+      "stars": 4,
+      "downloads": 0,
+      "score": 4000
+    },
+    {
+      "rank": 2,
+      "id": "repo:zzjzzb/ai-memory",
+      "name": "ai-memory",
+      "owner": "zzjzzb",
+      "url": "https://github.com/zzjzzb/ai-memory",
+      "category": "ui",
+      "description": {
+        "en": "Personal AI memory semantic layer SDK (Rust + SQLite) — short/mid/long-term memory with hybrid recall",
+        "zh": ""
+      },
+      "install": "dsh plugin add github:zzjzzb/ai-memory",
+      "targetKind": "github",
+      "stars": 3,
+      "downloads": 0,
+      "score": 3000
+    },
+    {
+      "rank": 3,
+      "id": "npm:@jw-king/dsh-plugin-zentao",
+      "name": "@jw-king/dsh-plugin-zentao",
+      "owner": "jw-king",
+      "url": "https://gitee.com/jw-king/dsh-plugin-zentao.git",
+      "category": "tools",
+      "description": {
+        "en": "DeepSeek Harness bundle plugin that connects ZenTao PMS (禅道) REST API v1 as model tools: products, projects, stories, tasks, bugs and more.",
+        "zh": ""
+      },
+      "install": "dsh plugin --profile web add @jw-king/dsh-plugin-zentao",
       "targetKind": "npm",
       "stars": 0,
-      "downloads": 1193,
-      "score": 1193
+      "downloads": 1944,
+      "score": 1944
+    },
+    {
+      "rank": 4,
+      "id": "repo:fitbbc/dsh-plugin-tokenmarket",
+      "name": "dsh-plugin-tokenmarket",
+      "owner": "FitBBC",
+      "url": "https://github.com/FitBBC/dsh-plugin-tokenmarket",
+      "category": "model",
+      "description": {
+        "en": "Adds Token Market as an OpenAI-compatible model provider with DeepSeek V4 Pro, Kimi K3, and GLM-5.3.",
+        "zh": "将 Token Market 添加为 OpenAI 兼容模型供应商，并提供 DeepSeek V4 Pro、Kimi K3 和 GLM-5.3。"
+      },
+      "install": "dsh plugin --profile web add github:FitBBC/dsh-plugin-tokenmarket",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 5,
+      "id": "repo:drscrewdriver/dsh-date-wrapper",
+      "name": "dsh-date-wrapper",
+      "owner": "drscrewdriver",
+      "url": "https://github.com/drscrewdriver/dsh-date-wrapper",
+      "category": "session",
+      "description": {
+        "en": "Compresses DSH time-context from ~280 chars to 46 chars by injecting a compact date line into the runtime-context snapshot; zero runtime dependencies.",
+        "zh": "将 DSH 时间上下文从约 280 字符压缩到 46 字符，向运行期快照注入紧凑日期行，无运行时依赖。"
+      },
+      "install": "dsh plugin --profile web add github:drscrewdriver/dsh-date-wrapper",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 6,
+      "id": "repo:huangfuren/dsh-localsend",
+      "name": "dsh-localsend",
+      "owner": "huangfuren",
+      "url": "https://github.com/huangfuren/dsh-localsend",
+      "category": "tools",
+      "description": {
+        "en": "Send files or folders over the local network via the LocalSend v2 protocol, or generate a temporary browser download link that the receiver opens with no software installed.",
+        "zh": "在 DSH 对话中通过 LocalSend v2 协议把文件/文件夹发到局域网内其它机器，或生成一次性浏览器下载链接（接收方无需安装任何软件）。零配置开箱即用，兼容 dsh 0.1.1-rc.2 与 0.1.3-alpha.1。"
+      },
+      "install": "dsh plugin --profile web add github:huangfuren/dsh-localsend",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 7,
+      "id": "repo:drscrewdriver/dsh-perm-gate",
+      "name": "dsh-perm-gate",
+      "owner": "drscrewdriver",
+      "url": "https://github.com/drscrewdriver/dsh-perm-gate",
+      "category": "security",
+      "description": {
+        "en": "P0–P4 deterministic-first permission gate with permissive tier, learning sedimentation and approval-history UI; hard-deny credentials and protected paths, auto-allow internal read-only tools.",
+        "zh": "P0–P4 确定性优先权限门控，含 Permissive 档位、学习沉淀与审批历史 UI；凭据/受保护路径硬拒绝，内部只读工具自动放行。"
+      },
+      "install": "dsh plugin --profile web add github:drscrewdriver/dsh-perm-gate",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 8,
+      "id": "repo:flandern1211/dsh-task-time",
+      "name": "dsh-task-time",
+      "owner": "Flandern1211",
+      "url": "https://github.com/Flandern1211/dsh-task-time",
+      "category": "notify",
+      "description": {
+        "en": "Session-based task time management and reminders for DeepSeek Harness: plan time per session, continuous countdown (model-only runtime), interval reminders with system toast and UI cards, decision alerts when the model needs user input, task board with session jumping, and persistent local records.",
+        "zh": "DeepSeek Harness 会话级任务用时管理与提醒：为每个会话设置计划用时，仅模型运行时连续计时，定时提醒（系统通知 + 界面提醒卡），需要你决策时红色常驻提醒，任务面板支持点击跳转会话，本地记录持久化。"
+      },
+      "install": "dsh plugin --profile web add github:Flandern1211/dsh-task-time",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 9,
+      "id": "repo:sodazheng/dsh-totp",
+      "name": "dsh-totp",
+      "owner": "SodaZheng",
+      "url": "https://github.com/SodaZheng/dsh-totp",
+      "category": "security",
+      "description": {
+        "en": "TOTP-only access control for personal DeepSeek Harness Web instances, with in-app QR enrollment, single-use recovery codes, live protection controls and lock-all revocation of page access.",
+        "zh": "面向个人 DeepSeek Harness Web 实例的纯 TOTP 访问验证，支持设置内扫码绑定、一次性恢复码、动态启停保护和撤销所有页面授权。"
+      },
+      "install": "dsh plugin --profile web add github:SodaZheng/dsh-totp",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 10,
+      "id": "repo:icstick/dsh-inject-scheduler",
+      "name": "dsh-inject-scheduler",
+      "owner": "Icstick",
+      "url": "https://github.com/Icstick/dsh-inject-scheduler",
+      "category": "memory",
+      "description": {
+        "en": "Injection scheduler for DeepSeek Harness injection planes: cross-plugin sections register/order/account on the official storageDomain, with conflict detection and per-session budget summaries (B10 panel data source).",
+        "zh": "DSH 注入调度器：跨插件注入段的注册/排序/记账落在官方 storageDomain，含冲突检测与每会话预算汇总（B10 面板数据源）。"
+      },
+      "install": "dsh plugin --profile web add github:Icstick/dsh-inject-scheduler",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 11,
+      "id": "repo:wwweljf/dsh-plugins",
+      "name": "dsh-plugins#dsh-ding-sound",
+      "owner": "wwweljf",
+      "url": "https://github.com/wwweljf/dsh-plugins/tree/master/plugins/dsh-ding-sound",
+      "category": "voice",
+      "description": {
+        "en": "Turn-end notification sound for DSH: built-in internet meme voices (ni gan ma ai yo, ji ni tai mei, shen ying ge, etc.), Settings panel with preview/switch/random, custom audio folder support.",
+        "zh": "DSH 对话结束提示音：内置网络热梗原声（你干嘛哎呦、鸡你太美、神鹰哥等），设置面板可试听/切换/随机，支持自定义音频目录。"
+      },
+      "install": "dsh plugin --profile web add github:wwweljf/dsh-plugins#path:/plugins/dsh-ding-sound",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
     }
   ]
 }
