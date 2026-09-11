@@ -88,11 +88,22 @@ jobs:
           node -e "
             const c = require('./data/catalog.json');
             console.log('plugins', c.count, '| updated', c.updated);
-            console.log('identity:', c.stats.normalized, 'records ->', c.stats.identityClasses, 'classes (', c.stats.duplicatesCollapsed, 'duplicates collapsed )');
+            console.log('identity:', c.stats.normalized, 'records ->', c.stats.identityClasses, 'classes (', c.stats.duplicatesCollapsed, 'duplicates collapsed,', c.stats.ambiguousRepos, 'ambiguous repos left unlinked )');
             console.log('admission:', JSON.stringify(c.stats.admission));
             console.log('kinds', JSON.stringify(c.stats.byTargetKind));
             console.log('top5', c.plugins.slice(0,5).map(p => p.name + '(' + p.score + ')').join(', '));
           "
+
+      - name: Verify the market will accept the catalog
+        # The published catalog was unusable once: 3895 entries carried an empty
+        # category and dshmarket refuses the whole file over one of them, so the
+        # market window said "插件目录加载失败 — catalog plugin 140 carries no usable
+        # category". The pipeline already asserts this before writing; this step
+        # applies the same check to the committed artifact, which is the thing
+        # consumers actually fetch.
+        run: |
+          node ingest/validate-catalog.mjs --catalog data/plugins.json
+          node ingest/validate-catalog.mjs --catalog plugins.json
 
       - name: Commit the refreshed catalog
         run: |
