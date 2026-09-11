@@ -1,0 +1,19 @@
+{
+  "name": "dsh-market-own",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DSH Market — an own plugin market for DeepSeek Harness: multi-source ingestion, scheduled discovery, ranking, compatibility repair.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "ingest": "node ingest/index.mjs",
+    "ingest:offline": "node ingest/index.mjs --no-discover",
+    "db": "node ingest/load-sqlite.mjs --db data/market.sql --apply",
+    "serve": "node scripts/serve.mjs",
+    "api:dev": "wrangler dev --config api/wrangler.toml",
+    "api:deploy": "wrangler deploy --config api/wrangler.toml",
+    "check": "node --check ingest/index.mjs && node --check web/app.js && node --check api/worker.js"
+  },
+  "engines": { "node": ">=22" },
+  "repository": { "type": "git", "url": "https://github.com/zyf-maker/dsh-catalog-merged" }
+}
