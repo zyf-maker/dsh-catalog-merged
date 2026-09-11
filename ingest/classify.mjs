@@ -184,20 +184,52 @@ const KEYWORDS = [
 ]
 
 /**
+ * What the built-in rules say about a bare piece of text, or null.
+ *
+ * Exported for category discovery: a token that the curated rules already match is
+ * not a missing category — it is a word the taxonomy handles — so discovery uses
+ * this to reject its own noise.
+ *
+ * @param text - a token or phrase.
+ * @returns `{ category, source }` or null.
+ */
+export function builtinMatch(text) {
+  const haystack = String(text ?? '').toLowerCase()
+  const alias = ALIASES[haystack]
+  if (alias !== undefined && !GENERIC_CATEGORIES.has(haystack)) return { category: alias, source: 'alias' }
+  for (const rule of KEYWORDS) {
+    for (const pattern of rule.patterns) {
+      if (pattern.test(haystack)) return { category: rule.id, source: alias === undefined ? 'keyword' : 'keyword-over-generic' }
+    }
+  }
+  if (alias !== undefined) return { category: alias, source: 'alias-fallback' }
+  return null
+}
+
+/** Whether the curated rules already place this text. */
+export function matchesBuiltin(text) {
+  return builtinMatch(text) !== null
+}
+
+/**
  * Classify one plugin.
  *
  * Order of authority:
  *   1. the raw category, when it names a subject the taxonomy knows and is not a
  *      generic word;
- *   2. the plugin's own text (name, description, topics), most specific rule first;
- *   3. the raw category even when generic, if no rule matched at all;
- *   4. `other`.
+ *   2. the plugin's own text, curated rules first, most specific first;
+ *   3. **discovered** rules, which is what makes the taxonomy extensible without a
+ *      code change — they run after curation because they exist precisely for what
+ *      curation missed;
+ *   4. the raw category even when generic, if no rule matched at all;
+ *   5. `other`.
  *
- * @param input - `rawCategory`, `name`, `description` (`{en, zh}`), `topics`.
- * @returns `{ category, source }` where `source` records which step decided it,
- *   so the pipeline can report how much of the catalog was auto-classified.
+ * @param input - `rawCategory`, `name`, `description` (`{en, zh}`), `topics`, and
+ *   `discovered` rules (`{id, patterns}`) from `ingest/categories.mjs`.
+ * @returns `{ category, source }`; `source` records which step decided it, so the
+ *   pipeline can report how much of the catalog was auto-classified.
  */
-export function classify({ rawCategory, name = '', description = {}, topics = [] }) {
+export function classify({ rawCategory, name = '', description = {}, topics = [], discovered = [] }) {
   const raw = String(rawCategory ?? '').trim().toLowerCase()
   const alias = ALIASES[raw]
   if (alias !== undefined && !GENERIC_CATEGORIES.has(raw)) return { category: alias, source: 'alias' }
@@ -216,23 +248,38 @@ export function classify({ rawCategory, name = '', description = {}, topics = []
     }
   }
 
+  for (const rule of discovered) {
+    for (const pattern of rule.patterns) {
+      if (pattern.test(haystack)) return { category: rule.id, source: 'discovered' }
+    }
+  }
+
   if (alias !== undefined) return { category: alias, source: 'alias-fallback' }
   if (CATEGORY_IDS.has(raw) && raw !== 'other') return { category: raw, source: 'raw' }
   return { category: 'other', source: 'unmatched' }
 }
 
 /**
- * Count plugins per canonical category, in taxonomy order.
+ * Count plugins per category, in taxonomy order with `other` last.
  *
  * @param plugins - records carrying a canonical `category`.
- * @returns `[{ id, en, zh, count }]` including empty buckets, because a filter
- *   that hides its own zeroes looks like a bug when a category disappears.
+ * @param extra - discovered categories (`{id, en, zh}`) to include as buckets.
+ * @returns `[{ id, en, zh, count }]` including empty buckets, because a filter that
+ *   hides its own zeroes looks like a bug when a category disappears.
  */
-export function categoryCounts(plugins) {
-  const counts = new Map(CATEGORIES.map((c) => [c.id, 0]))
+export function categoryCounts(plugins, extra = []) {
+  const known = new Set(CATEGORIES.map((c) => c.id))
+  const middle = CATEGORIES.filter((c) => c.id !== 'other')
+  const last = CATEGORIES.filter((c) => c.id === 'other')
+  // Discovered buckets sit before `other`, and a discovered id that collides with
+  // a taxonomy id is ignored rather than duplicated.
+  const extraBuckets = extra.filter((c) => c !== null && typeof c.id === 'string' && !known.has(c.id))
+  const buckets = [...middle, ...extraBuckets, ...last]
+
+  const counts = new Map(buckets.map((c) => [c.id, 0]))
   for (const plugin of plugins) {
-    const id = CATEGORY_IDS.has(plugin.category) ? plugin.category : 'other'
+    const id = counts.has(plugin.category) ? plugin.category : 'other'
     counts.set(id, (counts.get(id) ?? 0) + 1)
   }
-  return CATEGORIES.map((c) => ({ ...c, count: counts.get(c.id) ?? 0 }))
+  return buckets.map((c) => ({ id: c.id, en: c.en, zh: c.zh, count: counts.get(c.id) ?? 0 }))
 }
