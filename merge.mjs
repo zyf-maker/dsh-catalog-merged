@@ -21,9 +21,13 @@ const SOURCES = [
     pick: (r) => r.plugins,
   },
   {
-    name: 'Oh-My-DSH',
+    name: 'Oh-My.DSH',
     url: 'https://raw.githubusercontent.com/JohnXu22786/Oh-My-DSH/main/data/plugins.json',
     pick: (r) => r.items ?? (Array.isArray(r) ? r : null),
+    // Oh-My.DSH's raw catalog is the GitHub "dsh-plugin" topic scrape: it also
+    // holds the harness core repo and non-plugin "项目/渠道" entries. Only its
+    // own curated `type === '插件'` subset is a real plugin.
+    requireType: '插件',
   },
   {
     name: 'deepseek1024 (dsh-1024store)',
@@ -31,6 +35,15 @@ const SOURCES = [
     pick: (r) => (Array.isArray(r) ? r : r?.plugins ?? r?.items ?? r?.data),
   },
 ]
+
+/**
+ * A repo that is the platform itself rather than an installable plugin. A
+ * topic-based source can surface the harness core repo (185k★) and a plugin
+ * market must never let it rank above plugins.
+ */
+const DENY_REPO = /^deepseek-ai\/deepseek-harness$/i
+
+const ghRepoOf = (url) => { const m = /github\.com\/([^/]+\/[^/]+?)(?:\/|$).*/.exec(url || ''); return m ? m[1] : '' }
 
 const normalize = (e, src) => {
   const desc = (v) => {
@@ -40,13 +53,15 @@ const normalize = (e, src) => {
   }
   const s = e.stars ?? e.starsCount ?? 0
   const d = e.downloads ?? e.downloads30d ?? e.download ?? 0
-  const name = e.name ?? (e.repo ? String(e.repo).split('/').pop() : '')
-  const url = e.url ?? e.page ?? e.homepage ?? (e.repo ? `https://github.com/${e.repo}` : '')
+  const repo = e.full_name ?? e.repo
+  const name = e.name ?? (repo ? String(repo).split('/').pop() : '')
+  const url = e.url ?? e.page ?? e.homepage ?? (repo ? `https://github.com/${repo}` : '')
+  const owner = e.owner ?? (repo ? String(repo).split('/')[0] : '')
   const stars = Number.isFinite(s) ? s : 0
   const downloads = Number.isFinite(d) ? d : 0
   return {
     name: String(name ?? ''),
-    owner: e.owner ?? (e.repo ? String(e.repo).split('/')[0] : ''),
+    owner,
     url,
     category: e.category ?? e.cat ?? '',
     description: desc(e.description ?? e.desc ?? e.note),
@@ -85,8 +100,12 @@ for (const s of SOURCES) {
     let ok = 0
     for (const e of list) {
       if (!e || typeof e !== 'object') continue
+      // Repeat sources can be tagged as non-plidable (the harness core repo,
+      // "项目"/"渠道"); drop those here so the market stays a market.
+      if (s.requireType && String(e.type ?? e.kind ?? '').trim() !== s.requireType) continue
       const p = normalize(e, s.name)
       if (!p.name && !p.npm) continue
+      if (DENY_REPO.test(ghRepoOf(p.url))) continue
       const key = keyOf(p)
       if (!key) continue
       // Keep the newest/hottest duplicate: stars then downloads.
