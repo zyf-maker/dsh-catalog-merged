@@ -60,8 +60,12 @@ export function inspectManifest(manifest, { treePaths = null, hostVersion = null
     if (!ok) issues.push({ code: ISSUE.MISSING_CLIENT_PLATFORM, detail: `dsh.client.platform is ${JSON.stringify(platform ?? null)}` })
   }
   if (hostVersion !== null) {
+    // The lockstep family is the whole `@deepseek-ai` scope, not just the
+    // `@deepseek-ai/dsh-*` packages: `@deepseek-ai/cordis` and
+    // `@deepseek-ai/schemastery` are peers of every plugin in the ecosystem and
+    // were silently unchecked by the narrower pattern.
     for (const [peer, range] of Object.entries(manifest.peerDependencies ?? {})) {
-      if (!peer.startsWith('@deepseek-ai/dsh-')) continue
+      if (!peer.startsWith('@deepseek-ai/')) continue
       if (typeof range !== 'string' || range === '*') continue
       if (!satisfiesLoose(hostVersion, range)) {
         issues.push({ code: ISSUE.PEER_VERSION_MISMATCH, detail: `${peer}@${range} vs host ${hostVersion}` })
@@ -116,10 +120,16 @@ export function planRepair({ plugin, manifest, treePaths = null, hostVersion = n
   // The overlay depends on the real plugin through a range that always resolves:
   // an omitted range would make pnpm look for the overlay's own name upstream.
   dependencies[plugin.npm ?? plugin.name] = plugin.npm ? `>=${manifest.version ?? '0.0.0'}` : plugin.target
-  for (const issue of fixable.filter((i) => i.code === ISSUE.PEER_VERSION_MISMATCH)) {
-    const peer = issue.detail.split('@')[0]
-    dependencies[peer] = `^${hostVersion}`
-    notes.push(`pinned ${peer} to the running host (${hostVersion})`)
+  // Peers are re-derived from the manifest rather than parsed back out of the
+  // issue detail, because a scoped name (`@deepseek-ai/cordis@^4.0.1`) has two
+  // `@` characters and splitting on the first one yields an empty package name.
+  if (hostVersion !== null && fixable.some((i) => i.code === ISSUE.PEER_VERSION_MISMATCH)) {
+    for (const [peer, range] of Object.entries(manifest.peerDependencies ?? {})) {
+      if (!peer.startsWith('@deepseek-ai/')) continue
+      if (typeof range !== 'string' || range === '*' || satisfiesLoose(hostVersion, range)) continue
+      dependencies[peer] = `^${hostVersion}`
+      notes.push(`pinned ${peer} to the running host (${hostVersion})`)
+    }
   }
 
   const overlay = {
