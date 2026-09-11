@@ -22,6 +22,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { SEED_SOURCES, HARVEST_SOURCES, discoverSources } from './sources.mjs'
 import { harvesterFor } from './harvest.mjs'
 import { normalize, betterRecord, byRank, UNCATEGORIZED } from './normalize.mjs'
+import { CATEGORIES, GENERIC_CATEGORIES, categoryCounts } from './classify.mjs'
 import { buildIdentityIndex } from './identity.mjs'
 import { AdmissionCache, verifyAll } from './admission.mjs'
 import { planRepair } from './compat.mjs'
@@ -202,37 +203,36 @@ export async function runIngest({
   const plugins = admitted.sort(byRank)
   const updated = new Date().toISOString()
   const byKind = plugins.reduce((acc, p) => { acc[p.targetKind] = (acc[p.targetKind] ?? 0) + 1; return acc }, {})
-  const byCategory = plugins.reduce((acc, p) => { const c = p.category || 'uncategorized'; acc[c] = (acc[c] ?? 0) + 1; return acc }, {})
   const multiSource = plugins.filter((p) => p.sources.length > 1).length
   const duplicatesCollapsed = records.length - classes.size
   /**
-   * The catalog's category dictionary, in the market's shape: an id mapped to
-   * its labels. `uncategorized` is labelled rather than shown as a raw id,
-   * because it is a real bucket holding a third of the catalog and a user
-   * reading "uncategorized" in English beside a Chinese UI learns nothing.
+   * Category statistics, counted over the FINAL set and in taxonomy order: a count
+   * taken before admission would advertise plugins the market does not show, and a
+   * dictionary ordered by frequency would reshuffle itself on every run.
    */
-  const CATEGORY_LABELS = {
-    [UNCATEGORIZED]: { en: 'Uncategorized', zh: '未分类' },
-    ui: { en: 'UI', zh: '界面' },
-    webui: { en: 'Web UI', zh: '网页界面' },
-    skin: { en: 'Themes & skins', zh: '主题皮肤' },
-    tools: { en: 'Tools', zh: '工具' },
-    devtools: { en: 'Developer tools', zh: '开发工具' },
-    agent: { en: 'Agents', zh: '智能体' },
-    memory: { en: 'Memory', zh: '记忆' },
-    vision: { en: 'Vision', zh: '视觉' },
-    data: { en: 'Data', zh: '数据' },
-    code: { en: 'Code', zh: '代码' },
-    channel: { en: 'Channels', zh: '消息渠道' },
-    browser: { en: 'Browser', zh: '浏览器' },
-    docs: { en: 'Docs', zh: '文档' },
-    skills: { en: 'Skills', zh: '技能' },
-    sandbox: { en: 'Sandbox', zh: '沙箱' },
-    eco: { en: 'Ecosystem', zh: '生态' },
-  }
+  const inTaxonomy = categoryCounts(plugins)
   const categories = Object.fromEntries(
-    Object.keys(byCategory).sort().map((id) => [id, CATEGORY_LABELS[id] ?? { en: id, zh: id }]),
+    inTaxonomy.filter((c) => c.count > 0).map(({ id, en, zh, count }) => [id, { en, zh, count }]),
   )
+  const byCategory = Object.fromEntries(inTaxonomy.filter((c) => c.count > 0).map((c) => [c.id, c.count]))
+  /** How each placement happened, so "自动归类" is measurable rather than claimed. */
+  const byCategorySource = plugins.reduce((acc, p) => {
+    const key = p.categorySource ?? 'unknown'
+    acc[key] = (acc[key] ?? 0) + 1
+    return acc
+  }, {})
+  const categoryStats = {
+    taxonomy: CATEGORIES.length,
+    used: Object.keys(categories).length,
+    counts: inTaxonomy.filter((c) => c.count > 0),
+    // Entries whose raw catalog value was a non-answer word (`cordis-plugin`,
+    // `插件`, `uncategorized`) — the bucket automatic classification exists to empty.
+    rawGeneric: plugins.filter((p) => GENERIC_CATEGORIES.has(String(p.rawCategory ?? '').toLowerCase())).length,
+    // Entries no rule could place: the honest measure of classification quality,
+    // because it is what a reader would otherwise have to browse by hand.
+    unclassified: plugins.filter((p) => p.category === 'other').length,
+    bySource: byCategorySource,
+  }
 
   const stats = {
     normalized: records.length,
@@ -247,6 +247,7 @@ export async function runIngest({
     sources: sourceHealth.length,
     multiSource,
     admission: admissionStats,
+    category: categoryStats,
     byTargetKind: byKind,
     byCategory,
   }
