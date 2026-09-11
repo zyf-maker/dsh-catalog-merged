@@ -115,8 +115,30 @@ export const DENY_REPOS = new Set([
 /** Entries tagged by their own curator as something that is not a plugin. */
 export const DENY_TYPES = new Set(['项目', '渠道', '技能', '合集', '教程', 'project', 'docs'])
 
-/** Repository names that look like a directory worth probing for a catalog. */
-const DIRECTORY_HINTS = /(awesome|market|marketplace|store|catalog|directory|hub|list|registry)/i
+/**
+ * Repository names that look like a directory worth probing for a catalog.
+ *
+ * Bilingual on purpose: the Chinese ecosystem names these things 市场 / 商店 /
+ * 目录 / 聚合 / 精选, and an English-only pattern is why the first version
+ * discovered nothing at all despite Oh-My-DSH and DSH Get being exactly that.
+ */
+const DIRECTORY_HINTS = /(awesome|market|marketplace|store|catalog|directory|hub|list|registry|plugins?|市场|商店|目录|聚合|精选|索引|合集)/i
+
+/**
+ * Search queries used to look for directories.
+ *
+ * Several narrow queries beat one broad one: `topic:dsh-plugin sort:stars`
+ * returns the biggest *projects*, which for this ecosystem means the harness
+ * itself and its satellites, so a directory has to be searched for by name
+ * shape rather than by popularity.
+ */
+const DISCOVERY_QUERIES = [
+  'topic:dsh-plugin marketplace in:name,description',
+  'topic:dsh-plugin awesome in:name',
+  'topic:dsh-plugin catalog in:name,description',
+  'topic:dsh-plugin 插件市场 in:name,description,readme',
+  'dsh plugin directory in:name,description',
+]
 
 /** Paths a community directory commonly publishes its machine-readable data at. */
 const CATALOG_PROBE_PATHS = [
@@ -126,6 +148,7 @@ const CATALOG_PROBE_PATHS = [
   'data/catalog.json',
   'public/plugins.json',
   'dist/plugins.json',
+  'catalog/catalog.json',
 ]
 
 /**
@@ -140,45 +163,48 @@ const CATALOG_PROBE_PATHS = [
  * @param options - `token` for GitHub, `fetchImpl` for tests, `log` for progress.
  * @returns the catalogs found, each ready to be added to the source table.
  */
-export async function discoverSources({ token, fetchImpl = fetch, log = () => {}, max = 40 } = {}) {
+export async function discoverSources({ token, fetchImpl = fetch, log = () => {}, max = 30 } = {}) {
   const headers = { accept: 'application/vnd.github+json', 'user-agent': 'dsh-market-discovery' }
   if (token) headers.authorization = `Bearer ${token}`
-  const query = encodeURIComponent('topic:dsh-plugin sort:stars')
   const found = []
-  try {
-    const res = await fetchImpl(
-      `https://api.github.com/search/repositories?q=${query}&sort=stars&order=desc&per_page=${max}`,
-      { headers },
-    )
-    if (!res.ok) { log(`discovery: GitHub search HTTP ${res.status}`); return found }
-    const json = await res.json()
-    for (const repo of json.items ?? []) {
-      const full = repo.full_name ?? ''
-      if (!full || DENY_REPOS.has(full)) continue
-      if (repo.archived === true) continue
-      const name = full.split('/').pop() ?? ''
-      const desc = `${repo.description ?? ''} ${name}`
-      if (!DIRECTORY_HINTS.test(desc)) continue
-      const branch = repo.default_branch ?? 'main'
-      for (const path of CATALOG_PROBE_PATHS) {
-        const url = `https://raw.githubusercontent.com/${full}/${branch}/${path}`
-        const catalog = await probeCatalog(url, fetchImpl)
-        if (catalog === null) continue
-        found.push({
-          id: `discovered:${full.toLowerCase()}`,
-          name: full,
-          kind: 'catalog',
-          url,
-          pick: (r) => (Array.isArray(r) ? r : r?.plugins ?? r?.items ?? r?.data),
-          discoveredFrom: `github:${full}`,
-          note: `auto-discovered directory (${catalog} entries)`,
-        })
-        log(`discovery: adopted ${full} -> ${path} (${catalog} entries)`)
-        break
+  const tried = new Set()
+  for (const rawQuery of DISCOVERY_QUERIES) {
+    try {
+      const res = await fetchImpl(
+        `https://api.github.com/search/repositories?q=${encodeURIComponent(rawQuery)}&sort=stars&order=desc&per_page=${max}`,
+        { headers },
+      )
+      if (!res.ok) { log(`discovery: "${rawQuery}" HTTP ${res.status}`); continue }
+      const json = await res.json()
+      for (const repo of json.items ?? []) {
+        const full = repo.full_name ?? ''
+        if (!full || DENY_REPOS.has(full) || tried.has(full)) continue
+        if (repo.archived === true) continue
+        const name = full.split('/').pop() ?? ''
+        const haystack = `${repo.description ?? ''} ${name}`
+        if (!DIRECTORY_HINTS.test(haystack)) continue
+        tried.add(full)
+        const branch = repo.default_branch ?? 'HEAD'
+        for (const path of CATALOG_PROBE_PATHS) {
+          const url = `https://raw.githubusercontent.com/${full}/${branch}/${path}`
+          const count = await probeCatalog(url, fetchImpl)
+          if (count === null) continue
+          found.push({
+            id: `discovered:${full.toLowerCase()}`,
+            name: full,
+            kind: 'catalog',
+            url,
+            pick: (r) => (Array.isArray(r) ? r : r?.plugins ?? r?.items ?? r?.results ?? r?.data),
+            discoveredFrom: `github-search:"${rawQuery}":${full}`,
+            note: `auto-discovered directory (${count} entries)`,
+          })
+          log(`discovery: adopted ${full} -> ${path} (${count} entries)`)
+          break
+        }
       }
+    } catch (error) {
+      log(`discovery: "${rawQuery}" ERR ${error.message}`)
     }
-  } catch (error) {
-    log(`discovery: ERR ${error.message}`)
   }
   return found
 }
