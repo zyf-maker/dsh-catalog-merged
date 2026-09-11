@@ -20,7 +20,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import {
   DEFAULT_OPTIONS, STOPWORDS, candidateTerms, dictionaryFor, discoverCategories, loadLabels,
-  loadState, mergeDiscovered, rulesFor, saveState, termPattern,
+  loadState, mergeDiscovered, promotedTermsOf, rulesFor, saveState, surveyCandidates, termPattern,
 } from '../ingest/categories.mjs'
 import { classify, categoryCounts } from '../ingest/classify.mjs'
 import { normalize } from '../ingest/normalize.mjs'
@@ -81,16 +81,35 @@ test('a new domain arriving in the leftovers creates its own category', () => {
   assert.equal(proposals[0].samples.length > 0, true, 'a proposal carries samples so a human can review it')
 })
 
-test('a new domain that arrives already classified is still discovered', () => {
-  // A wave can also land in the catch-alls: `tools` and `dev` swallow most things,
-  // so the cross-cutting channel exists for exactly this case.
+test('a cross-cutting term is proposal-only, and a promotion creates it', () => {
+  // This is the case that changed the design. A wave can land in the catch-alls
+  // (`tools`, `dev`, `ui`…) instead of the leftovers, and the first version created
+  // a category for it automatically. Measuring the real catalog showed those terms
+  // are ATTRIBUTES — `codex`, `claude`, `xby` (a publisher prefix), `management`,
+  // `sync` — i.e. what a plugin integrates with or how it is built, not what it is.
+  // So such a term becomes a *proposal* a human can promote, never a bucket that
+  // appears on its own.
   const wave = Array.from({ length: 150 }, (_, i) =>
     plugin(`dsh-warp-${i}`, ['tools', 'dev', 'ui', 'data', 'session', 'desktop'][i % 6]))
-  const proposals = discover(wave)
+
+  assert.deepEqual(discover(wave), [], 'nothing is created without a human asking')
+
+  const survey = surveyCandidates(wave, { knownCategoryIds: KNOWN, limit: 10 })
+  const row = survey.find((r) => r.term === 'warp')
+  assert.equal(row.qualifies, 'promotable', 'but it is visible as promotable')
+  assert.equal(row.members, 150)
+  assert.equal(row.spread, 6)
+
+  // Promotion is one line in the labels file.
+  const promoted = new Set(promotedTermsOf({ warp: { en: 'Warp drive', zh: '曲速', promote: true } }))
+  const proposals = discover(wave, { promoteTerms: promoted })
   assert.equal(proposals.length, 1)
   assert.equal(proposals[0].term, 'warp')
-  assert.equal(proposals[0].channel, 'cross-cutting')
-  assert.equal(proposals[0].members, 150)
+  assert.equal(proposals[0].path, 'promoted', 'and it is recorded as human-requested')
+
+  // A promoted term still needs a real cluster behind it.
+  const tiny = Array.from({ length: 5 }, (_, i) => plugin(`dsh-warp-${i}`, 'tools'))
+  assert.deepEqual(discover(tiny, { promoteTerms: promoted }), [], 'promotion is not a way to create a 5-plugin bucket')
 })
 
 test('the whole lifecycle: create, persist, apply, retire, revive', () => {
