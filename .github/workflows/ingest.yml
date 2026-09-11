@@ -30,10 +30,19 @@ jobs:
         with:
           node-version: 22
 
+      - name: Install sqlite3
+        # Before the tests, not before the load: the loader's integration test
+        # skips itself when the CLI is absent, so installing it afterwards would
+        # leave the one test that proves the SQL applies never running in CI.
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq sqlite3
+          sqlite3 --version
+
       - name: Test
         # Before the harvest, not after: a broken import or a drifted repair rule
         # should fail in seconds rather than after a run has spent its network
-        # budget, and the loader is only exercised here.
+        # budget.
         #
         # No path argument: `node --test tests/` is interpreted as a single file
         # on Node 22 and fails with MODULE_NOT_FOUND, while a bare `node --test`
@@ -49,13 +58,11 @@ jobs:
 
       - name: Load the queryable database
         run: |
-          # `sqlite3` is not on the runner image, and the previous step hid that
-          # behind `2>/dev/null || true` — so the shell still created an empty
-          # market.db through its own redirect and the run committed a 0-byte
-          # database as if it had succeeded. Install it, and let a real failure
-          # fail the job.
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq sqlite3
+          # The loader emits schema + data together, so this step only has to
+          # apply one file and then prove the result is real. The first version
+          # split them, and the CI step that consumed the data never applied the
+          # schema — every insert failed with "no such table" while `|| true`
+          # swallowed the error and the run committed an empty database.
           node ingest/load-sqlite.mjs --db data/market.sql --apply
           rm -f data/market.db
           sqlite3 data/market.db < data/market.sql
