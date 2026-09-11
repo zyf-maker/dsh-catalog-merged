@@ -61,6 +61,36 @@ test('a target inferred from a repository needs evidence; an explicit one does n
     'a source that says the entry is not installable is believed')
 })
 
+test('every install spec shape found in production is classified correctly', () => {
+  const cases = [
+    // [install command, expected kind]
+    ['dsh plugin --profile web add @linxin666/dsh-web-ui-all@0.1.10', 'npm'],
+    ['dsh plugin --profile web add dsh-codex-connect@alpha', 'npm'],
+    ['dsh plugin --profile web add dsh-web-plugin-manager@latest', 'npm'],
+    ['dsh plugin --profile web add npm:dsh-plugins-store', 'npm'],
+    ['dsh plugin --profile web add @openviking/dsh-memory-plugin', 'npm'],
+    ['dsh plugin --profile web add "github:Aisland-SJL/dsh-usage"', 'github'],
+    ['dsh plugin --profile web add "github:JimmyLv/bibigpt-skill#path:/dsh-plugin"', 'github'],
+    ['dsh plugin add github:nexu-io/open-design', 'github'],
+    ['dsh plugin add https://github.com/o/r/releases/download/v1/p.tgz', 'tarball'],
+  ]
+  for (const [command, kind] of cases) {
+    assert.equal(classifyTarget({ install: command }).kind, kind, command)
+  }
+})
+
+test('a quoted spec is unwrapped so the target itself stays installable', () => {
+  const target = classifyTarget({ install: 'dsh plugin --profile web add "github:Aisland-SJL/dsh-usage"' })
+  assert.equal(target.target, 'github:Aisland-SJL/dsh-usage', 'quotes must not survive into the target')
+  assert.ok(!target.target.includes('"'))
+})
+
+test('a version on an npm spec is part of the target, not the kind', () => {
+  const target = classifyTarget({ install: 'dsh plugin --profile web add @linxin666/dsh-web-ui-all@0.1.10' })
+  assert.equal(target.kind, 'npm')
+  assert.equal(target.target, '@linxin666/dsh-web-ui-all@0.1.10')
+})
+
 test('normalize reads camelCase, summary fields and split summaries', () => {
   const plugin = normalize({
     fullName: 'tt-a1i/archify#integrations/deepseek-harness',
