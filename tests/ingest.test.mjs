@@ -7,7 +7,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { buildIdentityIndex, candidateKeys, parseRepo } from '../ingest/identity.mjs'
-import { normalize, classifyTarget, betterRecord, npmNameOfSpec } from '../ingest/normalize.mjs'
+import { normalize, classifyTarget, betterRecord, npmNameOfSpec, byRank } from '../ingest/normalize.mjs'
 import { inspectManifest, planRepair, ISSUE } from '../ingest/compat.mjs'
 
 const record = (fields) => ({
@@ -213,6 +213,20 @@ test('the winner of a duplicate pair is the one that ranks higher', () => {
   const poor = normalize({ name: 'x', repo: 'o/x', stars: 1, downloads: 0 }, 's')
   assert.equal(betterRecord(rich, poor), true)
   assert.equal(betterRecord(poor, rich), false)
+})
+
+test('ranking falls back to recency, not the alphabet, in the zero-score tail', () => {
+  // A third of the catalog (3624 plugins) has neither stars nor downloads, so its
+  // score is exactly zero. Ordering those rows by name would mean "sort by score"
+  // was, in its tail, sorted by name — which is not what the control promises.
+  const older = { name: 'aaa-old', score: 0, stars: 0, downloads: 0, added: '2026-01-01' }
+  const newer = { name: 'zzz-new', score: 0, stars: 0, downloads: 0, added: '2026-09-01' }
+  assert.equal(byRank(newer, older) < 0, true, 'the newer zero-score plugin ranks first')
+  assert.equal(byRank(older, newer) > 0, true, 'and the relation is antisymmetric')
+
+  // A scored plugin still outranks any zero-score plugin regardless of date.
+  const scored = { name: 'scored', score: 5000, stars: 5, downloads: 0, added: '2020-01-01' }
+  assert.equal(byRank(scored, newer) < 0, true, 'popularity beats recency')
 })
 
 test('inspectManifest reports each break the ecosystem actually ships', () => {
