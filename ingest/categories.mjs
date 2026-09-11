@@ -7,71 +7,73 @@
  * strong enough that today it creates nothing and tomorrow it creates the thing
  * that arrived.
  *
- * ## What the data said before this was written
+ * ## What the data said, and how it changed the design
  *
- * Measured over the published catalog (10695 plugins, 1195 unclassified):
+ * Measured over the served catalog (10694 plugins, 1195 unclassified):
  *
  *   - terms with >= 20 members confined to the leftovers (share >= 60%): **zero**
- *   - the highest-share terms were marketing phrases, not domains:
- *     `无需联网`, `纯本地实现`, `即装即用`, `care`, `calc`
+ *   - the highest-share leftovers were marketing phrases, not domains:
+ *     `无需联网`, `纯本地实现`, `care`, `calc`
+ *   - a permissive survey of every candidate token showed what the cross-cutting
+ *     ones really are: `xby` (a publisher prefix, 146 members), `codex` (141),
+ *     `claude` (91), `management`, `conversation`, `reasoning`, `archive`,
+ *     `message`, `sync` — every one an ATTRIBUTE (an integration target, a metric,
+ *     a generic word), not a subject nobody has a bucket for
  *
- * Two conclusions shaped the design. First, the leftovers are genuinely one-offs
- * (relay, ssh, pdf, fleet, doctor…), so a mechanism that inventing categories from
- * weak signal would produce noise — the thresholds below are deliberately high.
- * Second, prose is a bad source of category names: a category is a token, and
- * tokens live in names and topics, so candidates are drawn from there and a phrase
- * like `无需联网` can never become a category.
+ * That last point killed the original premise of the cross-cutting channel. It was
+ * built to catch "a wave that lands in the catch-alls", on the theory that landing
+ * in `tools` means the taxonomy failed. The data says otherwise: a Codex sidebar
+ * belongs in `ui` and a Codex adapter in `model`, so a token spanning many
+ * categories is evidence of *cross-cutting*, which is exactly what a one-dimensional
+ * category cannot express. Promoting those would have split the sidebar into
+ * `codex` / `claude` / `opencode` buckets that say what a plugin integrates with
+ * rather than what it is.
  *
- * ## Two channels, because a future category need not look like today's leftovers
+ * So the rule is now:
  *
- *   leftover      a token that dominates the unclassified set. This is where a
- *                 genuinely new subject first appears, before any rule knows it.
- *   cross-cutting a token spread across many existing categories. A new subject
- *                 can also arrive already classified — `tools` and `dev` are
- *                 catch-alls, so a wave of 40 plugins about one new thing may all
- *                 land in `tools` and never touch the leftovers.
+ *   leftover      a cluster with no home — may create a category automatically.
+ *                 This is the promise "以备后续有新的类别" rests on, and it is sound:
+ *                 a new subject has no rule, so it lands in `other`, and a real
+ *                 cluster is visible there.
+ *   cross-cutting **proposals only.** A human promotes one by name in
+ *                 `data/category-labels.json`; nothing is created on a token that
+ *                 merely spans categories.
  *
  * ## Stability
  *
  * Discovered categories are persisted (`data/categories.json`) and reused, not
  * recomputed: a sidebar whose entries appear and vanish between runs is worse than
- * no sidebar. A category is retired only when its membership decays below a floor,
- * and the record is kept so it can be revived without being re-learned. Labels can
- * be corrected by hand in `data/category-labels.json` without touching code.
+ * no sidebar. A category is retired when its membership decays below a floor —
+ * decided from the live catalog, not from a stored number — and the record is kept
+ * so it can be revived without being re-learned. Labels, hiding and merging are
+ * hand-editable in `data/category-labels.json`.
  */
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { dirname } from 'node:path'
-import { builtinMatch, matchesBuiltin } from './classify.mjs'
+import { matchesBuiltin } from './classify.mjs'
 
 /**
  * Thresholds.
  *
- * These were raised after measuring what the first, looser set produced on the real
- * catalog: the cross-cutting channel proposed 16 terms and most were generic words
- * — `cordis` (the framework's own name), `token` (a unit, not a subject),
- * `workspace`, `task`, `hub`, `monitor`, `pick`, `whale` (the mascot). Creating
- * categories from those is worse than having none: it splits the sidebar into
- * buckets that do not describe anything.
- *
- * So the bar is now high enough that today's catalog creates nothing from the
- * cross-cutting channel unless a term really dominates (≥120 members across ≥6
- * categories and almost never in the leftovers). The stopword list carries the
- * rest of the weight, and it will need maintenance — that is the honest cost of
- * mechanical discovery, and it is paid in a list rather than in wrong categories.
+ * The cross-cutting numbers are the bar a *promoted* term must still clear: a human
+ * asking for a category is a strong signal, but asking for one that covers three
+ * plugins is not a category. The leftover bar is the automatic path, and it is set
+ * where today's catalog is silent — verified, not assumed: at 25 members and 75%
+ * share, the current leftovers produce zero proposals.
  */
 export const DEFAULT_OPTIONS = {
-  /** Channel A: members confined to the leftovers. */
+  /** Channel A: members confined to the leftovers. May create automatically. */
   leftoverMinMembers: 25,
   leftoverMinShare: 0.75,
-  /** Channel B: members spread across existing categories. */
+  /** Channel B: cross-cutting. Proposal-only unless promoted by hand. */
   crossMinMembers: 120,
   crossMinCategories: 6,
   crossMaxShare: 0.02,
+  /** A promoted term still needs this many members to become a bucket. */
+  promoteMinMembers: 25,
   /** Guards. */
   maxTermLength: 20,
   maxNewPerRun: 2,
-  /** Overlap: a proposal mostly covered by an accepted one is dropped. */
-  overlapLimit: 0.7,
   /** Retirement: below this, an existing category stops being used. */
   retireFloor: 8,
 }
@@ -162,13 +164,105 @@ export function termPattern(term) {
  * Propose categories from one catalog snapshot.
  *
  * @param plugins - every emitted record, each carrying `category` and `name`.
- * @param options - threshold overrides; see `DEFAULT_OPTIONS`.
- * @returns proposals, strongest first, already de-overlapped and capped.
+ * @param options - threshold overrides plus `promoteTerms` (a Set of terms a human
+ *   has asked for in the labels file; see `promotedTermsOf`).
+ * @returns proposals that may be created, strongest first, de-overlapped and capped.
+ *   Cross-cutting terms are excluded unless promoted — see the module header for the
+ *   measurement that decided this.
  */
 export function discoverCategories(plugins, options = {}) {
   const opts = { ...DEFAULT_OPTIONS, ...options }
   const known = new Set(options.knownCategoryIds ?? [])
+  const promoted = options.promoteTerms instanceof Set ? options.promoteTerms : new Set()
 
+  const stats = collectStats(plugins, opts, known)
+
+  const proposals = []
+  for (const [term, { members, categories }] of stats) {
+    const total = members.size
+    const leftover = categories.get('other') ?? 0
+    const share = leftover / total
+    const spread = categories.size
+    const channels = []
+    if (leftover >= opts.leftoverMinMembers && share >= opts.leftoverMinShare) channels.push('leftover')
+    if (total >= opts.crossMinMembers && spread >= opts.crossMinCategories && share <= opts.crossMaxShare) channels.push('cross-cutting')
+    if (channels.length === 0) continue
+    // The automatic path is the leftover channel alone. The cross-cutting channel is
+    // evidence for a human to act on, because the measurement above showed those
+    // terms describe what a plugin integrates with, not what it is.
+    const automatic = channels.includes('leftover')
+    const humanAsked = promoted.has(term) && total >= opts.promoteMinMembers
+    if (!automatic && !humanAsked) continue
+    proposals.push({
+      term,
+      members: total,
+      leftover,
+      share: Number(share.toFixed(3)),
+      spread,
+      channel: automatic ? 'leftover' : 'promoted',
+      channels,
+      path: automatic ? 'automatic' : 'promoted',
+      samples: sampleNames(plugins, term),
+    })
+  }
+
+  return deOverlap(proposals).slice(0, Math.max(opts.maxNewPerRun, promoted.size))
+}
+
+/**
+ * Every candidate term with its numbers, for human review.
+ *
+ * This is what makes a proposal-only channel useful rather than opaque: the numbers
+ * that would justify a category are written to `data/category-proposals.json` on
+ * every run, so promoting one is a decision made from evidence.
+ *
+ * @param plugins - the served catalog.
+ * @param options - `limit` (how many to return), plus the threshold overrides.
+ * @returns candidates sorted by member count, each with `qualifies` and `why`.
+ */
+export function surveyCandidates(plugins, options = {}) {
+  const opts = { ...DEFAULT_OPTIONS, ...options }
+  const known = new Set(options.knownCategoryIds ?? [])
+  const rows = []
+  for (const [term, { members, categories }] of collectStats(plugins, opts, known)) {
+    const total = members.size
+    const leftover = categories.get('other') ?? 0
+    const spread = categories.size
+    const share = leftover / total
+    const leftoverQualified = leftover >= opts.leftoverMinMembers && share >= opts.leftoverMinShare
+    const crossQualified = total >= opts.crossMinMembers && spread >= opts.crossMinCategories && share <= opts.crossMaxShare
+    rows.push({
+      term,
+      members: total,
+      leftover,
+      spread,
+      share: Number(share.toFixed(3)),
+      channels: [...(leftoverQualified ? ['leftover'] : []), ...(crossQualified ? ['cross-cutting'] : [])],
+      qualifies: leftoverQualified ? 'automatic' : crossQualified ? 'promotable' : 'below-threshold',
+      why: leftoverQualified
+        ? `${leftover} unclassified of ${total}`
+        : crossQualified
+          ? `spans ${spread} categories; promote by hand if it names a subject`
+          : `needs >=${opts.leftoverMinMembers} unclassified (has ${leftover}) or >=${opts.crossMinMembers} members across >=${opts.crossMinCategories} categories (has ${total}/${spread})`,
+      samples: sampleNames(plugins, term, 3),
+    })
+  }
+  rows.sort((a, b) => b.members - a.members || a.term.localeCompare(b.term))
+  return rows.slice(0, options.limit ?? 60)
+}
+
+/** Terms a human asked for in the labels file (`promote: true`). */
+export function promotedTermsOf(labels) {
+  const terms = new Set()
+  for (const [term, value] of Object.entries(labels ?? {})) {
+    if (term.startsWith('_')) continue
+    if (value !== null && typeof value === 'object' && value.promote === true) terms.add(term)
+  }
+  return terms
+}
+
+/** Term → members and per-category counts, over the whole set. */
+function collectStats(plugins, opts, known) {
   /** @type {Map<string, { members: Set<string>, categories: Map<string, number> }>} */
   const stats = new Map()
   for (const plugin of plugins) {
@@ -177,8 +271,8 @@ export function discoverCategories(plugins, options = {}) {
     for (const term of candidateTerms(plugin)) {
       if (term.length > opts.maxTermLength) continue
       if (known.has(term)) continue
-      // A term an existing rule already matches is not a missing category; it is
-      // a word the taxonomy handles.
+      // A term an existing rule already matches is not a missing category; it is a
+      // word the taxonomy handles.
       if (matchesBuiltin(term)) continue
       if (!stats.has(term)) stats.set(term, { members: new Set(), categories: new Map() })
       const entry = stats.get(term)
@@ -186,42 +280,27 @@ export function discoverCategories(plugins, options = {}) {
       entry.categories.set(category, (entry.categories.get(category) ?? 0) + 1)
     }
   }
+  return stats
+}
 
-  const proposals = []
-  for (const [term, { members, categories }] of stats) {
-    const total = members.size
-    const leftover = categories.get('other') ?? 0
-    const spread = categories.size
-    const channels = []
-    if (leftover >= opts.leftoverMinMembers && leftover / total >= opts.leftoverMinShare) channels.push('leftover')
-    if (total >= opts.crossMinMembers && spread >= opts.crossMinCategories && leftover / total <= opts.crossMaxShare) channels.push('cross-cutting')
-    if (channels.length === 0) continue
-    proposals.push({
-      term,
-      members: total,
-      leftover,
-      share: Number((leftover / total).toFixed(3)),
-      spread,
-      channel: channels[0],
-      channels,
-      samples: plugins
-        .filter((p) => candidateTerms(p).has(term))
-        .slice(0, 5)
-        .map((p) => String(p.name ?? '')),
-    })
+/** The first few plugin names matching a term, for review. */
+function sampleNames(plugins, term, limit = 5) {
+  const out = []
+  for (const plugin of plugins) {
+    if (out.length >= limit) break
+    if (candidateTerms(plugin).has(term)) out.push(String(plugin.name ?? ''))
   }
+  return out
+}
 
-  // Strongest first, then drop anything an accepted proposal already covers.
+/** Drop proposals that another accepted proposal already covers. */
+function deOverlap(proposals) {
   proposals.sort((a, b) => b.members - a.members || a.term.localeCompare(b.term))
   const accepted = []
   for (const proposal of proposals) {
-    const covered = accepted.some((chosen) =>
-      chosen.term.includes(proposal.term) || proposal.term.includes(chosen.term))
-    if (covered) continue
+    if (accepted.some((chosen) => chosen.term.includes(proposal.term) || proposal.term.includes(chosen.term))) continue
     accepted.push(proposal)
   }
-  // A term that is a substring of another accepted term is redundant; keep the
-  // broader one, which the sort has already placed first.
   return accepted
 }
 
