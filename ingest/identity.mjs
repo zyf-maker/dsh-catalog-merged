@@ -3,15 +3,30 @@
  *
  * The same plugin arrives from different sources through different namespaces:
  * one catalog knows its npm package, another only its repository, a third only
- * a display name. Keying each record independently (which the first version
- * did) puts one plugin into several namespaces at once, and the market then
- * lists it several times — measured on production data: 3398 such groups.
+ * a display name. Keying each record independently puts one plugin into several
+ * namespaces at once, so the market lists it several times (measured: 3398 such
+ * groups on production data).
  *
- * The fix is to stop treating identity as a property of a record and treat it
- * as an equivalence class over the keys a record *does* carry: a record that
- * names both its npm package and its repository is the evidence that those two
- * keys denote the same plugin. Union-find folds that evidence transitively, and
- * a deterministic representative keeps ids stable across runs.
+ * The first fix for that modelled identity as an *equivalence* class over the
+ * keys a record carries — if one record names both `npm:x` and `repo:o/r`, those
+ * two keys must denote the same plugin. That is wrong, and it silently deleted
+ * plugins: `npm ↔ repo` is **many-to-one**, because a monorepo publishes many
+ * packages from one repository. On production data `zhu1090093659/dsh-web`
+ * publishes 19 packages (`@linxin666/dsh-pet`, `dsh-ssh`, `dsh-i18n`, …) and
+ * equivalence collapsed all 19 into one entry, losing 18; four other monorepos
+ * lost every one of their packages.
+ *
+ * So identity is a *precedence*, and a repository link is used only when it is
+ * unambiguous:
+ *
+ *   1. `npm:<name>` — globally unique, always wins.
+ *   2. `repo:<owner>/<name>#<subpath>` — unique per directory, for repo-only listings.
+ *   3. `repo:<owner>/<name>` — only when the repository hosts exactly one known plugin.
+ *   4. `name:<name>` — last resort, groups only what nothing else could.
+ *
+ * A repository claimed by two or more npm packages proves nothing about which
+ * package a repo-only listing refers to, so its links are refused rather than
+ * guessed at. An extra duplicate entry is recoverable; a deleted plugin is not.
  */
 
 /** npm package names the harness accepts. */
@@ -67,86 +82,79 @@ export function repoFromUrl(url) {
   return parseRepo({ repo: match[1] })
 }
 
+/** The npm identity of a record, or null. */
+export function npmKeyOf(record) {
+  return record.npm && NPM_NAME.test(record.npm) ? `npm:${record.npm.toLowerCase()}` : null
+}
+
 /**
- * Every key that could denote this record, strongest first.
+ * The repository key of a record: the subpath-qualified form when there is one,
+ * because a subpath names a directory and a bare path only names the repository.
+ */
+export function repoKeyOf(record) {
+  if (!record.repoPath) return null
+  const base = record.repoPath.toLowerCase()
+  return record.repoSubpath === null ? `repo:${base}` : `repo:${base}#${record.repoSubpath.toLowerCase()}`
+}
+
+/**
+ * Every key this record could be identified by, strongest first.
  *
- * Order is the precedence used when no equivalence evidence exists: an npm name
- * is globally unique, a repository path (with its subpath) is unique on GitHub,
- * and a display name is a last resort that only ever groups records nothing
- * else could group.
- *
- * A repository key WITHOUT a subpath and one WITH a subpath are deliberately
- * distinct keys: a monorepo can publish several plugins, and collapsing them
- * would silently delete all but one.
+ * Kept as a public view (tooling and tests read it) but no longer the basis of
+ * the merge: the keys of one record are not an equivalence class.
  */
 export function candidateKeys(record) {
   const keys = []
-  if (record.npm && NPM_NAME.test(record.npm)) keys.push(`npm:${record.npm.toLowerCase()}`)
-  if (record.repoPath) {
-    const base = record.repoPath.toLowerCase()
-    keys.push(record.repoSubpath === null ? `repo:${base}` : `repo:${base}#${record.repoSubpath.toLowerCase()}`)
-  }
-  if (keys.length === 0 && record.name) keys.push(`name:${record.name.toLowerCase()}`)
+  const npm = npmKeyOf(record)
+  if (npm !== null) keys.push(npm)
+  const repo = repoKeyOf(record)
+  if (repo !== null) keys.push(repo)
+  if (keys.length === 0 && record.name) keys.push(`name:${String(record.name).toLowerCase()}`)
   return keys
 }
 
-/** Union-find over identity keys. */
-class DisjointSet {
-  #parent = new Map()
-
-  find(key) {
-    if (!this.#parent.has(key)) { this.#parent.set(key, key); return key }
-    let root = key
-    while (this.#parent.get(root) !== root) root = this.#parent.get(root)
-    // Path compression: repeated lookups are the common case in a 13k merge.
-    let cursor = key
-    while (this.#parent.get(cursor) !== root) {
-      const next = this.#parent.get(cursor)
-      this.#parent.set(cursor, root)
-      cursor = next
-    }
-    return root
-  }
-
-  union(a, b) {
-    const rootA = this.find(a)
-    const rootB = this.find(b)
-    if (rootA === rootB) return
-    // The smaller key wins, so the representative never depends on input order
-    // and ids stay stable between runs.
-    if (rootA < rootB) this.#parent.set(rootB, rootA)
-    else this.#parent.set(rootA, rootB)
-  }
-
-  /** Canonical, order-independent id for the class containing `key`. */
-  representative(key) {
-    return this.find(key)
-  }
-}
-
 /**
- * Fold every record's keys into equivalence classes.
+ * Build the identity resolver for a corpus.
  *
  * @param records - records carrying `npm`/`repoPath`/`repoSubpath`/`name`.
- * @returns a resolver mapping any of a record's keys to its canonical id.
+ * @returns `{ idFor, ambiguousRepos, claimedRepos }`; `ambiguousRepos` counts the
+ *   repositories whose links were refused because more than one package claims
+ *   them, which is the number this module exists to get right.
  */
 export function buildIdentityIndex(records) {
-  const set = new DisjointSet()
+  // Which npm packages claim each repository. Two or more means a monorepo, and
+  // then the repository key cannot say which package a repo-only listing means.
+  /** @type {Map<string, Set<string>>} */
+  const claims = new Map()
   for (const record of records) {
-    const keys = candidateKeys(record)
-    if (keys.length === 0) continue
-    for (const key of keys) set.find(key)
-    // The evidence: this record claims these keys are the same plugin. Only
-    // keys that co-occur in one record are joined, so two plugins that happen
-    // to share a monorepo URL are never merged by coincidence.
-    for (let i = 1; i < keys.length; i += 1) set.union(keys[0], keys[i])
+    const npmKey = npmKeyOf(record)
+    const repoKey = repoKeyOf(record)
+    if (npmKey === null || repoKey === null) continue
+    if (!claims.has(repoKey)) claims.set(repoKey, new Set())
+    claims.get(repoKey).add(npmKey)
   }
-  return {
-    idFor(record) {
-      const keys = candidateKeys(record)
-      return keys.length === 0 ? null : set.representative(keys[0])
-    },
-    /** Merge two already-computed ids (used when a winner adopts a loser's keys). */
-    union: (a, b) => set.union(a, b),
+
+  let ambiguousRepos = 0
+  for (const owners of claims.values()) if (owners.size > 1) ambiguousRepos += 1
+
+  /**
+   * The class a record belongs to. Derived from the record's own keys, so the
+   * id and the record's fields can never disagree — the previous version could
+   * emit `id=npm:a` beside `npm=b` when a class had been wrongly merged.
+   */
+  const idFor = (record) => {
+    const npmKey = npmKeyOf(record)
+    if (npmKey !== null) return npmKey
+    const repoKey = repoKeyOf(record)
+    if (repoKey !== null) {
+      const owners = claims.get(repoKey)
+      // Exactly one claimant: the repo-only listing is that plugin.
+      if (owners !== undefined && owners.size === 1) return [...owners][0]
+      // None, or several: the repository is the most specific thing we know.
+      return repoKey
+    }
+    return record.name ? `name:${String(record.name).toLowerCase()}` : null
   }
+
+  return { idFor, ambiguousRepos, claimedRepos: claims.size }
 }
