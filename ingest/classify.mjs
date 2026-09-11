@@ -23,26 +23,33 @@
 /**
  * The taxonomy, in navigation order. `id` is stored on every plugin; the labels
  * are what the UI shows.
+ *
+ * English labels are deliberately ONE WORD each. The longest previous label
+ * (`Market & plugin management`, 26 chars) does not fit the market's 168–240px
+ * navigation column, and a wrapped or ellipsised category name loses the meaning
+ * the label exists to carry — measured against the 19-entry index, wrapping would
+ * also make that column taller than the panel. A category name is a navigation
+ * label, not a description. Chinese labels stay as they are: 6–7 characters each.
  */
 export const CATEGORIES = [
   { id: 'ui', en: 'Interface', zh: '界面' },
-  { id: 'theme', en: 'Themes & skins', zh: '主题皮肤' },
+  { id: 'theme', en: 'Themes', zh: '主题皮肤' },
   { id: 'tools', en: 'Tools', zh: '工具' },
   { id: 'dev', en: 'Development', zh: '开发' },
-  { id: 'agent', en: 'Agents & orchestration', zh: '智能体与编排' },
-  { id: 'memory', en: 'Memory & context', zh: '记忆与上下文' },
-  { id: 'model', en: 'Models & providers', zh: '模型接入' },
-  { id: 'vision', en: 'Vision & multimodal', zh: '视觉与多模态' },
-  { id: 'voice', en: 'Voice & audio', zh: '语音与音频' },
-  { id: 'data', en: 'Data & knowledge', zh: '数据与知识库' },
-  { id: 'session', en: 'Sessions & usage', zh: '会话与用量' },
-  { id: 'notify', en: 'Channels & notifications', zh: '渠道与通知' },
-  { id: 'browser', en: 'Browser & web', zh: '浏览器与网页' },
-  { id: 'security', en: 'Security & permissions', zh: '安全与权限' },
-  { id: 'market', en: 'Market & plugin management', zh: '市场与插件管理' },
-  { id: 'desktop', en: 'Desktop & clients', zh: '桌面与客户端' },
-  { id: 'docs', en: 'Docs & skills', zh: '文档与技能' },
-  { id: 'fun', en: 'Fun & lifestyle', zh: '娱乐与生活' },
+  { id: 'agent', en: 'Agents', zh: '智能体与编排' },
+  { id: 'memory', en: 'Memory', zh: '记忆与上下文' },
+  { id: 'model', en: 'Models', zh: '模型接入' },
+  { id: 'vision', en: 'Vision', zh: '视觉与多模态' },
+  { id: 'voice', en: 'Voice', zh: '语音与音频' },
+  { id: 'data', en: 'Data', zh: '数据与知识库' },
+  { id: 'session', en: 'Sessions', zh: '会话与用量' },
+  { id: 'notify', en: 'Channels', zh: '渠道与通知' },
+  { id: 'browser', en: 'Browser', zh: '浏览器与网页' },
+  { id: 'security', en: 'Security', zh: '安全与权限' },
+  { id: 'market', en: 'Marketplace', zh: '市场与插件管理' },
+  { id: 'desktop', en: 'Desktop', zh: '桌面与客户端' },
+  { id: 'docs', en: 'Docs', zh: '文档与技能' },
+  { id: 'fun', en: 'Fun', zh: '娱乐与生活' },
   { id: 'other', en: 'Other', zh: '其他' },
 ]
 
