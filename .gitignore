@@ -1,0 +1,15 @@
+# Generated artifacts are produced by CI and by nothing else.
+#
+# The catalog is the product — it belongs in this repository so raw URLs can
+# serve it, but it must never appear in a working copy: it is ~25 MB across
+# catalog.json / market.sql / market.db, it is regenerated from scratch on every
+# run, and a stale local copy is indistinguishable from a fresh one. CI writes
+# these paths with `git add -f`, which is deliberate — the ignore below applies
+# to people, not to the pipeline.
+/data/
+/plugins.json
+
+# Local scratch.
+node_modules/
+.wrangler/
+*.log
