@@ -90,6 +90,28 @@ function isTarball(spec) {
 }
 
 /**
+ * The bare npm package name inside an install spec, or null.
+ *
+ * Sources do not agree on where the package name lives. Some declare `npm` (or
+ * `npmPackage`), while others only publish a command — 1024 Store is entirely
+ * the latter, so before this existed none of its 500 entries had an npm
+ * identity at all, every one of them fell back to its repository key, and a
+ * 19-package monorepo collapsed again through that fallback.
+ *
+ * Handles the shapes production contains: `@scope/name`, `name`, `name@1.2.3`,
+ * `name@alpha`, `@scope/name@1.2.3`, and the `npm:` alias prefix.
+ */
+export function npmNameOfSpec(spec) {
+  let text = String(spec ?? '').trim()
+  if (text.startsWith('npm:')) text = text.slice(4)
+  if (text === '' || text.startsWith('github:') || text.startsWith('git+') || /^[a-z]+:\/\//i.test(text)) return null
+  // A scoped name starts with `@`, so the version separator is the NEXT one.
+  const separator = text.startsWith('@') ? text.indexOf('@', 1) : text.indexOf('@')
+  const name = separator === -1 ? text : text.slice(0, separator)
+  return NPM_NAME.test(name) ? name : null
+}
+
+/**
  * Classify an install target the way the harness does.
  *
  * @param input - `install`, `npm`, `tarball`, `repoPath`, `url`, `installable`.
@@ -146,13 +168,13 @@ export function normalize(raw, sourceId, requireType) {
   }) ?? repoFromUrl(pick(raw, 'url', 'page', 'homepage', 'repoUrl'))
   if (repo !== null && DENY_REPOS.has(repo.path.toLowerCase())) return null
 
-  const npm = pick(raw, 'npm', 'npmPackage', 'pkg') ?? null
+  const declaredNpm = pick(raw, 'npm', 'npmPackage', 'pkg') ?? null
   const installRaw = pick(raw, 'install', 'cmd') ?? ''
   const tarball = pick(raw, 'tarball') ?? null
   const url = String(pick(raw, 'url', 'page', 'homepage', 'repoUrl')
     ?? (repo === null ? '' : `https://github.com/${repo.path}`))
   const target = classifyTarget({
-    install: installRaw, npm, tarball, repoPath: repo?.path ?? null, url,
+    install: installRaw, npm: declaredNpm, tarball, repoPath: repo?.path ?? null, url,
     installable: pick(raw, 'installable'),
   })
   // A record with no usable target is still kept: it may be one source's view
@@ -160,12 +182,24 @@ export function normalize(raw, sourceId, requireType) {
   // away its stars, its localized description and its provenance. The runner
   // drops a plugin only when no record for it has a target.
   const hasTarget = target.kind !== 'unknown'
+  // Identity comes from the install target when the source declares no package:
+  // a command naming an npm package is exactly as strong an identity as an `npm`
+  // field, and without this the entry could only be identified by its repository.
+  const npm = declaredNpm ?? (target.kind === 'npm' ? npmNameOfSpec(target.target) : null)
 
   const name = String(pick(raw, 'name') ?? (repo === null ? '' : repo.subpath === null ? repo.path.split('/').pop() : repo.subpath.split('/').pop())).trim()
   if (name === '' && npm === null) return null
 
   const stars = numberOf(pick(raw, 'stars', 'starsCount', 'stargazers_count'))
-  const downloads = numberOf(pick(raw, 'downloads', 'downloads30d', 'download', 'downloadCount'))
+  // Download counts, and an honest note about the units: the ecosystem's
+  // `downloads` is npm downloads over 30 days, while 1024 Store publishes a
+  // 7-day npm figure (`npmDownloads7d`) and a harness-install count
+  // (`installs30d`). Only same-metric figures are folded in; the install count
+  // is deliberately NOT mapped here, because "installs" and "downloads" are
+  // different measurements and adding them would invent a number. Stars carry
+  // 1000× the weight of downloads in the ranking, so a window difference cannot
+  // reorder the leaderboard on its own.
+  const downloads = numberOf(pick(raw, 'downloads', 'downloads30d', 'download', 'downloadCount', 'npmDownloads', 'npmDownloads7d'))
 
   return {
     name,
