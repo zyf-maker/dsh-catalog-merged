@@ -65,14 +65,20 @@ export const SEED_SOURCES = [
     id: 'deepseek1024',
     name: 'deepseek1024 (1024 Store)',
     kind: 'catalog',
-    url: 'https://api.deepseek1024.com/api/v1/registry',
-    pick: (r) => (Array.isArray(r) ? r : r?.plugins ?? r?.items ?? r?.data),
-    // Its public registry endpoint answered 404 on every documented path when
-    // this list was written (the site still serves its own UI). Kept in the
-    // registry so a future endpoint is picked up without a code change, but
-    // disabled so a dead host does not spend the run's budget.
-    enabled: false,
-    note: 'registry API currently 404 — enable when it answers',
+    // The catalog lives on the site host, NOT on the developer-API host.
+    // `api.deepseek1024.com/v1/…` is documented to serve only the search
+    // endpoint and `/v1/health`; every other path there 404s **by design**
+    // (verified 2026-09-11), which is why the first source URL never worked and
+    // looked like a dead service. The Worker's own API reference states that
+    // internal routes under `deepseek1024.com/api/v1/` are backward compatible
+    // within their major version, and `/api/v1/plugins` is the view documented
+    // "for external consumers": installable-only, star-ranked, and every entry
+    // carries a working npm install command.
+    url: 'https://deepseek1024.com/api/v1/plugins',
+    pick: (r) => r.packages ?? r.plugins ?? (Array.isArray(r) ? r : null),
+    // Its own cap, not ours: `meta.total` is 500 while `meta.catalogTotal` is
+    // ~13.6k, so the source is capped upstream and there is nothing to page.
+    note: 'installable view, upstream-capped at 500 of ~13.6k (documented)',
   },
 ]
 
