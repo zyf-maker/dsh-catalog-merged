@@ -1,0 +1,44 @@
+name: pages
+
+# Publishes the market UI and the static catalog artifacts. The UI reads
+# data/*.json when no Worker API is configured in front of it, so GitHub Pages
+# alone is a complete deployment.
+on:
+  push:
+    branches: [ main ]
+  workflow_run:
+    workflows: [ ingest ]
+    types: [ completed ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Assemble the site
+        run: |
+          mkdir -p site/data site/web
+          cp -r web/. site/web/
+          cp data/catalog.json data/plugins.json data/sources.json data/rankings.json data/health.json site/data/ 2>/dev/null || true
+          # The market plugin and the dshmarket-compatible registry both live at
+          # stable paths, so a client only needs one configured URL.
+          cp data/plugins.json site/plugins.json 2>/dev/null || true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4
