@@ -34,7 +34,11 @@ jobs:
         # Before the harvest, not after: a broken import or a drifted repair rule
         # should fail in seconds rather than after a run has spent its network
         # budget, and the loader is only exercised here.
-        run: node --test tests/
+        #
+        # No path argument: `node --test tests/` is interpreted as a single file
+        # on Node 22 and fails with MODULE_NOT_FOUND, while a bare `node --test`
+        # discovers `**/*.test.mjs` from the repository root.
+        run: node --test
 
       - name: Harvest, merge, rank
         env:
