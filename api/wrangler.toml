@@ -1,0 +1,23 @@
+# Cloudflare Worker API. Optional: the market is fully functional on GitHub
+# Pages alone, reading data/*.json. Deploy this when you want search and
+# ranking served from a database instead of downloading the catalog.
+name = "dsh-market-api"
+main = "worker.js"
+compatibility_date = "2026-09-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "dsh-market"
+# Set after `wrangler d1 create dsh-market`:
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+
+[vars]
+GITHUB_REPO = "zyf-maker/dsh-catalog-merged"
+GITHUB_REF = "main"
+
+# Secrets (never in this file):
+#   wrangler secret put GITHUB_TOKEN    # dispatches the ingest workflow
+#   wrangler secret put INGEST_TOKEN    # bearer token for POST /api/v1/ingest/run
+
+[observability]
+enabled = true
