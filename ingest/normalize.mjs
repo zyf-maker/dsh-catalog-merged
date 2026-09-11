@@ -42,12 +42,28 @@ function descriptionOf(raw) {
   }
 }
 
-/** Category as one id, from a string or an array. */
+/** Category as one non-empty id, from a string or an array. */
 function categoryOf(raw) {
-  const value = pick(raw, 'category', 'cat', 'categories')
-  if (Array.isArray(value)) return String(value[0] ?? '')
-  return String(value ?? '')
+  const value = pick(raw, 'category', 'cat', 'categories', 'type')
+  const candidates = Array.isArray(value) ? value : [value]
+  for (const candidate of candidates) {
+    const text = String(candidate ?? '').trim()
+    // dshmarket refuses the ENTIRE catalog when one entry has no usable
+    // category, so this must never return an empty string. The fallback is a
+    // real bucket that the market renders, not a placeholder.
+    if (text !== '') return text.toLowerCase()
+  }
+  return UNCATEGORIZED
 }
+
+/**
+ * The bucket every entry without a category lands in.
+ *
+ * Declared once and exported, because three things must agree on it: the id
+ * written into each entry, the label in the catalog's category dictionary, and
+ * the contract check that forbids an empty one.
+ */
+export const UNCATEGORIZED = 'uncategorized'
 
 /** A finite, non-negative number, or 0. */
 function numberOf(value) {
