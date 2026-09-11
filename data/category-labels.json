@@ -1,8 +1,10 @@
 {
-  "_readme": "Hand-written corrections for auto-discovered categories. Keys are the discovered term (see data/categories.json). Values may set: en / zh (rename or translate), hidden (true = never classify and never show), mergeInto (fold this term into another category id, e.g. an existing taxonomy id like 'tools', or another discovered term). This file is never generated: the pipeline only reads it, so an edit here is the supported way to curate emergent categories without touching code.",
-  "_example": {
+  "_readme": "Hand-written overrides for auto-discovered categories. Keys are the discovered term (see data/categories.json and data/category-proposals.json). Values may set: en / zh (rename or translate), hidden (true = never classify and never show), mergeInto (fold this term into another category id — a taxonomy id like 'tools', or another discovered term), promote (true = create a category for a cross-cutting proposal that the pipeline deliberately did not create on its own). This file is never generated: the pipeline only reads it, so an edit here is the supported way to curate emergent categories without touching code.",
+  "_why_promote_exists": "Automatic creation is limited to clusters with no home (terms that dominate the unclassified set). Measurement showed cross-cutting terms — codex, claude, xby, management, sync — describe what a plugin integrates with or how it is built, not what it is, so creating buckets for them would split the sidebar by attribute. They are offered as proposals instead, with their numbers, and a person decides.",
+  "_examples": {
     "quantum": { "en": "Quantum computing", "zh": "量子计算" },
-    "claude": { "mergeInto": "agent" },
-    "token": { "hidden": true }
+    "claude": { "promote": true, "en": "Claude integration", "zh": "Claude 集成" },
+    "token": { "mergeInto": "session" },
+    "xby": { "hidden": true }
   }
 }
