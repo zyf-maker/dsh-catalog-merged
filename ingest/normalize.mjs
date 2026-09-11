@@ -56,6 +56,40 @@ function numberOf(value) {
 }
 
 /**
+ * A full npm spec: an optional `npm:` alias prefix, a name (optionally scoped),
+ * and an optional `@version` or `@dist-tag`.
+ *
+ * Production data contains all of these — `@linxin666/dsh-web-ui-all@0.1.10`,
+ * `dsh-codex-connect@alpha`, `npm:dsh-plugins-store` — and the first version's
+ * name-only pattern typed every one of them as `other`, which silently drops
+ * them from any consumer that filters on the install kind.
+ */
+const NPM_SPEC = /^(?:npm:)?((?:@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*)(?:@[^\s]+)?$/i
+
+/** Strip the quotes a source may have included around its install spec. */
+function unquote(value) {
+  const text = String(value ?? '').trim()
+  if (text.length >= 2 && ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'")))) {
+    return text.slice(1, -1).trim()
+  }
+  return text
+}
+
+/** GitHub-family targets, including the harness's own `#path:` monorepo selector. */
+function isGitTarget(spec) {
+  if (spec.startsWith('github:') || spec.startsWith('git+') || spec.startsWith('git:')) return true
+  if (/^https?:\/\/github\.com\//.test(spec)) return true
+  // `github:owner/repo#path:/sub` names a package inside a monorepo.
+  if (spec.startsWith('github:') || /^[^\s/]+\/[^\s/]+#path:/.test(spec)) return true
+  return false
+}
+
+/** A release archive hosted on GitHub, which the market binds to its own repo. */
+function isTarball(spec) {
+  return /^https:\/\/github\.com\/[^/]+\/[^/]+\/releases\/download\/.+\.(tgz|tar\.gz)$/.test(spec)
+}
+
+/**
  * Classify an install target the way the harness does.
  *
  * @param input - `install`, `npm`, `tarball`, `repoPath`, `url`, `installable`.
@@ -68,21 +102,19 @@ export function classifyTarget({ install = '', npm = null, tarball = null, repoP
   // `installable: false` is a source's own verdict that the entry cannot be
   // installed; it is honoured for everything except an explicit target, which
   // is stronger evidence than the flag.
-  const spec = /add\s+(\S+)\s*$/.exec(command)?.[1] ?? ''
-  if (spec !== '' && spec !== 'null' && spec !== 'undefined') {
-    if (tarball !== null && /^https:\/\/github\.com\//.test(String(tarball))) {
-      return { kind: 'tarball', target: String(tarball), command, needsEvidence: false }
-    }
-    if (spec.startsWith('github:') || spec.startsWith('git+') || /^https?:\/\/github\.com\//.test(spec)) {
-      return { kind: 'github', target: spec, command, needsEvidence: false }
-    }
-    if (!spec.startsWith('-')) return { kind: NPM_NAME.test(spec) ? 'npm' : 'other', target: spec, command, needsEvidence: false }
+  const spec = unquote(/add\s+(.+?)\s*$/.exec(command)?.[1] ?? '')
+  if (spec !== '' && spec !== 'null' && spec !== 'undefined' && !spec.startsWith('-')) {
+    if (isTarball(spec)) return { kind: 'tarball', target: spec, command, needsEvidence: false }
+    if (isGitTarget(spec)) return { kind: 'github', target: spec, command, needsEvidence: false }
+    if (NPM_SPEC.test(spec)) return { kind: 'npm', target: spec, command, needsEvidence: false }
+    return { kind: 'other', target: spec, command, needsEvidence: false }
   }
   if (npm !== null && NPM_NAME.test(String(npm))) {
     return { kind: 'npm', target: String(npm), command: command === '' ? `dsh plugin --profile web add ${npm}` : command, needsEvidence: false }
   }
-  if (tarball !== null && /^https:\/\/github\.com\//.test(String(tarball))) {
-    return { kind: 'tarball', target: String(tarball), command: `dsh plugin add ${tarball}`, needsEvidence: false }
+  const tarballSpec = unquote(tarball ?? '')
+  if (tarballSpec !== '' && isTarball(tarballSpec)) {
+    return { kind: 'tarball', target: tarballSpec, command: `dsh plugin add ${tarballSpec}`, needsEvidence: false }
   }
   // Last resort: the repository itself, which requires admission evidence.
   const fromRepo = repoPath ?? (url === '' ? null : repoFromUrl(url)?.path ?? null)
