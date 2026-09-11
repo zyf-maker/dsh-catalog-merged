@@ -10,7 +10,6 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { identityOf } from './normalize.mjs'
 
 const ROOT = join(dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '..')
 const args = process.argv.slice(2)
@@ -21,6 +20,20 @@ const sourcesPath = join(dirname(catalogPath), 'sources.json')
 const catalog = JSON.parse(readFileSync(catalogPath, 'utf8'))
 const sources = JSON.parse(readFileSync(sourcesPath, 'utf8'))
 const now = new Date().toISOString()
+
+/**
+ * The canonical id comes from the catalog, which the ingest run computed by
+ * folding every source's keys into an equivalence class.
+ *
+ * Recomputing it here from a record's own fields is what the first version did,
+ * and it is why the loader silently disagreed with the catalog about what the
+ * same plugin is: the loader saw one record, the merge had seen all of them.
+ * An entry without an id is therefore a format error, not something to guess at.
+ */
+function idOf(plugin) {
+  if (typeof plugin.id === 'string' && plugin.id !== '') return plugin.id
+  throw new Error(`catalog entry "${plugin.name ?? '?'}" has no id; regenerate the catalog with the current ingest run`)
+}
 
 const statements = []
 const q = (value) => (value === null || value === undefined ? 'NULL' : `'${String(value).replace(/'/g, "''")}'`)
@@ -45,7 +58,7 @@ for (const source of sources.sources) {
 
 // Plugins, then their provenance, so a re-run updates rather than duplicates.
 for (const plugin of catalog.plugins) {
-  const id = identityOf(plugin)
+  const id = idOf(plugin)
   statements.push(
     `INSERT INTO plugins (id,name,owner,url,repo,category,desc_en,desc_zh,npm,tarball,install_target,target_kind,
        stars,downloads,score,version,added_at,first_seen,updated_at,deprecated,replacement,content_hash) VALUES (` +
@@ -83,7 +96,7 @@ for (const [kind, rows] of Object.entries(rankKinds)) {
   rows.slice(0, 500).forEach((plugin, index) => {
     statements.push(
       `INSERT INTO rankings (plugin_id,kind,rank,computed_at) VALUES (` +
-      [q(identityOf(plugin)), q(kind), String(index + 1), q(now)].join(',') + `)
+      [q(idOf(plugin)), q(kind), String(index + 1), q(now)].join(',') + `)
        ON CONFLICT(plugin_id,kind) DO UPDATE SET rank=excluded.rank, computed_at=excluded.computed_at;`,
     )
   })
