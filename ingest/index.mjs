@@ -21,10 +21,11 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { SEED_SOURCES, HARVEST_SOURCES, discoverSources } from './sources.mjs'
 import { harvesterFor } from './harvest.mjs'
-import { normalize, betterRecord, byRank } from './normalize.mjs'
+import { normalize, betterRecord, byRank, UNCATEGORIZED } from './normalize.mjs'
 import { buildIdentityIndex } from './identity.mjs'
 import { AdmissionCache, verifyAll } from './admission.mjs'
 import { planRepair } from './compat.mjs'
+import { assertCatalogAcceptable } from './catalog-contract.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 
@@ -204,7 +205,34 @@ export async function runIngest({
   const byCategory = plugins.reduce((acc, p) => { const c = p.category || 'uncategorized'; acc[c] = (acc[c] ?? 0) + 1; return acc }, {})
   const multiSource = plugins.filter((p) => p.sources.length > 1).length
   const duplicatesCollapsed = records.length - classes.size
-  const categories = Object.fromEntries(Object.keys(byCategory).sort().map((id) => [id, { en: id, zh: id }]))
+  /**
+   * The catalog's category dictionary, in the market's shape: an id mapped to
+   * its labels. `uncategorized` is labelled rather than shown as a raw id,
+   * because it is a real bucket holding a third of the catalog and a user
+   * reading "uncategorized" in English beside a Chinese UI learns nothing.
+   */
+  const CATEGORY_LABELS = {
+    [UNCATEGORIZED]: { en: 'Uncategorized', zh: '未分类' },
+    ui: { en: 'UI', zh: '界面' },
+    webui: { en: 'Web UI', zh: '网页界面' },
+    skin: { en: 'Themes & skins', zh: '主题皮肤' },
+    tools: { en: 'Tools', zh: '工具' },
+    devtools: { en: 'Developer tools', zh: '开发工具' },
+    agent: { en: 'Agents', zh: '智能体' },
+    memory: { en: 'Memory', zh: '记忆' },
+    vision: { en: 'Vision', zh: '视觉' },
+    data: { en: 'Data', zh: '数据' },
+    code: { en: 'Code', zh: '代码' },
+    channel: { en: 'Channels', zh: '消息渠道' },
+    browser: { en: 'Browser', zh: '浏览器' },
+    docs: { en: 'Docs', zh: '文档' },
+    skills: { en: 'Skills', zh: '技能' },
+    sandbox: { en: 'Sandbox', zh: '沙箱' },
+    eco: { en: 'Ecosystem', zh: '生态' },
+  }
+  const categories = Object.fromEntries(
+    Object.keys(byCategory).sort().map((id) => [id, CATEGORY_LABELS[id] ?? { en: id, zh: id }]),
+  )
 
   const stats = {
     normalized: records.length,
@@ -223,7 +251,7 @@ export async function runIngest({
     byCategory,
   }
 
-  write(join(out, 'catalog.json'), {
+  const catalog = {
     schema: 'dsh-market/catalog-v3',
     name: 'dsh-market (own)',
     url: 'https://github.com/zyf-maker/dsh-catalog-merged',
@@ -233,9 +261,9 @@ export async function runIngest({
     ranking: { formula: 'stars*1000 + downloads', order: ['score', 'stars', 'downloads', 'name'] },
     stats,
     plugins,
-  })
+  }
 
-  write(join(out, 'plugins.json'), {
+  const marketCatalog = {
     name: 'dsh-market',
     url: 'https://github.com/zyf-maker/dsh-catalog-merged',
     updated,
@@ -245,7 +273,14 @@ export async function runIngest({
       name: p.name,
       owner: p.owner,
       url: p.url,
-      category: p.category,
+      // The repository is shipped so the installer can re-read the manifest
+      // against the host's own version — the one fact the ingest run cannot know.
+      repo: p.repoPath,
+      subpath: p.repoSubpath,
+      // dshmarket refuses the whole catalog over one unusable category, so a
+      // plugin without one is placed in the labelled fallback bucket rather
+      // than published with `""`.
+      category: p.category === '' ? UNCATEGORIZED : p.category,
       description: p.description,
       npm: p.npm,
       tarball: p.tarball,
@@ -253,9 +288,19 @@ export async function runIngest({
       downloads: p.downloads,
       score: p.score,
       install: p.install,
+      installable: p.installable,
+      compat: p.compat ?? null,
       added: p.added,
     })),
-  })
+  }
+
+  // Before anything is written: a catalog the market would refuse must fail in
+  // the run that produced it, where the reason is readable, instead of inside
+  // the user's settings window as "插件目录加载失败".
+  assertCatalogAcceptable(marketCatalog, log)
+
+  write(join(out, 'catalog.json'), catalog)
+  write(join(out, 'plugins.json'), marketCatalog)
 
   write(join(out, 'sources.json'), { updated, sources: sourceHealth })
   write(join(out, 'rankings.json'), {
