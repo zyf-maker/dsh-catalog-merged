@@ -102,6 +102,18 @@ export async function verifyPlugin({ repoPath, subpath = null, branch = 'HEAD', 
 }
 
 /**
+ * How long an admission verdict is trusted.
+ *
+ * A verdict keyed only by revision never expires for a repository that reports
+ * no revision at all (`repo@pushedAt` where `pushedAt` is empty), so a plugin
+ * rejected once because its manifest was missing would stay rejected forever —
+ * including after it ships the manifest. Expiring verdicts means every
+ * repository is re-asked eventually, and a changed revision is re-asked
+ * immediately because it produces a different key.
+ */
+export const VERDICT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000
+
+/**
  * A cache of admission verdicts, keyed by `repo@revision`.
  *
  * Keyed by revision rather than by repo on purpose: a repository that adds a
@@ -112,23 +124,27 @@ export class AdmissionCache {
   #entries
   #hits = 0
   #misses = 0
+  #expired = 0
 
-  constructor(path) {
+  constructor(path, { maxAgeMs = VERDICT_MAX_AGE_MS } = {}) {
     this.path = path
+    this.maxAgeMs = maxAgeMs
     this.#entries = existsSync(path) ? JSON.parse(readFileSync(path, 'utf8')) : {}
   }
 
-  /** Look up a verdict, or undefined when it must be probed. */
+  /** Look up a verdict, or undefined when it is missing or too old to trust. */
   get(key) {
     const hit = this.#entries[key]
     if (hit === undefined) { this.#misses += 1; return undefined }
+    const age = Date.now() - (Number(hit.at) || 0)
+    if (!Number.isFinite(age) || age > this.maxAgeMs) { this.#expired += 1; this.#misses += 1; return undefined }
     this.#hits += 1
     return hit
   }
 
-  /** Record a verdict. */
+  /** Record a verdict, stamped so it can expire. */
   set(key, value) {
-    this.#entries[key] = value
+    this.#entries[key] = { ...value, at: Date.now() }
   }
 
   /** Persist, pruning verdicts for revisions no longer current. */
@@ -139,7 +155,7 @@ export class AdmissionCache {
   }
 
   get stats() {
-    return { hits: this.#hits, misses: this.#misses, size: Object.keys(this.#entries).length }
+    return { hits: this.#hits, misses: this.#misses, expired: this.#expired, size: Object.keys(this.#entries).length }
   }
 }
 
