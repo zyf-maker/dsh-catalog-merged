@@ -1,158 +1,166 @@
 /**
  * Normalization and ranking.
  *
- * Every source invents its own field names; the market needs one record shape
- * and one identity, because identity is what makes deduplication possible.
+ * Every source invents its own field names — snake_case, camelCase, `summary`
+ * beside `description`, a `repo` that is sometimes `owner/name` and sometimes a
+ * bare name — and one of them (DSH Marketplace) returns `summary`/`summaryZh`
+ * only. The first version read one assumed spelling, so every one of that
+ * source's 7741 descriptions was silently empty and its repository identity
+ * collapsed to a bare name.
+ *
+ * So mapping is explicit and multi-spelling here, and nothing downstream has to
+ * know which source a record came from.
  */
+import { parseRepo, repoFromUrl, NPM_NAME } from './identity.mjs'
 import { DENY_REPOS, DENY_TYPES } from './sources.mjs'
-
-/** npm package names the harness accepts as an install target. */
-const NPM_NAME = /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/
 
 /** Composite ranking weight: stars dominate, downloads break ties and lift. */
 export const STARS_WEIGHT = 1000
 
-/** Localized description, from whatever shape the source used. */
-function description(value) {
-  if (value === null || value === undefined) return { en: '', zh: '' }
-  if (typeof value === 'string') return { en: value, zh: '' }
+/** First defined value among the spellings a source might use. */
+function pick(raw, ...names) {
+  for (const name of names) {
+    const value = raw[name]
+    if (value !== undefined && value !== null && value !== '') return value
+  }
+  return undefined
+}
+
+/** Localized description from a string, an object, or the split summary fields. */
+function descriptionOf(raw) {
+  const value = pick(raw, 'description', 'desc', 'note', 'summary')
+  const zhValue = pick(raw, 'descriptionZh', 'descZh', 'summaryZh', 'noteZh')
+  if (value !== undefined && typeof value === 'object' && !Array.isArray(value)) {
+    return {
+      en: String(value.en ?? value.English ?? '').trim(),
+      zh: String(value['zh-Hans'] ?? value.zh ?? value.zh_CN ?? zhValue ?? '').trim(),
+    }
+  }
   return {
-    en: value.en ?? value.English ?? '',
-    zh: value['zh-Hans'] ?? value.zh ?? value.zh_CN ?? '',
+    en: String(value ?? '').trim(),
+    zh: String(zhValue ?? '').trim(),
   }
 }
 
-/** GitHub `owner/repo` out of any of the URL shapes a source might use. */
-export function ghRepo(url) {
-  const match = /github\.com\/([^/]+\/[^/]+?)(?:\.git)?(?:\/|$)/.exec(String(url ?? ''))
-  return match ? match[1] : ''
+/** Category as one id, from a string or an array. */
+function categoryOf(raw) {
+  const value = pick(raw, 'category', 'cat', 'categories')
+  if (Array.isArray(value)) return String(value[0] ?? '')
+  return String(value ?? '')
+}
+
+/** A finite, non-negative number, or 0. */
+function numberOf(value) {
+  const n = Number(value)
+  return Number.isFinite(n) && n > 0 ? Math.trunc(n) : 0
 }
 
 /**
- * Classify an install target the way the harness does, so the market can show
- * what an install will actually pull and which repositories it must trust.
+ * Classify an install target the way the harness does.
  *
- * @param entry - `install` command, `npm` name, `tarball` URL, `url` of the page.
+ * @param input - `install`, `npm`, `tarball`, `repoPath`, `url`, `installable`.
+ * @returns `{ kind, target, command, needsEvidence }`. `needsEvidence` marks a
+ *   target inferred from a repository alone: those must pass admission before
+ *   the market shows them, because a repository URL is not proof of a plugin.
  */
-export function classifyTarget({ install = '', npm = null, tarball = null, url = '' }) {
-  const command = String(install ?? '')
+export function classifyTarget({ install = '', npm = null, tarball = null, repoPath = null, url = '', installable }) {
+  const command = String(install ?? '').trim()
+  // `installable: false` is a source's own verdict that the entry cannot be
+  // installed; it is honoured for everything except an explicit target, which
+  // is stronger evidence than the flag.
   const spec = /add\s+(\S+)\s*$/.exec(command)?.[1] ?? ''
-  if (tarball && /^https:\/\/github\.com\//.test(tarball)) {
-    return { kind: 'tarball', target: tarball, command: `dsh plugin add ${tarball}` }
+  if (spec !== '' && spec !== 'null' && spec !== 'undefined') {
+    if (tarball !== null && /^https:\/\/github\.com\//.test(String(tarball))) {
+      return { kind: 'tarball', target: String(tarball), command, needsEvidence: false }
+    }
+    if (spec.startsWith('github:') || spec.startsWith('git+') || /^https?:\/\/github\.com\//.test(spec)) {
+      return { kind: 'github', target: spec, command, needsEvidence: false }
+    }
+    if (!spec.startsWith('-')) return { kind: NPM_NAME.test(spec) ? 'npm' : 'other', target: spec, command, needsEvidence: false }
   }
-  if (spec.startsWith('github:') || spec.startsWith('git+') || /^https?:\/\/github\.com\//.test(spec)) {
-    return { kind: 'github', target: spec, command: command || `dsh plugin add ${spec}` }
+  if (npm !== null && NPM_NAME.test(String(npm))) {
+    return { kind: 'npm', target: String(npm), command: command === '' ? `dsh plugin --profile web add ${npm}` : command, needsEvidence: false }
   }
-  if (spec !== '' && !spec.startsWith('-')) {
-    return { kind: NPM_NAME.test(spec) ? 'npm' : 'other', target: spec, command }
+  if (tarball !== null && /^https:\/\/github\.com\//.test(String(tarball))) {
+    return { kind: 'tarball', target: String(tarball), command: `dsh plugin add ${tarball}`, needsEvidence: false }
   }
-  if (npm && NPM_NAME.test(npm)) {
-    return { kind: 'npm', target: npm, command: `dsh plugin --profile web add ${npm}` }
+  // Last resort: the repository itself, which requires admission evidence.
+  const fromRepo = repoPath ?? (url === '' ? null : repoFromUrl(url)?.path ?? null)
+  if (fromRepo !== null && installable !== false) {
+    return { kind: 'github', target: `github:${fromRepo}`, command: `dsh plugin add github:${fromRepo}`, needsEvidence: true }
   }
-  const repo = ghRepo(url)
-  if (repo) return { kind: 'github', target: `github:${repo}`, command: `dsh plugin add github:${repo}` }
-  return { kind: 'unknown', target: '', command }
+  return { kind: 'unknown', target: '', command: '', needsEvidence: false }
 }
 
 /**
- * Turn one raw source entry into a canonical plugin record, or null when the
- * entry is not a plugin at all.
+ * Turn one raw source entry into a canonical record, or null when the entry
+ * cannot become an installable plugin.
  *
  * @param raw - the source's own entry object.
- * @param sourceId - which source it came from (provenance).
- * @param requireType - when set, the source's `type` must equal it.
+ * @param sourceId - provenance.
+ * @param requireType - when set, the source's own `type` must equal it.
  */
 export function normalize(raw, sourceId, requireType) {
   if (raw === null || typeof raw !== 'object') return null
-  const type = String(raw.type ?? raw.kind ?? '').trim()
+  const type = String(pick(raw, 'type', 'kind') ?? '').trim()
   if (requireType !== undefined && type !== requireType) return null
   if (DENY_TYPES.has(type)) return null
 
-  const repo = raw.full_name ?? raw.repo ?? ghRepo(raw.url ?? raw.page ?? raw.homepage)
-  if (DENY_REPOS.has(repo)) return null
+  const repo = parseRepo({
+    fullName: pick(raw, 'fullName', 'full_name'),
+    repo: pick(raw, 'repo'),
+    owner: pick(raw, 'owner'),
+    subpath: pick(raw, 'subpath', 'path'),
+  }) ?? repoFromUrl(pick(raw, 'url', 'page', 'homepage', 'repoUrl'))
+  if (repo !== null && DENY_REPOS.has(repo.path.toLowerCase())) return null
 
-  const name = String(raw.name ?? (repo ? String(repo).split('/').pop() : '')).trim()
-  const npm = raw.npm ?? raw.pkg ?? null
-  if (name === '' && !npm) return null
+  const npm = pick(raw, 'npm', 'npmPackage', 'pkg') ?? null
+  const installRaw = pick(raw, 'install', 'cmd') ?? ''
+  const tarball = pick(raw, 'tarball') ?? null
+  const url = String(pick(raw, 'url', 'page', 'homepage', 'repoUrl')
+    ?? (repo === null ? '' : `https://github.com/${repo.path}`))
+  const target = classifyTarget({
+    install: installRaw, npm, tarball, repoPath: repo?.path ?? null, url,
+    installable: pick(raw, 'installable'),
+  })
+  // A record with no usable target is still kept: it may be one source's view
+  // of a plugin another source can install, and dropping it here would throw
+  // away its stars, its localized description and its provenance. The runner
+  // drops a plugin only when no record for it has a target.
+  const hasTarget = target.kind !== 'unknown'
 
-  const url = raw.url ?? raw.page ?? raw.homepage ?? (repo ? `https://github.com/${repo}` : '')
-  const target = classifyTarget({ install: raw.install ?? raw.cmd, npm, tarball: raw.tarball ?? null, url })
-  if (target.kind === 'unknown') return null
-  const stars = Number(raw.stars ?? raw.starsCount ?? 0) || 0
-  const downloads = Number(raw.downloads ?? raw.downloads30d ?? raw.download ?? 0) || 0
-  const category = Array.isArray(raw.category) ? raw.category[0] ?? '' : String(raw.category ?? raw.cat ?? '')
+  const name = String(pick(raw, 'name') ?? (repo === null ? '' : repo.subpath === null ? repo.path.split('/').pop() : repo.subpath.split('/').pop())).trim()
+  if (name === '' && npm === null) return null
+
+  const stars = numberOf(pick(raw, 'stars', 'starsCount', 'stargazers_count'))
+  const downloads = numberOf(pick(raw, 'downloads', 'downloads30d', 'download', 'downloadCount'))
 
   return {
     name,
-    owner: String(raw.owner ?? (repo ? String(repo).split('/')[0] : '')).trim(),
+    owner: String(pick(raw, 'owner') ?? (repo === null ? '' : repo.path.split('/')[0])).trim(),
     url,
-    repo,
-    category,
-    description: description(raw.description ?? raw.desc ?? raw.note),
-    npm: npm ?? null,
-    tarball: raw.tarball ?? null,
+    repoPath: repo?.path ?? null,
+    repoSubpath: repo?.subpath ?? null,
+    category: categoryOf(raw),
+    description: descriptionOf(raw),
+    npm: npm === null ? null : String(npm),
+    tarball: tarball === null ? null : String(tarball),
     install: target.command,
     target: target.target,
-    targetKind: target.kind,
+    targetKind: target.kind === 'unknown' ? 'github' : target.kind,
+    hasTarget,
+    // A target inferred from a repository has to be verified before the market
+    // offers it as one-click installable.
+    needsEvidence: target.needsEvidence,
+    installable: !hasTarget ? false : (target.needsEvidence ? null : true),
+    riskFlags: Array.isArray(pick(raw, 'riskFlags')) ? raw.riskFlags : [],
     stars,
     downloads,
     score: Math.round(stars * STARS_WEIGHT + downloads),
-    version: raw.version ?? '',
-    added: String(raw.added ?? raw.pushed_at ?? '').slice(0, 10),
+    version: String(pick(raw, 'version') ?? ''),
+    added: String(pick(raw, 'added', 'pushedAt', 'pushed_at') ?? '').slice(0, 10),
     sourceId,
   }
-}
-
-/**
- * The identity key that decides two entries are the same plugin.
- *
- * Ordered by certainty: an npm name is a globally unique package identity, a
- * repository path is unique on GitHub, and a bare name is a last resort. Using
- * one key for the whole merge is what makes "keep the newest" well defined.
- */
-export function identityOf(plugin) {
-  if (plugin.npm && NPM_NAME.test(plugin.npm)) return `npm:${plugin.npm.toLowerCase()}`
-  if (plugin.repo) return `repo:${plugin.repo.toLowerCase()}`
-  return `name:${String(plugin.name).toLowerCase()}`
-}
-
-/**
- * Merge one entry into the accumulator, keeping the newest/hottest duplicate.
- *
- * "Newest" is deliberately ordered rather than a timestamp: a source that
- * stopped updating has an old `version`, and stars/downloads are what the
- * ranking is built on, so the surviving record is the one that wins the
- * ranking. Provenance is unioned instead of replaced — a plugin listed by
- * three sources keeps all three.
- *
- * @param seen - the `Map<identity, record>` accumulator.
- * @param plugin - the normalized candidate.
- * @returns whether the candidate replaced an existing record.
- */
-export function mergeInto(seen, plugin) {
-  const key = identityOf(plugin)
-  const existing = seen.get(key)
-  if (existing === undefined) {
-    seen.set(key, { ...plugin, sources: [plugin.sourceId] })
-    return true
-  }
-  const better =
-    plugin.stars > existing.stars ||
-    (plugin.stars === existing.stars && plugin.downloads > existing.downloads) ||
-    (plugin.stars === existing.stars && plugin.downloads === existing.downloads && plugin.install.length > existing.install.length)
-  if (!better) {
-    if (!existing.sources.includes(plugin.sourceId)) existing.sources.push(plugin.sourceId)
-    // Fill gaps: a duplicate often carries a field the winner lacks.
-    existing.description.en ||= plugin.description.en
-    existing.description.zh ||= plugin.description.zh
-    existing.category ||= plugin.category
-    existing.version ||= plugin.version
-    existing.npm ??= plugin.npm
-    return false
-  }
-  const sources = existing.sources.includes(plugin.sourceId) ? existing.sources : [...existing.sources, plugin.sourceId]
-  seen.set(key, { ...plugin, sources })
-  return true
 }
 
 /** Rank order: score, then stars, then downloads, then name (stable). */
@@ -163,4 +171,25 @@ export function byRank(a, b) {
     b.downloads - a.downloads ||
     a.name.localeCompare(b.name)
   )
+}
+
+/**
+ * Which of two records for the same plugin should survive.
+ *
+ * Deliberately not "the newest timestamp": a source that stopped updating has
+ * an old timestamp, and the ranking is built on stars and downloads, so the
+ * record that wins the ranking is the one worth keeping. Ties fall back to the
+ * record that carries more install-relevant information, so provenance and a
+ * richer install command are never thrown away for an equally ranked duplicate.
+ */
+export function betterRecord(candidate, existing) {
+  if (existing === undefined) return true
+  // A record that can actually be installed beats one that cannot, whatever the
+  // popularity numbers say: the market's job is to install plugins.
+  if (candidate.hasTarget !== existing.hasTarget) return candidate.hasTarget
+  if (candidate.stars !== existing.stars) return candidate.stars > existing.stars
+  if (candidate.downloads !== existing.downloads) return candidate.downloads > existing.downloads
+  if ((candidate.npm !== null) !== (existing.npm !== null)) return candidate.npm !== null
+  if (candidate.install.length !== existing.install.length) return candidate.install.length > existing.install.length
+  return candidate.name.length > existing.name.length
 }
