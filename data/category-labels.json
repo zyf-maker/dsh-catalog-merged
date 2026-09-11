@@ -1,0 +1,8 @@
+{
+  "_readme": "Hand-written corrections for auto-discovered categories. Keys are the discovered term (see data/categories.json). Values may set: en / zh (rename or translate), hidden (true = never classify and never show), mergeInto (fold this term into another category id, e.g. an existing taxonomy id like 'tools', or another discovered term). This file is never generated: the pipeline only reads it, so an edit here is the supported way to curate emergent categories without touching code.",
+  "_example": {
+    "quantum": { "en": "Quantum computing", "zh": "量子计算" },
+    "claude": { "mergeInto": "agent" },
+    "token": { "hidden": true }
+  }
+}
