@@ -1,14 +1,15 @@
 /**
- * Load a catalog artifact into SQLite (or Cloudflare D1) using the schema in
- * db/schema.sql. Kept separate from the ingest run because the same JSON feeds
- * a static host, a local database, and D1 — the loader is the only part that
- * knows about SQL.
+ * Load a catalog artifact into SQLite (or Cloudflare D1), emitting a complete,
+ * self-contained SQL file: the schema first, then the data.
+ *
+ * Kept separate from the ingest run because the same JSON feeds a static host, a
+ * local database, and D1 — the loader is the only part that knows about SQL.
  *
  * Usage:
- *   node ingest/load-sqlite.mjs --db data/market.sql       # emits SQL to pipe
- *   node ingest/load-sqlite.mjs --db data/market.sql --apply
+ *   node ingest/load-sqlite.mjs --db data/market.sql          # emits SQL to stdout
+ *   node ingest/load-sqlite.mjs --db data/market.sql --apply  # writes the file
  */
-import { readFileSync, writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 
 const ROOT = join(dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '..')
@@ -20,6 +21,18 @@ const sourcesPath = join(dirname(catalogPath), 'sources.json')
 const catalog = JSON.parse(readFileSync(catalogPath, 'utf8'))
 const sources = JSON.parse(readFileSync(sourcesPath, 'utf8'))
 const now = new Date().toISOString()
+
+/**
+ * The schema is emitted with the data rather than left to the caller.
+ *
+ * The first version produced INSERT statements only, and the CI step that
+ * consumed them never applied `db/schema.sql` — so every insert failed with
+ * "no such table" and the run ended with an empty database. A file that must be
+ * applied before this one is a step someone will forget; `IF NOT EXISTS` in the
+ * schema makes inlining it free and idempotent.
+ */
+const schemaPath = join(ROOT, 'db', 'schema.sql')
+const schema = existsSync(schemaPath) ? readFileSync(schemaPath, 'utf8') : ''
 
 /**
  * The canonical id comes from the catalog, which the ingest run computed by
@@ -102,7 +115,16 @@ for (const [kind, rows] of Object.entries(rankKinds)) {
   })
 }
 
-const sql = `PRAGMA foreign_keys = ON;\nBEGIN;\n${statements.join('\n')}\nCOMMIT;\n`
+// Schema first (idempotent), then one transaction of data. `PRAGMA` cannot run
+// inside the transaction, so the ordering below is load-bearing.
+const sql = [
+  'PRAGMA foreign_keys = ON;',
+  schema.trim() === '' ? '' : `-- ---- schema (db/schema.sql) ----\n${schema.trim()}`,
+  '-- ---- data ----\nBEGIN;',
+  statements.join('\n'),
+  'COMMIT;',
+  '',
+].filter((chunk) => chunk !== '').join('\n')
 if (args.includes('--apply')) writeFileSync(dbPath, sql)
 else process.stdout.write(sql)
 console.error(`load-sqlite: ${catalog.plugins.length} plugins, ${statements.length} statements`)
