@@ -1,23 +1,40 @@
 {
-  "updated": "2026-09-11T15:11:16.055Z",
-  "count": 1,
+  "updated": "2026-09-11T15:36:31.322Z",
+  "count": 2,
   "plugins": [
     {
       "rank": 1,
-      "id": "repo:tuojc/dsh-browser-firefox",
-      "name": "dsh-browser-firefox",
-      "owner": "tuojc",
-      "url": "https://github.com/tuojc/dsh-browser-firefox",
-      "category": "vision",
+      "id": "npm:dsh-browser",
+      "name": "dsh-browser",
+      "owner": "Lum1104",
+      "url": "https://github.com/Lum1104/dsh-browser",
+      "category": "tools",
       "description": {
-        "en": "Firefox browser-control plugin for DeepSeek Harness: one DSH plugin + one Firefox extension, driving your own Firefox over a token-authenticated WebSocket. Text-first toolset (snapshot/click/type/navigate/tab-stack) with screenshot as visual fallback. Firefox add-on available on AMO. Ported from Lum1104/dsh-browser (MIT).",
-        "zh": "让 DeepSeek Harness 直接操控你的 Firefox 标签页，后台静默操作，保留登录状态，无需切换窗口。"
+        "en": "Chrome sidebar extension letting DSH drive the browser.",
+        "zh": "Chrome 侧边栏扩展，让 DSH 操控浏览器。"
       },
-      "install": "dsh plugin --profile web add github:tuojc/dsh-browser-firefox",
-      "targetKind": "github",
-      "stars": 3,
+      "install": "dsh plugin add dsh-browser",
+      "targetKind": "npm",
+      "stars": 630,
       "downloads": 0,
-      "score": 3000
+      "score": 630000
+    },
+    {
+      "rank": 2,
+      "id": "npm:@onetest/dsh-deck",
+      "name": "@onetest/dsh-deck",
+      "owner": "arozumenko",
+      "url": "git+https://github.com/onetest-ai/octodeck.git",
+      "category": "dev",
+      "description": {
+        "en": "Octodeck deck capability for DeepSeek Harness: deck tools, a live preview server, and the deck canvas",
+        "zh": ""
+      },
+      "install": "dsh plugin --profile web add @onetest/dsh-deck",
+      "targetKind": "npm",
+      "stars": 0,
+      "downloads": 1054,
+      "score": 1054
     }
   ]
 }
