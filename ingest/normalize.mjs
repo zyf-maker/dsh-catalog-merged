@@ -170,8 +170,11 @@ export function classifyTarget({ install = '', npm = null, tarball = null, repoP
  * @param raw - the source's own entry object.
  * @param sourceId - provenance.
  * @param requireType - when set, the source's own `type` must equal it.
+ * @param context - `discovered` rules, so a category the pipeline created on an
+ *   earlier run is applied while harvesting rather than only in a later pass.
  */
-export function normalize(raw, sourceId, requireType) {
+export function normalize(raw, sourceId, requireType, context = {}) {
+  const discovered = Array.isArray(context.discovered) ? context.discovered : []
   if (raw === null || typeof raw !== 'object') return null
   const type = String(pick(raw, 'type', 'kind') ?? '').trim()
   if (requireType !== undefined && type !== requireType) return null
@@ -224,12 +227,11 @@ export function normalize(raw, sourceId, requireType) {
   // plugin's own text to place what the raw catalog could not.
   const description = descriptionOf(raw)
   const rawCategory = categoryOf(raw)
-  const classified = classify({
-    rawCategory,
-    name,
-    description,
-    topics: Array.isArray(pick(raw, 'topics')) ? raw.topics : [],
-  })
+  // Topics are stored on the record, not just used for this decision: category
+  // discovery reads them (they are curated tokens, unlike prose), and they are the
+  // strongest signal a repository publishes about what it is.
+  const topics = Array.isArray(pick(raw, 'topics')) ? raw.topics.map(String) : []
+  const classified = classify({ rawCategory, name, description, topics, discovered })
 
   return {
     name,
@@ -240,6 +242,7 @@ export function normalize(raw, sourceId, requireType) {
     category: classified.category,
     categorySource: classified.source,
     rawCategory,
+    topics,
     description,
     npm: npm === null ? null : String(npm),
     tarball: tarball === null ? null : String(tarball),
