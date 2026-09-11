@@ -39,9 +39,11 @@ const normalize = (e, src) => {
     return { en: v.en ?? v.English ?? '', zh: v['zh-Hans'] ?? v.zh ?? '' }
   }
   const s = e.stars ?? e.starsCount ?? 0
-  const d = e.downloads ?? e.downloads30d ?? 0
+  const d = e.downloads ?? e.downloads30d ?? e.download ?? 0
   const name = e.name ?? (e.repo ? String(e.repo).split('/').pop() : '')
   const url = e.url ?? e.page ?? e.homepage ?? (e.repo ? `https://github.com/${e.repo}` : '')
+  const stars = Number.isFinite(s) ? s : 0
+  const downloads = Number.isFinite(d) ? d : 0
   return {
     name: String(name ?? ''),
     owner: e.owner ?? (e.repo ? String(e.repo).split('/')[0] : ''),
@@ -50,8 +52,11 @@ const normalize = (e, src) => {
     description: desc(e.description ?? e.desc ?? e.note),
     npm: e.npm ?? e.pkg ?? null,
     tarball: e.tarball ?? null,
-    stars: Number.isFinite(s) ? s : null,
-    downloads: Number.isFinite(d) ? d : null,
+    stars,
+    downloads,
+    // Composite ranking: stars dominate, downloads as the tiebeaker. Mirrors
+    // the sort used below and is kept on each record for the market to read.
+    score: Math.round(stars * 1000 + downloads),
     install: String(e.install ?? e.cmd ?? '').trim() || null,
     added: e.added ?? '',
     source: src,
@@ -84,9 +89,10 @@ for (const s of SOURCES) {
       if (!p.name && !p.npm) continue
       const key = keyOf(p)
       if (!key) continue
-      const score = (p.stars ?? 0) * 1000 + (p.downloads ?? 0)
+      // Keep the newest/hottest duplicate: stars then downloads.
+      const dedupRank = (p.stars ?? 0) * 1000000 + (p.downloads ?? 0)
       const prev = seen.get(key)
-      if (!prev || score > prev.score) { seen.set(key, { ...p, score }) }
+      if (!prev || dedupRank > prev._rank) { seen.set(key, { ...p, _rank: dedupRank }) }
       ok++
     }
     fetched += ok
@@ -94,8 +100,14 @@ for (const s of SOURCES) {
   } catch (e) { log.push(`${s.name}: ERR ${e.message}`) }
 }
 
-const plugins = [...seen.values()].map(({ score, ...p }) => p)
-plugins.sort((a, b) => (b.stars ?? 0) - (a.stars ?? 0) || (b.downloads ?? 0) - (a.downloads ?? 0))
+const plugins = [...seen.values()].map(({ _rank, ...p }) => p) // drop internal dedup key, keep score
+// Rank: composite score (stars*1000 + downloads), then stars, then downloads, then name.
+plugins.sort((a, b) =>
+  (b.score ?? 0) - (a.score ?? 0) ||
+  (b.stars ?? 0) - (a.stars ?? 0) ||
+  (b.downloads ?? 0) - (a.downloads ?? 0) ||
+  a.name.localeCompare(b.name)
+)
 const dedupedDrop = [...seen.keys()].length
 
 // Minimal category dictionary; market renders ids, keep as-is when unknown.
