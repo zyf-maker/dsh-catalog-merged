@@ -25,7 +25,7 @@ import { normalize, betterRecord, byRank, UNCATEGORIZED } from './normalize.mjs'
 import { CATEGORIES, GENERIC_CATEGORIES, categoryCounts, classify } from './classify.mjs'
 import {
   DEFAULT_OPTIONS as CATEGORY_OPTIONS, dictionaryFor, discoverCategories, loadLabels, loadState,
-  mergeDiscovered, rulesFor, saveState, termPattern,
+  mergeDiscovered, promotedTermsOf, rulesFor, saveState, surveyCandidates, termPattern,
 } from './categories.mjs'
 import { buildIdentityIndex } from './identity.mjs'
 import { AdmissionCache, verifyAll } from './admission.mjs'
@@ -222,13 +222,17 @@ export async function runIngest({
   // category that only takes effect next run would leave the sidebar and the
   // catalog disagreeing for an hour.
   const updated = new Date().toISOString()
-  const categoryRun = { created: [], revived: [], retired: [], updated: [], proposals: [] }
+  const categoryRun = { created: [], revived: [], retired: [], updated: [], proposals: [], survey: [] }
   if (categoryOptions.discover !== false) {
-    categoryRun.proposals = discoverCategories(admitted, {
-      ...CATEGORY_OPTIONS,
-      ...categoryOptions,
-      knownCategoryIds: CATEGORIES.map((c) => c.id),
-    })
+    const options = { ...CATEGORY_OPTIONS, ...categoryOptions, knownCategoryIds: CATEGORIES.map((c) => c.id) }
+    // A term a human promoted in the labels file may create a category even though
+    // the automatic path would not: the cross-cutting channel is proposal-only by
+    // measurement, and promotion is how a person acts on one.
+    options.promoteTerms = promotedTermsOf(categoryLabels)
+    categoryRun.proposals = discoverCategories(admitted, options)
+    // The survey is written every run so a promotion is a decision made from
+    // numbers rather than from a guess about what the leftovers contain.
+    categoryRun.survey = surveyCandidates(admitted, { ...options, limit: 60 })
     const merged = mergeDiscovered(categoryState, categoryRun.proposals, {
       now: updated,
       options: { ...CATEGORY_OPTIONS, ...categoryOptions },
@@ -249,7 +253,19 @@ export async function runIngest({
     categoryRun.updated = merged.updated
     saveState(categoriesPath, categoryState)
     discoveredRules = rulesFor(categoryState)
+    write(join(out, 'category-proposals.json'), {
+      updated,
+      note: 'Evidence for category discovery. `automatic` entries were created by the pipeline; `promotable` entries need a human to add them to category-labels.json with "promote": true, because measurement showed cross-cutting tokens describe what a plugin integrates with rather than what it is.',
+      thresholds: { ...CATEGORY_OPTIONS, ...categoryOptions },
+      counts: {
+        automatic: categoryRun.survey.filter((row) => row.qualifies === 'automatic').length,
+        promotable: categoryRun.survey.filter((row) => row.qualifies === 'promotable').length,
+        belowThreshold: categoryRun.survey.filter((row) => row.qualifies === 'below-threshold').length,
+      },
+      candidates: categoryRun.survey,
+    })
     log(`categories: ${categoryRun.proposals.length} proposal(s), ${categoryRun.created.length} created, ${categoryRun.revived.length} revived, ${categoryRun.retired.length} retired`)
+    log(`  survey: ${categoryRun.survey.filter((r) => r.qualifies === 'promotable').length} promotable, ${categoryRun.survey.filter((r) => r.qualifies === 'below-threshold').length} below threshold`)
     if (categoryRun.created.length > 0) log(`  created: ${categoryRun.created.join(', ')}`)
 
     // Re-place what the new buckets claim. Only entries still in `other` are
@@ -319,12 +335,22 @@ export async function runIngest({
      * when the evidence is a real cluster, and the leftovers are one-offs.
      */
     discovery: {
-      thresholds: { ...CATEGORY_OPTIONS, ...categoryOptions, knownCategoryIds: undefined },
-      proposals: categoryRun.proposals.map((p) => ({ term: p.term, members: p.members, channel: p.channel, share: p.share })),
+      thresholds: { ...CATEGORY_OPTIONS, ...categoryOptions, knownCategoryIds: undefined, promoteTerms: undefined },
+      proposals: categoryRun.proposals.map((p) => ({ term: p.term, members: p.members, channel: p.channel, path: p.path, share: p.share })),
       created: categoryRun.created,
       revived: categoryRun.revived,
       retired: categoryRun.retired,
       active: Object.keys(discoveredDictionary).length,
+      /**
+       * Counts for the review file. `promotable` is the size of the queue a human
+       * can act on; a non-zero `promotable` with an empty `created` is the intended
+       * steady state, not a failure.
+       */
+      survey: {
+        automatic: categoryRun.survey.filter((r) => r.qualifies === 'automatic').length,
+        promotable: categoryRun.survey.filter((r) => r.qualifies === 'promotable').length,
+        belowThreshold: categoryRun.survey.filter((r) => r.qualifies === 'below-threshold').length,
+      },
     },
   }
 
