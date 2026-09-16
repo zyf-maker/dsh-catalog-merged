@@ -31,8 +31,12 @@ jobs:
       - uses: actions/configure-pages@v5
       - name: Assemble the site
         run: |
-          mkdir -p site/data site/web
+          mkdir -p site/data site/web site/shared
           cp -r web/. site/web/
+          # The quality rules ship with the page: the browser applies the same
+          # module the ingest run used, so a reader holding a cached catalog.json
+          # and one holding a fresh copy still see the same market.
+          cp -r shared/. site/shared/
           cp data/catalog.json data/plugins.json data/sources.json data/rankings.json data/health.json site/data/ 2>/dev/null || true
           # The market plugin and the dshmarket-compatible registry both live at
           # stable paths, so a client only needs one configured URL.

@@ -62,7 +62,8 @@ db/schema.sql        数据模型（sources / plugins / plugin_sources / version
 api/worker.js        REST API（health、sources、plugins、详情、rankings、new、触发重建）
 api/wrangler.toml    Worker + D1 绑定
 web/index.html       UI 外壳（搜索 / 分类 / 排序 / 目标筛选）
-web/app.js           数据层（API 优先，静态回退）+ 列表 + 详情 + 安装桥
+web/app.js           数据层（读 catalog.json，套用 shared/quality）+ 列表 + 详情 + 安装桥
+shared/quality.mjs   空壳判定 + 质量分档 + 推荐排序（ingest 与浏览器共用同一份）
 plugin/              自有 DSH 插件（host 半 + client 半，设置页里的"我的市场"）
 data/                构建产物（catalog / plugins / sources / rankings / health / new）
 .github/workflows/   ingest.yml（每小时）、pages.yml（发布 UI 与数据）
@@ -97,7 +98,15 @@ data/                构建产物（catalog / plugins / sources / rankings / hea
 
 ## 5. UI 架构
 
-`web/` 是零构建的原生 ES 模块应用：搜索栏 + 分类侧栏 + 排序/目标筛选 + 结果列表 + 详情对话框 + 安装按钮。数据层优先打 `/api/v1`，失败即回退静态 `data/catalog.json`（所以 Pages 单独部署也是完整产品）。安装调用 `window.dshMarket.install(target)`；独立打开没有桥时改为复制命令，不做假的成功。
+`web/` 是零构建的原生 ES 模块应用：控件在顶部、分类 chips 紧随其下、结果是**卡片网格**（从左往右读）。
+
+版式与设置页里的「我的市场」是同一套：目录有一万多条，浏览是扫描，扫描要的是宽度——早先那版把分类放在左侧栏、卡片排成单列，结果是竖着拉一条长表，19 个分类还要靠侧栏自己滚动才看得全。
+
+数据只有一条路：整份 `data/catalog.json` 读进来，筛选在浏览器里做。早先那版「优先打 `/api/v1`、失败回退静态」，等于对同一个问题有两个答案——页面列出 11538 条、设置页列出 10333 条。Worker API 仍然可用，只是不再是这个页面的数据源。
+
+**空壳判定、质量分档、推荐排序不在这个页面里重写**：`shared/quality.mjs` 就是 `ingest/index.mjs` 导入的同一份文件，随页面一起发布。（`pages.yml` 把 `shared/` 拷进站点。）所以一行的判定只有一个答案，哪怕读者手上是旧的缓存产物。
+
+安装调用 `window.dshMarket.install(target)`；独立打开没有桥时改为复制命令，不做假的成功。
 
 ## 6. 兼容与自动修复（第 4 条要求）
 

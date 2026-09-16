@@ -31,6 +31,10 @@ import { buildIdentityIndex } from './identity.mjs'
 import { AdmissionCache, verifyAll } from './admission.mjs'
 import { planRepair } from './compat.mjs'
 import { assertCatalogAcceptable } from './catalog-contract.mjs'
+// Every reader of the catalog — the settings-section market and the published
+// web page — reads the fields this module produces, so the two cannot disagree
+// about which rows are shells or how the rest are ordered.
+import { annotateCatalog } from '../shared/quality.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 
@@ -293,7 +297,17 @@ export async function runIngest({
   }
 
   // ------------------------------------------------------------- rank/emit
-  const plugins = admitted.sort(byRank)
+  /**
+   * Quality is decided here, once, and published with the rows.
+   *
+   * The market and the web page both need "is this a shell?" and "in what
+   * order?". Computing it in each UI produced two answers — the plugin showed
+   * 10333 rows and the page 11538, and a 7613-star plugin sat at position 10376
+   * behind rows whose only advantage was a manifest the pipeline happened to
+   * probe. A screen is a fact about the data, so it is stated once, here.
+   */
+  const { catalog: annotated, counts: qualityCounts } = annotateCatalog({ plugins: admitted.sort(byRank) })
+  const plugins = annotated.plugins
   const byKind = plugins.reduce((acc, p) => { acc[p.targetKind] = (acc[p.targetKind] ?? 0) + 1; return acc }, {})
   const multiSource = plugins.filter((p) => p.sources.length > 1).length
   const duplicatesCollapsed = records.length - classes.size
@@ -370,7 +384,10 @@ export async function runIngest({
     category: categoryStats,
     byTargetKind: byKind,
     byCategory,
+    /** How many rows each reader will show, and how many the screen drops. */
+    quality: qualityCounts,
   }
+
 
   const catalog = {
     schema: 'dsh-market/catalog-v3',
