@@ -1,44 +1,78 @@
 {
-  "updated": "2026-09-16T06:55:42.779Z",
-  "count": 6,
+  "updated": "2026-09-16T11:30:33.017Z",
+  "count": 17,
   "plugins": [
     {
       "rank": 1,
-      "id": "npm:dsh-browser",
-      "name": "dsh-browser",
-      "owner": "Lum1104",
-      "url": "https://github.com/Lum1104/dsh-browser",
-      "category": "tools",
+      "id": "npm:@zilliz/memsearch-dsh",
+      "name": "memsearch-dsh",
+      "owner": "zilliztech",
+      "url": "https://github.com/zilliztech/memsearch",
+      "category": "memory",
       "description": {
-        "en": "Chrome sidebar extension letting DSH drive the browser.",
-        "zh": "Chrome 侧边栏扩展，让 DSH 操控浏览器。"
+        "en": "Shared Markdown memory for DSH and other coding agents, with automatic capture, pre-step context injection, searchable recall, and a review panel.",
+        "zh": "供 DSH 与其他编程 Agent 共享的 Markdown 记忆，支持自动捕获、步骤前上下文注入、搜索召回与审阅面板。"
       },
-      "install": "dsh plugin add dsh-browser",
+      "install": "dsh plugin --profile web add @zilliz/memsearch-dsh",
       "targetKind": "npm",
-      "stars": 664,
-      "downloads": 0,
-      "score": 664000
+      "stars": 2608,
+      "downloads": 306,
+      "score": 2608306
     },
     {
       "rank": 2,
-      "id": "repo:litomore/agent-discord-presence",
-      "name": "agent-discord-presence",
-      "owner": "LitoMore",
-      "url": "https://github.com/LitoMore/agent-discord-presence",
-      "category": "agent",
+      "id": "npm:@cloudbase/dsh-plugin",
+      "name": "dsh-plugin",
+      "owner": "TencentCloudBase",
+      "url": "https://github.com/TencentCloudBase/CloudBase-AI-Toolkit",
+      "category": "tools",
       "description": {
-        "en": "Discord Rich Presence for Codex, Claude Code, OpenCode, Pi, and DeepSeek Harness, powered by one local service that keeps your active work visible in Discord.",
-        "zh": ""
+        "en": "Provides CloudBase backend services including database, authentication, and function execution for AI agents.",
+        "zh": "为AI代理提供云开发后端服务，涵盖数据库、认证和函数执行。"
       },
-      "install": "dsh plugin add github:LitoMore/agent-discord-presence",
-      "targetKind": "github",
-      "stars": 3,
-      "downloads": 0,
-      "score": 3000
+      "install": "dsh plugin --profile web add @cloudbase/dsh-plugin",
+      "targetKind": "npm",
+      "stars": 1112,
+      "downloads": 115,
+      "score": 1112115
     },
     {
       "rank": 3,
-      "id": "npm:dsh-docs-panel",
+      "id": "npm:dsh-branchmark",
+      "name": "bundle",
+      "owner": "zaizaizhao",
+      "url": "https://github.com/zaizaizhao/dsh-branchmark",
+      "category": "dev",
+      "description": {
+        "en": "Provides key knowledge excerpts, traceable session trees, and attention forks for developers to manage focus.",
+        "zh": "为开发者提供知识摘录、可追溯会话树和注意力分叉，帮助管理专注力。"
+      },
+      "install": "dsh plugin --profile web add dsh-branchmark",
+      "targetKind": "npm",
+      "stars": 24,
+      "downloads": 423,
+      "score": 24423
+    },
+    {
+      "rank": 4,
+      "id": "repo:cc19990113/dsh-plugin-codegraph",
+      "name": "dsh-plugin-codegraph",
+      "owner": "CC19990113",
+      "url": "https://github.com/CC19990113/dsh-plugin-codegraph",
+      "category": "model",
+      "description": {
+        "en": "Structural code intelligence for DeepSeek Harness (dsh) — gives the agent codegraph and codegraph_index tools to find where a symbol is declared, what calls it, and what a change   reaches, from a tree-sitter index it builds itself. Compatible with the codegraph CLI's on-disk format.",
+        "zh": "为 DeepSeek Harness 提供代码结构分析工具，快速定位符号声明、调用关系及变更影响范围。"
+      },
+      "install": "dsh plugin add github:CC19990113/dsh-plugin-codegraph",
+      "targetKind": "github",
+      "stars": 13,
+      "downloads": 0,
+      "score": 13000
+    },
+    {
+      "rank": 5,
+      "id": "repo:mlosun/dsh-docs-panel",
       "name": "dsh-docs-panel",
       "owner": "mlosun",
       "url": "https://github.com/mlosun/dsh-docs-panel",
@@ -54,48 +88,184 @@
       "score": 3000
     },
     {
-      "rank": 4,
-      "id": "npm:@dsheval/dsh-top100-plugin",
-      "name": "@dsheval/dsh-top100-plugin",
-      "owner": "d.c.5",
-      "url": "git+https://github.com/dsheval/dsh-top100.git",
-      "category": "docs",
+      "rank": 6,
+      "id": "npm:dsh-access-gate",
+      "name": "dsh-access-gate",
+      "owner": "bamboostrip",
+      "url": "https://github.com/bamboostrip/dsh-access-gate",
+      "category": "other",
       "description": {
-        "en": "Discover, install and manage DSH-Eval Top100 plugins and Skills in DeepSeek Harness",
-        "zh": ""
+        "en": "DSH plugin: password gate for remote (non-loopback) /api access (passwordless by default), unblock the loopback-pinned privileged endpoints, restore everything on uninstall, and give the local 127.0.0.1 user the native OS folder picker for workspace selec",
+        "zh": "为 DeepSeek Harness 提供远程访问认证门禁，保护你的服务不被未授权使用。"
       },
-      "install": "dsh plugin --profile web add @dsheval/dsh-top100-plugin",
-      "targetKind": "npm",
-      "stars": 0,
-      "downloads": 1750,
-      "score": 1750
+      "install": "dsh plugin add github:bamboostrip/dsh-access-gate",
+      "targetKind": "github",
+      "stars": 2,
+      "downloads": 0,
+      "score": 2000
     },
     {
-      "rank": 5,
-      "id": "npm:dsh-plugin-dashboard",
-      "name": "dsh-plugin-dashboard",
-      "owner": "mtaech",
-      "url": "git+https://github.com/mtaech/melon.git",
+      "rank": 7,
+      "id": "npm:koma-miko-dsh",
+      "name": "koma-miko-dsh",
+      "owner": "kotarokielo",
+      "url": "git+https://github.com/swnotmetal/Project-Koma.git",
+      "category": "agent",
+      "description": {
+        "en": "DeepSeek Harness adapter for Koma Miko Agent Specs.",
+        "zh": ""
+      },
+      "install": "dsh plugin --profile web add koma-miko-dsh",
+      "targetKind": "npm",
+      "stars": 0,
+      "downloads": 1365,
+      "score": 1365
+    },
+    {
+      "rank": 8,
+      "id": "npm:dsh-openai-codex-auth",
+      "name": "dsh-openai-codex-auth",
+      "owner": "gooosie",
+      "url": "git+https://github.com/gooosie/dsh-openai-codex-auth.git",
+      "category": "model",
+      "description": {
+        "en": "Unofficial OpenAI Codex provider for DeepSeek Harness with ChatGPT subscription sign-in.",
+        "zh": ""
+      },
+      "install": "dsh plugin --profile web add dsh-openai-codex-auth",
+      "targetKind": "npm",
+      "stars": 0,
+      "downloads": 1311,
+      "score": 1311
+    },
+    {
+      "rank": 9,
+      "id": "npm:@gm-hz/dsh-dag-workflow-catalog",
+      "name": "@gm-hz/dsh-dag-workflow-catalog",
+      "owner": "gm-hz",
+      "url": "git+https://github.com/GM-HZ/dsh-dag-workflow.git",
+      "category": "vision",
+      "description": {
+        "en": "Draft, CAS, validation and immutable revision catalog for DSH workflows",
+        "zh": ""
+      },
+      "install": "dsh plugin --profile web add @gm-hz/dsh-dag-workflow-catalog",
+      "targetKind": "npm",
+      "stars": 0,
+      "downloads": 1296,
+      "score": 1296
+    },
+    {
+      "rank": 10,
+      "id": "npm:@p-dsh-market/multi-agent-roundtable",
+      "name": "@p-dsh-market/multi-agent-roundtable",
+      "owner": "antony-jia",
+      "url": "https://www.npmjs.com/package/@p-dsh-market/multi-agent-roundtable",
+      "category": "session",
+      "description": {
+        "en": "DSH 多 Agent 圆桌讨论：独立会话、角色 Prompt、交叉评审与 Markdown 消息流",
+        "zh": ""
+      },
+      "install": "dsh plugin --profile web add @p-dsh-market/multi-agent-roundtable",
+      "targetKind": "npm",
+      "stars": 0,
+      "downloads": 1284,
+      "score": 1284
+    },
+    {
+      "rank": 11,
+      "id": "npm:dsh-tool-computer",
+      "name": "dsh-tool-computer",
+      "owner": "hanzhangz",
+      "url": "git+https://github.com/hanzhangzzz/dsh-computer-use.git",
+      "category": "model",
+      "description": {
+        "en": "Computer use plugin for DeepSeek Harness: one plugin composing the computer seam, a Playwright provider, and the computer_* tools",
+        "zh": "让 DeepSeek Harness 能像人一样操作浏览器，自动完成点击、输入、导航等任务，基于 Playwright 实现。"
+      },
+      "install": "dsh plugin --profile web add dsh-tool-computer",
+      "targetKind": "npm",
+      "stars": 0,
+      "downloads": 1269,
+      "score": 1269
+    },
+    {
+      "rank": 12,
+      "id": "npm:dsh-link-pulse",
+      "name": "dsh-link-pulse",
+      "owner": "rq3zs2wo",
+      "url": "git+https://github.com/j2st1n/dsh-link-pulse.git",
+      "category": "model",
+      "description": {
+        "en": "Dynamic LLM provider gateway latency and health pulse probe for DeepSeek Harness",
+        "zh": ""
+      },
+      "install": "dsh plugin --profile web add dsh-link-pulse",
+      "targetKind": "npm",
+      "stars": 0,
+      "downloads": 1197,
+      "score": 1197
+    },
+    {
+      "rank": 13,
+      "id": "npm:dsh-plugin-codegraph-tool",
+      "name": "dsh-plugin-codegraph-tool",
+      "owner": "cczhao990113",
+      "url": "git+https://github.com/CC19990113/dsh-plugin-codegraph.git",
       "category": "dev",
       "description": {
-        "en": "DSH third-party plugin version dashboard: a Web Settings tab listing installed plugins with current/latest versions (npm registry or git tags/HEAD) and one-click upgrade.",
+        "en": "Model-facing codegraph tools for DeepSeek Harness — a read-only codegraph tool with ten structural query operations plus a codegraph_index tool that builds or refreshes the index on its own timeout budget",
         "zh": ""
       },
-      "install": "dsh plugin --profile web add dsh-plugin-dashboard",
+      "install": "dsh plugin --profile web add dsh-plugin-codegraph-tool",
       "targetKind": "npm",
       "stars": 0,
-      "downloads": 1188,
-      "score": 1188
+      "downloads": 1080,
+      "score": 1080
     },
     {
-      "rank": 6,
-      "id": "npm:dsh-voice-kit",
+      "rank": 14,
+      "id": "npm:@omdp/dsh-gitbash-win",
+      "name": "@omdp/dsh-gitbash-win",
+      "owner": "jun0120",
+      "url": "git+https://github.com/XJungit/omdp.git",
+      "category": "security",
+      "description": {
+        "en": "Git Bash tool plugin for DeepSeek Harness on Windows: registers a global `gitbash` tool that runs commands via Git for Windows bash.exe. Lightweight, no node-pty, no WSL, sandbox-aware.",
+        "zh": ""
+      },
+      "install": "dsh plugin --profile web add @omdp/dsh-gitbash-win",
+      "targetKind": "npm",
+      "stars": 0,
+      "downloads": 1068,
+      "score": 1068
+    },
+    {
+      "rank": 15,
+      "id": "npm:dsh-plugin-codegraph-sqlite",
+      "name": "dsh-plugin-codegraph-sqlite",
+      "owner": "cczhao990113",
+      "url": "git+https://github.com/CC19990113/dsh-plugin-codegraph.git",
+      "category": "data",
+      "description": {
+        "en": "Read-only SQLite store for the DeepSeek Harness code-graph seam — serves structural queries from the schema-v4 graph at .codegraph/codegraph.db, the same on-disk format the codegraph CLI writes",
+        "zh": ""
+      },
+      "install": "dsh plugin --profile web add dsh-plugin-codegraph-sqlite",
+      "targetKind": "npm",
+      "stars": 0,
+      "downloads": 1062,
+      "score": 1062
+    },
+    {
+      "rank": 16,
+      "id": "repo:aaaadrop/dsh-voice-kit",
       "name": "dsh-voice-kit",
       "owner": "aaaadrop",
       "url": "https://github.com/aaaadrop/dsh-voice-kit",
       "category": "voice",
       "description": {
-        "en": "Voice input (Web Speech API) and read-aloud (speechSynthesis) for the DeepSeek Harness web GUI — DSH 语音输入 + 回复朗读套件",
+        "en": "",
         "zh": "给 DeepSeek Harness 网页界面加上语音输入和朗读功能，动动嘴就能和 AI 对话，也能让 AI 把回答念给你听。"
       },
       "install": "dsh plugin add github:aaaadrop/dsh-voice-kit",
@@ -103,6 +273,23 @@
       "stars": 1,
       "downloads": 0,
       "score": 1000
+    },
+    {
+      "rank": 17,
+      "id": "repo:esonxie/dsh-agent-toolkit",
+      "name": "dsh-agent-toolkit",
+      "owner": "EsonXie",
+      "url": "https://github.com/EsonXie/dsh-agent-toolkit",
+      "category": "agent",
+      "description": {
+        "en": "Deepseek Harness工具集",
+        "zh": "把五个Agent生产力功能打包成一个插件，装好就能用，省心省力。"
+      },
+      "install": "dsh plugin --profile web add github:EsonXie/dsh-agent-toolkit",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
     }
   ]
 }
