@@ -245,9 +245,9 @@ async function probeRuntime({ repoPath, branch, manifest, manifestPath, fetchImp
       if (seen.has(result.path)) continue
       seen.add(result.path)
       if (result.status !== 'found') continue
-      const meaningful = hasLoaderInsertion(result.text)
-      details.patch = { path: result.path, meaningful }
-      if (meaningful) sawConcreteRuntime = true
+      const usable = hasLoaderArray(result.text)
+      details.patch = { path: result.path, usable }
+      if (usable) sawConcreteRuntime = true
       break
     }
   }
@@ -258,7 +258,7 @@ async function probeRuntime({ repoPath, branch, manifest, manifestPath, fetchImp
     sawConcreteRuntime = true
   }
 
-  // A meaningful bundle patch is already a runtime proof. Only fan out to
+  // A usable bundle patch is already a runtime proof. Only fan out to
   // package entrypoint probes when the manifest has no usable patch/inject
   // signal; this keeps a full catalog run bounded to roughly one extra read
   // for a valid bundle instead of probing every export path as well.
@@ -300,11 +300,31 @@ function entrypointPaths(manifest) {
   return [...new Set(values)]
 }
 
-/** A non-empty patch must actually add at least one Loader entry. */
-function hasLoaderInsertion(text) {
-  const body = String(text ?? '').replace(/^\s*#.*$/gm, '').trim()
-  if (!/(?:^|\n)\s*-\s*insert\s*:/m.test(body)) return false
-  return /^\s*name\s*:\s*['"]?[^'"\n#]+['"]?\s*$/m.test(body)
+/**
+ * Whether a patch document is one the Loader accepts.
+ *
+ * The requirement the loader actually enforces is a non-empty top-level YAML
+ * array, not a populated one: `dsh-app-boot` fails loud on a missing, empty or
+ * non-array patch, so a plugin that injects no rows still has to ship a
+ * parseable document. Measured: `EternalNight996/publish-kit` declares
+ * `dsh.bundle.patch` pointing at a file whose entire content is `[]` — accepted
+ * by the harness, and rejected by an earlier version of this probe that demanded
+ * at least one `insert`.
+ *
+ * @param text - the patch document's contents.
+ * @returns true when the document is a parseable top-level sequence.
+ */
+function hasLoaderArray(text) {
+  const body = String(text ?? '')
+    .replace(/^\s*#.*$/gm, '')
+    .replace(/^\s*---\s*$/gm, '')
+    .trim()
+  if (body === '') return false
+  if (/^\[\s*\]$/.test(body)) return true
+  // A top-level sequence entry. An indented `- ` is inside a mapping, and a
+  // document of marker keys (`marketplace:`, `displayName:`) is an object, which
+  // is exactly what the loader refuses with "must be a top-level YAML array".
+  return /^(?:-\s|-$)/m.test(body)
 }
 
 /** Reject files containing only whitespace/comments, not normal source code. */

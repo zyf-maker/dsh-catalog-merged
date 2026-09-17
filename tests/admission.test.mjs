@@ -31,8 +31,8 @@ test('the admission probe requires a real patch or executable entrypoint', async
 
   assert.equal(result.ok, true)
   assert.equal(result.reason, 'dsh.bundle')
-  assert.equal(result.probe.patch.meaningful, true)
-  // The meaningful patch is sufficient, so the bounded probe does not fan out
+  assert.equal(result.probe.patch.usable, true)
+  // The usable patch is sufficient, so the bounded probe does not fan out
   // into every export path for this package.
   assert.deepEqual(result.probe.entrypoints, [])
 })
@@ -48,7 +48,7 @@ test('a manifest with an empty patch and no runtime entry is rejected', async ()
 
   assert.equal(result.ok, false)
   assert.equal(result.reason, 'empty-plugin-entry')
-  assert.equal(result.probe.patch.meaningful, false)
+  assert.equal(result.probe.patch.usable, false)
 })
 
 test('a client-only plugin passes when its declared entrypoint contains code', async () => {
@@ -78,7 +78,7 @@ test('cached admission keeps the probe and manifest needed for later repair', ()
   const directory = mkdtempSync(join(tmpdir(), 'dsh-admission-'))
   try {
     const cache = new AdmissionCache(join(directory, 'cache.json'))
-    const verdict = { ok: true, reason: 'dsh.bundle', manifest: { name: 'x' }, probe: { patch: { meaningful: true } } }
+    const verdict = { ok: true, reason: 'dsh.bundle', manifest: { name: 'x' }, probe: { patch: { usable: true } } }
     cache.set('owner/x@rev', verdict)
     cache.save(['owner/x@rev'])
     const loaded = new AdmissionCache(join(directory, 'cache.json')).get('owner/x@rev')
@@ -179,4 +179,34 @@ test('a name the registry misses answers nothing, not a rejection', async () => 
 
   assert.equal(result.ok, false)
   assert.equal(result.reason, 'no-npm-package')
+})
+
+test('a patch that is a valid empty array is installable, as the harness accepts it', async () => {
+  // publish-kit ships exactly this: a declared patch whose whole content is `[]`,
+  // because the loader requires a top-level array while the plugin injects no rows.
+  const result = await verifyPlugin({
+    repoPath: 'EternalNight996/publish-kit',
+    fetchImpl: fetchFiles({
+      'package.json': JSON.stringify({ name: 'publish-kit', dsh: { bundle: { patch: './dsh-bundle-patch.yml' } } }),
+      'dsh-bundle-patch.yml': '# the loader needs a top-level array; this plugin injects no rows\n[]\n',
+    }),
+  })
+
+  assert.equal(result.ok, true)
+  assert.equal(result.reason, 'dsh.bundle')
+  assert.equal(result.probe.patch.usable, true)
+})
+
+test('a patch that is a mapping, not a sequence, is still rejected', async () => {
+  const result = await verifyPlugin({
+    repoPath: 'owner/marker-only',
+    fetchImpl: fetchFiles({
+      'package.json': JSON.stringify({ name: 'marker-only', dsh: { bundle: { patch: './cordis.patch.yml' } } }),
+      'cordis.patch.yml': 'marketplace:\n  profiles: [web]\n',
+    }),
+  })
+
+  assert.equal(result.ok, false)
+  assert.equal(result.reason, 'empty-plugin-entry')
+  assert.equal(result.probe.patch.usable, false)
 })
