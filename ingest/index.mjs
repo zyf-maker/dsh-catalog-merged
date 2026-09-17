@@ -171,27 +171,37 @@ export async function runIngest({
   // Bump the namespace whenever the probe contract changes. Otherwise a cache
   // written by the old manifest-only check would silently bypass the new
   // runtime-file probe for seven days.
-  const admissionKeyOf = (plugin) => `probe-v2:${plugin.repoPath}@${plugin.added === '' ? 'unversioned' : plugin.added}`
+  //
+  // The npm name is part of the key as well as the revision: a row whose
+  // repository stays put while its published package changes is a different
+  // install target, and one verdict cannot stand for both.
+  const admissionKeyOf = (plugin) => `probe-v3:${plugin.repoPath ?? 'no-repo'}+${plugin.npm ?? 'no-npm'}@${plugin.added === '' ? 'unversioned' : plugin.added}`
   if (admission) {
     // An explicit install command is not proof that a repository is a plugin.
-    // Probe every GitHub-backed candidate, not only the targets `normalize()`
-    // inferred, so a source catalog cannot bypass admission by shipping its own
-    // `dsh plugin add` command. Measured before this rule: 4565 of 11653 rows
-    // were probed and 8343 were published on a directory's word alone, which is
-    // how `reactive-resume` — a resume builder — reached the top of the market
-    // with a one-click install button that could only fail.
-    const candidates = merged.filter((p) => p.repoPath !== null)
+    // Probe every candidate that names something to install, not only the
+    // targets `normalize()` inferred, so a source catalog cannot bypass
+    // admission by shipping its own `dsh plugin add` command. Measured before
+    // this rule: 4565 of 11653 rows were probed and 8343 were published on a
+    // directory's word alone, which is how `reactive-resume` — a resume builder
+    // — reached the top of the market with a one-click install button that
+    // could only fail.
+    //
+    // A package is a candidate on its own: `coding-agents` installs
+    // `@vectorize-io/hindsight-coding-agents`, whose registry manifest declares
+    // `dsh.bundle` while its repository root declares nothing.
+    const installsPackage = (p) => typeof p.npm === 'string' && p.npm.trim() !== ''
+    const candidates = merged.filter((p) => p.repoPath !== null || installsPackage(p))
     const cache = new AdmissionCache(join(out, 'admission-cache.json'))
     const verdicts = await verifyAll(
-      candidates.map((p) => ({ repoPath: p.repoPath, subpath: p.repoSubpath, cacheKey: admissionKeyOf(p) })),
+      candidates.map((p) => ({ repoPath: p.repoPath, subpath: p.repoSubpath, npm: p.npm ?? null, cacheKey: admissionKeyOf(p) })),
       { cache, token, log, fetchImpl },
     )
     admitted = []
     for (const plugin of merged) {
-      if (plugin.repoPath === null) {
-        // An npm-only record without a repository cannot be probed statically.
-        // Keep it without a one-click install rather than reading the source's
-        // command as proof or inventing a rejection out of silence.
+      if (plugin.repoPath === null && !installsPackage(plugin)) {
+        // Nothing to probe: a release archive or a bare command has no manifest
+        // to read. Keep it without a one-click install rather than reading the
+        // source's command as proof or inventing a rejection out of silence.
         plugin.installable = null
         plugin.evidence = 'unproven'
         admissionStats.unproven += 1

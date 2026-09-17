@@ -88,3 +88,95 @@ test('cached admission keeps the probe and manifest needed for later repair', ()
     rmSync(directory, { recursive: true, force: true })
   }
 })
+
+/**
+ * A fetch that answers both the repository raw endpoint and the npm registry, so
+ * one test can describe a row whose repository and its package disagree.
+ */
+function fetchWorld({ files = {}, packages = {} }) {
+  const REGISTRY = 'https://registry.npmjs.org/'
+  return async (url) => {
+    if (url.startsWith(REGISTRY)) {
+      const name = decodeURIComponent(url.slice(REGISTRY.length).replace(/\/latest$/, ''))
+      const manifest = packages[name]
+      if (manifest === undefined) return { ok: false, status: 404, text: async () => '' }
+      return { ok: true, status: 200, text: async () => JSON.stringify(manifest) }
+    }
+    const marker = '/HEAD/'
+    const path = url.slice(url.indexOf(marker) + marker.length).split('?')[0]
+    const body = files[path]
+    if (body === undefined) return { ok: false, status: 404, text: async () => '' }
+    return { ok: true, status: 200, text: async () => body }
+  }
+}
+
+test('a published package admits a row its repository root cannot', async () => {
+  const result = await verifyPlugin({
+    repoPath: 'vectorize-io/hindsight',
+    npm: '@vectorize-io/hindsight-coding-agents',
+    fetchImpl: fetchWorld({
+      // The monorepo root is a private workspace with no `dsh` field at all.
+      files: { 'package.json': JSON.stringify({ name: 'hindsight', private: true }) },
+      packages: {
+        '@vectorize-io/hindsight-coding-agents': {
+          name: '@vectorize-io/hindsight-coding-agents',
+          version: '0.6.1',
+          dsh: { bundle: { patch: './cordis.patch.yml' } },
+        },
+      },
+    }),
+  })
+
+  assert.equal(result.ok, true)
+  assert.equal(result.reason, 'dsh.bundle')
+  assert.deepEqual(result.probe, { source: 'npm' })
+})
+
+test('a package without a dsh field does not rescue the row', async () => {
+  const result = await verifyPlugin({
+    repoPath: 'amruthpillai/reactive-resume',
+    npm: 'reactive-resume',
+    fetchImpl: fetchWorld({
+      files: { 'package.json': JSON.stringify({ name: 'reactive-resume', private: true, workspaces: ['apps/*'] }) },
+      packages: { 'reactive-resume': { name: 'reactive-resume', version: '2.6.3', main: './dist/index.js' } },
+    }),
+  })
+
+  assert.equal(result.ok, false)
+  assert.equal(result.reason, 'no-dsh-field')
+})
+
+test('an unpublished name falls back to the repository verdict', async () => {
+  const result = await verifyPlugin({
+    repoPath: 'owner/gone',
+    npm: 'not-published-anywhere',
+    fetchImpl: fetchWorld({ files: {} }),
+  })
+
+  assert.equal(result.ok, false)
+  assert.equal(result.reason, 'no-manifest')
+})
+
+test('a row with no repository is decided by the registry alone', async () => {
+  const result = await verifyPlugin({
+    repoPath: null,
+    npm: 'package-only-plugin',
+    fetchImpl: fetchWorld({
+      packages: { 'package-only-plugin': { name: 'package-only-plugin', version: '2.0.0', dsh: { client: { platform: 'web', inject: [] } } } },
+    }),
+  })
+
+  assert.equal(result.ok, true)
+  assert.equal(result.reason, 'dsh.client')
+})
+
+test('a name the registry misses answers nothing, not a rejection', async () => {
+  const result = await verifyPlugin({
+    repoPath: null,
+    npm: 'never-published',
+    fetchImpl: fetchWorld({}),
+  })
+
+  assert.equal(result.ok, false)
+  assert.equal(result.reason, 'no-npm-package')
+})

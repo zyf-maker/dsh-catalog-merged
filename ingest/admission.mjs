@@ -86,16 +86,48 @@ async function readManifest({ repoPath, subpath, branch, fetchImpl, token }) {
 }
 
 /**
- * Decide whether a repository is an installable plugin.
+ * Decide whether a candidate is an installable plugin.
  *
- * @param input - `repoPath`, `subpath`, `branch`, `fetchImpl`, `token`.
+ * Two places can answer, and both are read because neither covers the ecosystem
+ * alone: a repository root can declare a plugin, and a published npm package can
+ * declare one that its repository root does not. Measured on the catalog: of the
+ * 468 npm-targeted rows admission dropped, 34 of 40 sampled packages did declare
+ * `dsh.bundle` — they are monorepo subpackages whose repository root carries no
+ * `dsh` field, while the artifact the install command actually fetches does.
+ *
+ * The repository is asked first because its probe is the stricter one — it reads
+ * the declared patch or entry file — so a run pays for the registry read only
+ * where the repository could not prove the plugin.
+ *
+ * @param input - `repoPath`, `subpath`, `branch`, `npm`, `fetchImpl`, `token`.
  * @returns `{ ok, reason, manifest, manifestPath }`. `ok: false` with a reason
  *   other than `probe-error` is a decision; `probe-error` means the question
  *   could not be answered, and callers must keep the record and retry later
  *   rather than treating silence as a rejection.
  */
-export async function verifyPlugin({ repoPath, subpath = null, branch = 'HEAD', fetchImpl = fetch, token }) {
-  if (typeof repoPath !== 'string' || repoPath === '') return { ok: false, reason: 'no-repo' }
+export async function verifyPlugin({ repoPath, subpath = null, branch = 'HEAD', npm = null, fetchImpl = fetch, token }) {
+  const hasRepo = typeof repoPath === 'string' && repoPath !== ''
+  const packageName = typeof npm === 'string' ? npm.trim() : ''
+  if (!hasRepo && packageName === '') return { ok: false, reason: 'no-repo' }
+  const repoVerdict = hasRepo ? await verifyRepository({ repoPath, subpath, branch, fetchImpl, token }) : null
+  if (repoVerdict?.ok === true) return repoVerdict
+  if (packageName === '') return repoVerdict
+  const npmVerdict = await verifyNpmPackage({ npm: packageName, fetchImpl })
+  if (npmVerdict.ok) return npmVerdict
+  // Neither `probe-error` nor `no-npm-package` answers the question, so the
+  // repository result stays the better record; anything else is a decision about
+  // the artifact the install command actually resolves to.
+  if (npmVerdict.reason === 'probe-error' || npmVerdict.reason === 'no-npm-package') return repoVerdict ?? npmVerdict
+  return npmVerdict
+}
+
+/**
+ * Verify one repository root as a plugin.
+ *
+ * @param input - `repoPath`, `subpath`, `branch`, `fetchImpl`, `token`.
+ * @returns the verdict for the repository alone.
+ */
+async function verifyRepository({ repoPath, subpath, branch, fetchImpl, token }) {
   const read = await readManifest({ repoPath, subpath, branch, fetchImpl, token })
   if (read.status === 'error') return { ok: false, reason: 'probe-error', detail: read.detail }
   if (read.status === 'absent') return { ok: false, reason: 'no-manifest' }
@@ -117,6 +149,68 @@ export async function verifyPlugin({ repoPath, subpath = null, branch = 'HEAD', 
     manifestPath: path,
     probe: probe.details,
   }
+}
+
+/**
+ * Verify a published npm package as a plugin.
+ *
+ * The registry manifest describes the artifact `dsh plugin add <name>` installs,
+ * which is why it can decide a row the repository root cannot. A declared
+ * `dsh.bundle` or `dsh.client` object is the evidence: the registry serves
+ * immutable published metadata, so the field is a fact about a released package
+ * rather than an editable claim in someone's working tree.
+ *
+ * @param input - `npm` (the package name) and `fetchImpl`.
+ * @returns `{ ok, reason, manifest }`; `no-npm-package` when the registry does
+ *   not serve the name, `probe-error` when the registry could not be read.
+ */
+async function verifyNpmPackage({ npm, fetchImpl }) {
+  const read = await readNpmManifest({ npm, fetchImpl })
+  if (read.status === 'error') return { ok: false, reason: 'probe-error', detail: read.detail }
+  if (read.status === 'absent') return { ok: false, reason: 'no-npm-package' }
+  const { manifest } = read
+  const dsh = manifest.dsh
+  if (dsh === null || typeof dsh !== 'object') return { ok: false, reason: 'no-dsh-field', manifest }
+  const declaresBundle = typeof dsh.bundle === 'object' && dsh.bundle !== null
+  const declaresClient = typeof dsh.client === 'object' && dsh.client !== null
+  if (!declaresBundle && !declaresClient) return { ok: false, reason: 'no-bundle-or-client', manifest }
+  return {
+    ok: true,
+    reason: declaresBundle ? 'dsh.bundle' : 'dsh.client',
+    manifest,
+    manifestPath: 'registry.npmjs.org',
+    probe: { source: 'npm' },
+  }
+}
+
+/**
+ * Read one published package manifest from the npm registry.
+ *
+ * `/<name>/latest` rather than the full packument: the latest version is what an
+ * unversioned `dsh plugin add <name>` resolves to, and the document is two orders
+ * of magnitude smaller.
+ *
+ * The distinction between "no such package" and "could not ask" is the same one
+ * `readManifest` makes, and matters the same way: a 404 is evidence of absence,
+ * a network failure is not evidence of anything.
+ *
+ * @returns `{ status: 'found', manifest }` | `{ status: 'absent' }` | `{ status: 'error', detail }`.
+ */
+async function readNpmManifest({ npm, fetchImpl }) {
+  const url = `https://registry.npmjs.org/${encodeURIComponent(npm)}/latest`
+  let sawError = null
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const res = await fetchImpl(url, { headers: { 'user-agent': 'dsh-market-admission' } })
+      if (res.status === 404) return { status: 'absent' }
+      if (!res.ok) { sawError = `HTTP ${res.status}`; continue }
+      const text = await res.text()
+      try { return { status: 'found', manifest: JSON.parse(text) } } catch { sawError = 'unparsable'; continue }
+    } catch (error) {
+      sawError = String(error?.message ?? error)
+    }
+  }
+  return sawError === null ? { status: 'absent' } : { status: 'error', detail: sawError }
 }
 
 /**
@@ -317,7 +411,7 @@ export class AdmissionCache {
 /**
  * Verify many candidates with bounded concurrency.
  *
- * @param candidates - `{ repoPath, subpath, branch, cacheKey }` entries.
+ * @param candidates - `{ repoPath, subpath, branch, npm, cacheKey }` entries.
  * @returns a `Map<cacheKey, verdict>`.
  */
 export async function verifyAll(candidates, { cache, fetchImpl = fetch, token, log = () => {}, concurrency = 32 }) {
@@ -330,7 +424,7 @@ export async function verifyAll(candidates, { cache, fetchImpl = fetch, token, l
       if (item === undefined) return
       const cached = cache.get(item.cacheKey)
       if (cached !== undefined) { verdicts.set(item.cacheKey, cached); continue }
-      const verdict = await verifyPlugin({ repoPath: item.repoPath, subpath: item.subpath, branch: item.branch, fetchImpl, token })
+      const verdict = await verifyPlugin({ repoPath: item.repoPath, subpath: item.subpath, branch: item.branch, npm: item.npm ?? null, fetchImpl, token })
       // Keep the manifest and static probe details with the verdict. A cached
       // admission must remain able to produce the same compatibility plan as a
       // fresh probe; caching only ok/reason silently disabled repairs on later
