@@ -15,9 +15,16 @@
  * repositories that are new or have actually changed.
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
+import { posix } from 'node:path'
 
 /** Files a monorepo plugin may declare its manifest in, cheapest first. */
 const MANIFEST_PATHS = ['package.json']
+
+/** Fallback bundle patch names used by real plugins that forgot to wire one. */
+const PATCH_HINTS = ['cordis.patch.yml', 'cordis.patch.yaml', 'dsh.patch.yml', 'dsh/cordis.patch.yml']
+
+/** A bounded set keeps one bad manifest from causing an unbounded probe. */
+const MAX_ENTRYPOINT_PROBES = 8
 
 /**
  * Read one manifest. Prefers raw.githubusercontent (no API quota, no auth) and
@@ -98,7 +105,155 @@ export async function verifyPlugin({ repoPath, subpath = null, branch = 'HEAD', 
   const declaresBundle = typeof dsh.bundle === 'object' && dsh.bundle !== null
   const declaresClient = typeof dsh.client === 'object' && dsh.client !== null
   if (!declaresBundle && !declaresClient) return { ok: false, reason: 'no-bundle-or-client', manifest, manifestPath: path }
-  return { ok: true, reason: declaresBundle ? 'dsh.bundle' : 'dsh.client', manifest, manifestPath: path }
+  const probe = await probeRuntime({
+    repoPath, branch, manifest, manifestPath: path, fetchImpl, token, declaresBundle, declaresClient,
+  })
+  if (probe.status === 'error') return { ok: false, reason: 'probe-error', detail: probe.detail, manifest, manifestPath: path }
+  if (!probe.ok) return { ok: false, reason: probe.reason, manifest, manifestPath: path, probe: probe.details }
+  return {
+    ok: true,
+    reason: declaresBundle ? 'dsh.bundle' : 'dsh.client',
+    manifest,
+    manifestPath: path,
+    probe: probe.details,
+  }
+}
+
+/**
+ * Probe the files that make a declared plugin real.
+ *
+ * A manifest field is only a claim. A bundle must point to a non-empty patch
+ * containing at least one Loader insertion, or expose an actual entry file;
+ * a client must expose an entry file or a non-empty injection list. This is a
+ * read-only static probe: the market never executes untrusted repository code
+ * during ingestion.
+ */
+async function probeRuntime({ repoPath, branch, manifest, manifestPath, fetchImpl, token, declaresBundle, declaresClient }) {
+  const packageDir = posix.dirname(manifestPath) === '.' ? '' : posix.dirname(manifestPath)
+  const details = { manifestPath, patch: null, entrypoints: [], clientInjects: 0 }
+  let sawProbeError = null
+  let sawConcreteRuntime = false
+
+  const read = async (relativePath) => {
+    const path = packageRelativePath(packageDir, relativePath)
+    if (path === '') return { status: 'absent', path }
+    const result = await readRepositoryFile({ repoPath, branch, path, fetchImpl, token })
+    if (result.status === 'error') sawProbeError = result.detail
+    return { ...result, path }
+  }
+
+  if (declaresBundle) {
+    const declaredPatch = typeof manifest.dsh.bundle.patch === 'string' ? manifest.dsh.bundle.patch.trim() : ''
+    const candidates = declaredPatch === '' ? PATCH_HINTS : [declaredPatch, ...PATCH_HINTS]
+    const seen = new Set()
+    for (const candidate of candidates) {
+      const result = await read(candidate)
+      if (seen.has(result.path)) continue
+      seen.add(result.path)
+      if (result.status !== 'found') continue
+      const meaningful = hasLoaderInsertion(result.text)
+      details.patch = { path: result.path, meaningful }
+      if (meaningful) sawConcreteRuntime = true
+      break
+    }
+  }
+
+  const clientInject = manifest.dsh.client?.inject
+  if (declaresClient && Array.isArray(clientInject) && clientInject.some((item) => String(item).trim() !== '')) {
+    details.clientInjects = clientInject.filter((item) => String(item).trim() !== '').length
+    sawConcreteRuntime = true
+  }
+
+  // A meaningful bundle patch is already a runtime proof. Only fan out to
+  // package entrypoint probes when the manifest has no usable patch/inject
+  // signal; this keeps a full catalog run bounded to roughly one extra read
+  // for a valid bundle instead of probing every export path as well.
+  if (!sawConcreteRuntime) {
+    const paths = entrypointPaths(manifest)
+    for (const candidate of paths.slice(0, MAX_ENTRYPOINT_PROBES)) {
+      const result = await read(candidate)
+      if (result.status !== 'found') continue
+      if (!hasExecutableText(result.text)) continue
+      details.entrypoints.push(result.path)
+      sawConcreteRuntime = true
+    }
+  }
+
+  if (sawConcreteRuntime) return { ok: true, details }
+  if (sawProbeError !== null) return { status: 'error', detail: sawProbeError }
+  return { ok: false, reason: 'empty-plugin-entry', details }
+}
+
+/** Resolve a manifest-relative path without allowing a repository traversal. */
+function packageRelativePath(packageDir, value) {
+  const clean = String(value ?? '').trim().replace(/^\.\//, '')
+  const resolved = posix.normalize(posix.join(packageDir, clean))
+  return resolved === '..' || resolved.startsWith('../') ? '' : resolved
+}
+
+/** Export values in package.json, including conditional/nested exports. */
+function entrypointPaths(manifest) {
+  const values = []
+  const add = (value) => {
+    if (typeof value === 'string' && value.startsWith('.') && !/(?:^|\/)package\.json$|\.(?:json|map|d\.ts|md)$/i.test(value)) values.push(value)
+    else if (Array.isArray(value)) value.forEach(add)
+    else if (value !== null && typeof value === 'object') Object.values(value).forEach(add)
+  }
+  add(manifest.main)
+  add(manifest.module)
+  add(manifest.browser)
+  add(manifest.exports)
+  return [...new Set(values)]
+}
+
+/** A non-empty patch must actually add at least one Loader entry. */
+function hasLoaderInsertion(text) {
+  const body = String(text ?? '').replace(/^\s*#.*$/gm, '').trim()
+  if (!/(?:^|\n)\s*-\s*insert\s*:/m.test(body)) return false
+  return /^\s*name\s*:\s*['"]?[^'"\n#]+['"]?\s*$/m.test(body)
+}
+
+/** Reject files containing only whitespace/comments, not normal source code. */
+function hasExecutableText(text) {
+  const body = String(text ?? '')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|\s)\/\/.*$/gm, '$1')
+    .replace(/(^|\s)#.*$/gm, '$1')
+    .trim()
+  return body.length > 0
+}
+
+/** Read a repository file with transient-error semantics and API fallback. */
+async function readRepositoryFile({ repoPath, branch, path, fetchImpl, token }) {
+  let sawError = null
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const res = await fetchImpl(`https://raw.githubusercontent.com/${repoPath}/${branch}/${path}`, {
+        headers: { 'user-agent': 'dsh-market-admission' },
+      })
+      if (res.status === 404) return { status: 'absent' }
+      if (!res.ok) { sawError = `HTTP ${res.status}`; continue }
+      return { status: 'found', text: await res.text() }
+    } catch (error) {
+      sawError = String(error?.message ?? error)
+    }
+  }
+  if (token !== undefined) {
+    try {
+      const res = await fetchImpl(
+        `https://api.github.com/repos/${repoPath}/contents/${path}?ref=${encodeURIComponent(branch)}`,
+        { headers: { accept: 'application/vnd.github+json', authorization: `Bearer ${token}`, 'user-agent': 'dsh-market-admission' } },
+      )
+      if (res.status === 404) return { status: 'absent' }
+      if (!res.ok) return { status: 'error', detail: `api HTTP ${res.status}` }
+      const json = await res.json()
+      if (typeof json.content !== 'string') return { status: 'absent' }
+      return { status: 'found', text: Buffer.from(json.content, 'base64').toString('utf8') }
+    } catch (error) {
+      sawError = String(error?.message ?? error)
+    }
+  }
+  return { status: 'error', detail: sawError ?? 'unknown probe error' }
 }
 
 /**
@@ -165,7 +320,7 @@ export class AdmissionCache {
  * @param candidates - `{ repoPath, subpath, branch, cacheKey }` entries.
  * @returns a `Map<cacheKey, verdict>`.
  */
-export async function verifyAll(candidates, { cache, fetchImpl = fetch, token, log = () => {}, concurrency = 8 }) {
+export async function verifyAll(candidates, { cache, fetchImpl = fetch, token, log = () => {}, concurrency = 32 }) {
   const verdicts = new Map()
   const queue = [...candidates]
   let done = 0
@@ -176,7 +331,11 @@ export async function verifyAll(candidates, { cache, fetchImpl = fetch, token, l
       const cached = cache.get(item.cacheKey)
       if (cached !== undefined) { verdicts.set(item.cacheKey, cached); continue }
       const verdict = await verifyPlugin({ repoPath: item.repoPath, subpath: item.subpath, branch: item.branch, fetchImpl, token })
-      cache.set(item.cacheKey, { ok: verdict.ok, reason: verdict.reason })
+      // Keep the manifest and static probe details with the verdict. A cached
+      // admission must remain able to produce the same compatibility plan as a
+      // fresh probe; caching only ok/reason silently disabled repairs on later
+      // runs.
+      cache.set(item.cacheKey, verdict)
       verdicts.set(item.cacheKey, verdict)
       done += 1
       if (done % 50 === 0) log(`  admission: ${done}/${candidates.length} probed`)

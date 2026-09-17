@@ -168,9 +168,19 @@ export async function runIngest({
    * Defined once and used for both the write and the read: two copies of this
    * expression is how a lookup silently stops matching its own writes.
    */
-  const admissionKeyOf = (plugin) => `${plugin.repoPath}@${plugin.added === '' ? 'unversioned' : plugin.added}`
+  // Bump the namespace whenever the probe contract changes. Otherwise a cache
+  // written by the old manifest-only check would silently bypass the new
+  // runtime-file probe for seven days.
+  const admissionKeyOf = (plugin) => `probe-v2:${plugin.repoPath}@${plugin.added === '' ? 'unversioned' : plugin.added}`
   if (admission) {
-    const candidates = merged.filter((p) => p.needsEvidence && p.repoPath !== null)
+    // An explicit install command is not proof that a repository is a plugin.
+    // Probe every GitHub-backed candidate, not only the targets `normalize()`
+    // inferred, so a source catalog cannot bypass admission by shipping its own
+    // `dsh plugin add` command. Measured before this rule: 4565 of 11653 rows
+    // were probed and 8343 were published on a directory's word alone, which is
+    // how `reactive-resume` — a resume builder — reached the top of the market
+    // with a one-click install button that could only fail.
+    const candidates = merged.filter((p) => p.repoPath !== null)
     const cache = new AdmissionCache(join(out, 'admission-cache.json'))
     const verdicts = await verifyAll(
       candidates.map((p) => ({ repoPath: p.repoPath, subpath: p.repoSubpath, cacheKey: admissionKeyOf(p) })),
@@ -178,12 +188,22 @@ export async function runIngest({
     )
     admitted = []
     for (const plugin of merged) {
-      if (!plugin.needsEvidence || plugin.repoPath === null) { admitted.push(plugin); continue }
+      if (plugin.repoPath === null) {
+        // An npm-only record without a repository cannot be probed statically.
+        // Keep it without a one-click install rather than reading the source's
+        // command as proof or inventing a rejection out of silence.
+        plugin.installable = null
+        plugin.evidence = 'unproven'
+        admissionStats.unproven += 1
+        admitted.push(plugin)
+        continue
+      }
       const verdict = verdicts.get(admissionKeyOf(plugin))
       admissionStats.checked += 1
       if (verdict?.ok === true) {
         plugin.installable = true
         plugin.evidence = verdict.reason
+        if (verdict.probe !== undefined) plugin.probe = verdict.probe
         if (verdict.manifest !== undefined) {
           const plan = planRepair({ plugin, manifest: verdict.manifest, treePaths: null, hostVersion: null })
           if (plan.needed) {
@@ -216,7 +236,7 @@ export async function runIngest({
       .map(admissionKeyOf))
     admissionStats.cached = cache.stats.hits
     admissionStats.expired = cache.stats.expired
-    log(`admission: ${admissionStats.checked} inferred targets checked, ${admissionStats.admitted} admitted, ${admissionStats.rejected} rejected, ${admissionStats.unproven} unproven (kept), ${admissionStats.repaired} repaired`)
+    log(`admission: ${admissionStats.checked} targets checked, ${admissionStats.admitted} admitted, ${admissionStats.rejected} rejected, ${admissionStats.unproven} unproven (kept), ${admissionStats.repaired} repaired`)
     log(`  rejected by reason: ${JSON.stringify(admissionStats.byReason)}`)
   }
 
@@ -427,6 +447,11 @@ export async function runIngest({
       score: p.score,
       install: p.install,
       installable: p.installable,
+      // The verdict a reader needs to tell a probed plugin from a row that only
+      // carries an install target. Published rather than recomputed, so the
+      // settings section and the published page cannot disagree.
+      evidence: p.evidence ?? null,
+      probe: p.probe ?? null,
       compat: p.compat ?? null,
       added: p.added,
     })),
@@ -459,6 +484,10 @@ export async function runIngest({
       sources: sourceHealth.length,
       failing: sourceHealth.filter((s) => !s.ok).length,
       rejectedByAdmission: admissionStats.rejected,
+      // The whole verdict table, not only the rejections: "how many rows were
+      // never probed" is the number that was missing while a market full of
+      // uninstallable rows still looked healthy.
+      admission: admissionStats,
     },
     sources: sourceHealth.map(({ id, name, ok, items, ms, error }) => ({ id, name, ok, items, ms, error })),
   })
