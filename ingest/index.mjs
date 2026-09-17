@@ -172,10 +172,16 @@ export async function runIngest({
   // written by the old manifest-only check would silently bypass the new
   // runtime-file probe for seven days.
   //
+  // `probe-v4` scopes a verdict to the row's install target: v3 stored a verdict
+  // for a row that carried an npm name, but the rule now decides whether that
+  // name may answer at all. Reusing v3 entries re-admitted the 64 repositories
+  // whose package belongs to someone else — the run that changed the rule
+  // reported `cached: 12897` and dropped exactly one row.
+  //
   // The npm name is part of the key as well as the revision: a row whose
   // repository stays put while its published package changes is a different
   // install target, and one verdict cannot stand for both.
-  const admissionKeyOf = (plugin) => `probe-v3:${plugin.repoPath ?? 'no-repo'}+${plugin.npm ?? 'no-npm'}@${plugin.added === '' ? 'unversioned' : plugin.added}`
+  const admissionKeyOf = (plugin) => `probe-v4:${plugin.repoPath ?? 'no-repo'}+${plugin.npm ?? 'no-npm'}@${plugin.added === '' ? 'unversioned' : plugin.added}`
   if (admission) {
     // An explicit install command is not proof that a repository is a plugin.
     // Probe every candidate that names something to install, not only the
