@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-17T06:48:12.558Z",
+  "updated": "2026-09-17T06:59:10.888Z",
   "note": "Evidence for category discovery. `automatic` entries were created by the pipeline; `promotable` entries need a human to add them to category-labels.json with \"promote\": true, because measurement showed cross-cutting tokens describe what a plugin integrates with rather than what it is.",
   "thresholds": {
     "leftoverMinMembers": 25,
@@ -14,8 +14,8 @@
   },
   "counts": {
     "automatic": 0,
-    "promotable": 2,
-    "belowThreshold": 58
+    "promotable": 1,
+    "belowThreshold": 59
   },
   "candidates": [
     {
@@ -52,15 +52,13 @@
     },
     {
       "term": "claude",
-      "members": 120,
+      "members": 119,
       "leftover": 0,
       "spread": 16,
       "share": 0,
-      "channels": [
-        "cross-cutting"
-      ],
-      "qualifies": "promotable",
-      "why": "spans 16 categories; promote by hand if it names a subject",
+      "channels": [],
+      "qualifies": "below-threshold",
+      "why": "needs >=25 unclassified (has 0) or >=120 members across >=6 categories (has 119/16)",
       "samples": [
         "dsh-TUI",
         "DSH-Claude-Style-Reasoning-Slider",
@@ -84,13 +82,13 @@
     },
     {
       "term": "opencode",
-      "members": 71,
+      "members": 70,
       "leftover": 1,
       "spread": 15,
       "share": 0.014,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 1) or >=120 members across >=6 categories (has 71/15)",
+      "why": "needs >=25 unclassified (has 1) or >=120 members across >=6 categories (has 70/15)",
       "samples": [
         "dsh-opencode-go-quota",
         "dsh-plugin-opencode-usage",
@@ -791,11 +789,11 @@
       "term": "system",
       "members": 25,
       "leftover": 1,
-      "spread": 11,
+      "spread": 10,
       "share": 0.04,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 1) or >=120 members across >=6 categories (has 25/11)",
+      "why": "needs >=25 unclassified (has 1) or >=120 members across >=6 categories (has 25/10)",
       "samples": [
         "dsh-s7r",
         "dsh-system-monitor",
