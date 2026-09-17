@@ -189,11 +189,25 @@ export async function runIngest({
     // A package is a candidate on its own: `coding-agents` installs
     // `@vectorize-io/hindsight-coding-agents`, whose registry manifest declares
     // `dsh.bundle` while its repository root declares nothing.
-    const installsPackage = (p) => typeof p.npm === 'string' && p.npm.trim() !== ''
+    //
+    // The package may only answer for a row that installs it. Plenty of rows
+    // carry an npm name pointing at a plugin someone else wrote for the same
+    // repository — `Molunerfinn/PicGo` installs `github:Molunerfinn/PicGo` while
+    // carrying `@picgo/dsh-plugin`, and `Tencent/WeKnora` carries
+    // `@wxg-prc-cpg/dsh-weknora` — so letting that package prove the row puts a
+    // one-click button on a repository that is not a plugin. Measured on the
+    // first run that allowed it: 64 of 464 package-admitted rows were that
+    // mistake, and they were the highest-star rows on the page.
+    const installsPackage = (p) => p.targetKind === 'npm' && typeof p.npm === 'string' && p.npm.trim() !== ''
     const candidates = merged.filter((p) => p.repoPath !== null || installsPackage(p))
     const cache = new AdmissionCache(join(out, 'admission-cache.json'))
     const verdicts = await verifyAll(
-      candidates.map((p) => ({ repoPath: p.repoPath, subpath: p.repoSubpath, npm: p.npm ?? null, cacheKey: admissionKeyOf(p) })),
+      candidates.map((p) => ({
+        repoPath: p.repoPath,
+        subpath: p.repoSubpath,
+        npm: installsPackage(p) ? p.npm : null,
+        cacheKey: admissionKeyOf(p),
+      })),
       { cache, token, log, fetchImpl },
     )
     admitted = []
