@@ -156,7 +156,7 @@ export async function runIngest({
   // The same read also answers the compatibility question, so one probe serves
   // admission and repair planning instead of two network passes.
   let admitted = merged
-  const admissionStats = { checked: 0, admitted: 0, rejected: 0, unproven: 0, repaired: 0, cached: 0, expired: 0, byReason: {} }
+  const admissionStats = { checked: 0, admitted: 0, rejected: 0, unproven: 0, repaired: 0, rewritten: 0, cached: 0, expired: 0, byReason: {} }
   /**
    * The cache key for one plugin's admission verdict.
    *
@@ -181,7 +181,10 @@ export async function runIngest({
   // The npm name is part of the key as well as the revision: a row whose
   // repository stays put while its published package changes is a different
   // install target, and one verdict cannot stand for both.
-  const admissionKeyOf = (plugin) => `probe-v4:${plugin.repoPath ?? 'no-repo'}+${plugin.npm ?? 'no-npm'}@${plugin.added === '' ? 'unversioned' : plugin.added}`
+  // `probe-v5` records that a package may now decide its row after all, which
+  // v4 refused. A v4 verdict for one of the affected rows is a rejection this
+  // rule reverses, so the namespace has to move with the rule.
+  const admissionKeyOf = (plugin) => `probe-v5:${plugin.repoPath ?? 'no-repo'}+${plugin.npm ?? 'no-npm'}@${plugin.added === '' ? 'unversioned' : plugin.added}`
   if (admission) {
     // An explicit install command is not proof that a repository is a plugin.
     // Probe every candidate that names something to install, not only the
@@ -192,33 +195,31 @@ export async function runIngest({
     // — reached the top of the market with a one-click install button that
     // could only fail.
     //
-    // A package is a candidate on its own: `coding-agents` installs
-    // `@vectorize-io/hindsight-coding-agents`, whose registry manifest declares
-    // `dsh.bundle` while its repository root declares nothing.
+    // A package is a candidate on its own, because a plugin's published package
+    // can declare `dsh.bundle` while its repository root declares nothing:
+    // `coding-agents` installs `@vectorize-io/hindsight-coding-agents`, and
+    // `reactive-resume` installs `dsh-plugin-reactive-resume` out of
+    // `packages/dsh-plugin` in its own monorepo.
     //
-    // The package may only answer for a row that installs it. Plenty of rows
-    // carry an npm name pointing at a plugin someone else wrote for the same
-    // repository — `Molunerfinn/PicGo` installs `github:Molunerfinn/PicGo` while
-    // carrying `@picgo/dsh-plugin`, and `Tencent/WeKnora` carries
-    // `@wxg-prc-cpg/dsh-weknora` — so letting that package prove the row puts a
-    // one-click button on a repository that is not a plugin. Measured on the
-    // first run that allowed it: 64 of 464 package-admitted rows were that
-    // mistake, and they were the highest-star rows on the page.
-    const installsPackage = (p) => p.targetKind === 'npm' && typeof p.npm === 'string' && p.npm.trim() !== ''
-    const candidates = merged.filter((p) => p.repoPath !== null || installsPackage(p))
+    // Neither source may be skipped — a row that installs a package needs the
+    // registry read, a row that installs a repository needs the repository probe —
+    // and which one ends up authoritative is decided below by which one answers,
+    // not by the install command a directory happened to ship.
+    const hasPackage = (p) => typeof p.npm === 'string' && p.npm.trim() !== ''
+    const candidates = merged.filter((p) => p.repoPath !== null || hasPackage(p))
     const cache = new AdmissionCache(join(out, 'admission-cache.json'))
     const verdicts = await verifyAll(
       candidates.map((p) => ({
         repoPath: p.repoPath,
         subpath: p.repoSubpath,
-        npm: installsPackage(p) ? p.npm : null,
+        npm: hasPackage(p) ? p.npm : null,
         cacheKey: admissionKeyOf(p),
       })),
       { cache, token, log, fetchImpl },
     )
     admitted = []
     for (const plugin of merged) {
-      if (plugin.repoPath === null && !installsPackage(plugin)) {
+      if (plugin.repoPath === null && !hasPackage(plugin)) {
         // Nothing to probe: a release archive or a bare command has no manifest
         // to read. Keep it without a one-click install rather than reading the
         // source's command as proof or inventing a rejection out of silence.
@@ -234,6 +235,19 @@ export async function runIngest({
         plugin.installable = true
         plugin.evidence = verdict.reason
         if (verdict.probe !== undefined) plugin.probe = verdict.probe
+        // The repository could not prove the plugin but its published package
+        // could. That means the author ships the plugin as a package and the
+        // repository root is not installable, so the row has to move to the
+        // package — otherwise its button offers a command that can only fail.
+        // Measured: 64 rows were in exactly this state, including `archify`
+        // (65203 stars, `integrations/deepseek-harness`) and `reactive-resume`
+        // (43065 stars, `packages/dsh-plugin`).
+        if (verdict.probe?.source === 'npm' && plugin.targetKind !== 'npm') {
+          plugin.install = `dsh plugin --profile web add ${plugin.npm}`
+          plugin.target = plugin.npm
+          plugin.targetKind = 'npm'
+          admissionStats.rewritten += 1
+        }
         if (verdict.manifest !== undefined) {
           const plan = planRepair({ plugin, manifest: verdict.manifest, treePaths: null, hostVersion: null })
           if (plan.needed) {
@@ -266,7 +280,7 @@ export async function runIngest({
       .map(admissionKeyOf))
     admissionStats.cached = cache.stats.hits
     admissionStats.expired = cache.stats.expired
-    log(`admission: ${admissionStats.checked} targets checked, ${admissionStats.admitted} admitted, ${admissionStats.rejected} rejected, ${admissionStats.unproven} unproven (kept), ${admissionStats.repaired} repaired`)
+    log(`admission: ${admissionStats.checked} targets checked, ${admissionStats.admitted} admitted, ${admissionStats.rejected} rejected, ${admissionStats.unproven} unproven (kept), ${admissionStats.repaired} repaired, ${admissionStats.rewritten} moved to their package`)
     log(`  rejected by reason: ${JSON.stringify(admissionStats.byReason)}`)
   }
 
