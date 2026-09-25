@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-25T04:56:57.213Z",
+  "updated": "2026-09-25T11:50:21.062Z",
   "note": "Evidence for category discovery. `automatic` entries were created by the pipeline; `promotable` entries need a human to add them to category-labels.json with \"promote\": true, because measurement showed cross-cutting tokens describe what a plugin integrates with rather than what it is.",
   "thresholds": {
     "leftoverMinMembers": 25,
@@ -20,13 +20,13 @@
   "candidates": [
     {
       "term": "codex",
-      "members": 168,
+      "members": 164,
       "leftover": 4,
       "spread": 17,
       "share": 0.024,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 4) or >=120 members across >=6 categories (has 168/17)",
+      "why": "needs >=25 unclassified (has 4) or >=120 members across >=6 categories (has 164/17)",
       "samples": [
         "dsh-codex-pet",
         "dsh-message-navigator",
@@ -50,60 +50,60 @@
     },
     {
       "term": "claude",
-      "members": 126,
+      "members": 125,
       "leftover": 0,
-      "spread": 15,
+      "spread": 16,
       "share": 0,
       "channels": [
         "cross-cutting"
       ],
       "qualifies": "promotable",
-      "why": "spans 15 categories; promote by hand if it names a subject",
+      "why": "spans 16 categories; promote by hand if it names a subject",
       "samples": [
-        "dsh-cc-tui",
+        "dsh-TUI",
         "DSH-Claude-Style-Reasoning-Slider",
-        "opencues"
+        "dsh-claude-slider"
       ]
     },
     {
       "term": "management",
-      "members": 82,
+      "members": 81,
       "leftover": 2,
       "spread": 14,
-      "share": 0.024,
+      "share": 0.025,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 82/14)",
+      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 81/14)",
       "samples": [
+        "dsh-token-optimizer",
         "dsh-model-management",
-        "CiteCiter",
-        "dsh-archived-chats"
+        "CiteCiter"
       ]
     },
     {
       "term": "opencode",
       "members": 79,
       "leftover": 1,
-      "spread": 16,
+      "spread": 15,
       "share": 0.013,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 1) or >=120 members across >=6 categories (has 79/16)",
+      "why": "needs >=25 unclassified (has 1) or >=120 members across >=6 categories (has 79/15)",
       "samples": [
-        "opencues",
-        "dsh-opencode-go-quota",
-        "dsh-plugin-opencode-usage"
+        "dsh-opencode-go-usage",
+        "dsh-opencode-usage",
+        "dsh-opencode-go-quota"
       ]
     },
     {
       "term": "control",
-      "members": 60,
+      "members": 59,
       "leftover": 4,
       "spread": 14,
-      "share": 0.067,
+      "share": 0.068,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 4) or >=120 members across >=6 categories (has 60/14)",
+      "why": "needs >=25 unclassified (has 4) or >=120 members across >=6 categories (has 59/14)",
       "samples": [
         "dsh-harness-chat-control",
         "dsh-audio-control",
@@ -112,32 +112,17 @@
     },
     {
       "term": "reasoning",
-      "members": 59,
+      "members": 58,
       "leftover": 0,
       "spread": 10,
       "share": 0,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 0) or >=120 members across >=6 categories (has 59/10)",
+      "why": "needs >=25 unclassified (has 0) or >=120 members across >=6 categories (has 58/10)",
       "samples": [
         "DSH-Claude-Style-Reasoning-Slider",
         "dsh-reasoning-slider",
         "better-reasoning-slider"
-      ]
-    },
-    {
-      "term": "openai",
-      "members": 55,
-      "leftover": 2,
-      "spread": 11,
-      "share": 0.036,
-      "channels": [],
-      "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 55/11)",
-      "samples": [
-        "opencues",
-        "dsh-openai-oauth",
-        "dsh-llm-openai-completions"
       ]
     },
     {
@@ -157,13 +142,13 @@
     },
     {
       "term": "oauth",
-      "members": 54,
+      "members": 53,
       "leftover": 2,
-      "spread": 10,
-      "share": 0.037,
+      "spread": 9,
+      "share": 0.038,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 54/10)",
+      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 53/9)",
       "samples": [
         "dsh-hub-oauth-gateway",
         "dsh-openai-oauth",
@@ -171,14 +156,29 @@
       ]
     },
     {
+      "term": "openai",
+      "members": 53,
+      "leftover": 2,
+      "spread": 11,
+      "share": 0.038,
+      "channels": [],
+      "qualifies": "below-threshold",
+      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 53/11)",
+      "samples": [
+        "dsh-openai-oauth",
+        "dsh-llm-openai-completions",
+        "dsh-polyglot"
+      ]
+    },
+    {
       "term": "archive",
       "members": 52,
       "leftover": 0,
-      "spread": 8,
+      "spread": 9,
       "share": 0,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 0) or >=120 members across >=6 categories (has 52/8)",
+      "why": "needs >=25 unclassified (has 0) or >=120 members across >=6 categories (has 52/9)",
       "samples": [
         "easy-archive",
         "dsh-archive-manager",
@@ -231,33 +231,33 @@
       ]
     },
     {
-      "term": "assistant",
+      "term": "gateway",
       "members": 45,
-      "leftover": 6,
-      "spread": 15,
-      "share": 0.133,
+      "leftover": 2,
+      "spread": 11,
+      "share": 0.044,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 6) or >=120 members across >=6 categories (has 45/15)",
+      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 45/11)",
+      "samples": [
+        "dsh-hub-oauth-gateway",
+        "dsh-gateway-wallet",
+        "dsh-gateway-models"
+      ]
+    },
+    {
+      "term": "assistant",
+      "members": 44,
+      "leftover": 6,
+      "spread": 16,
+      "share": 0.136,
+      "channels": [],
+      "qualifies": "below-threshold",
+      "why": "needs >=25 unclassified (has 6) or >=120 members across >=6 categories (has 44/16)",
       "samples": [
         "packhub-workbench-assistant",
         "dsh-sidebar-assistant",
         "dsh-llm-assistant"
-      ]
-    },
-    {
-      "term": "gateway",
-      "members": 44,
-      "leftover": 2,
-      "spread": 11,
-      "share": 0.045,
-      "channels": [],
-      "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 44/11)",
-      "samples": [
-        "dsh-hub-oauth-gateway",
-        "dsh-gateway-wallet",
-        "dsh-plugin#dsh-llm-pi-gateway"
       ]
     },
     {
@@ -270,9 +270,9 @@
       "qualifies": "below-threshold",
       "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 43/11)",
       "samples": [
+        "dsh-memory",
         "thoughtdag",
-        "dsh-task-graph",
-        "dsh-plugin-execution-graph"
+        "dsh-task-graph"
       ]
     },
     {
@@ -291,21 +291,6 @@
       ]
     },
     {
-      "term": "self",
-      "members": 42,
-      "leftover": 1,
-      "spread": 13,
-      "share": 0.024,
-      "channels": [],
-      "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 1) or >=120 members across >=6 categories (has 42/13)",
-      "samples": [
-        "thoughtdag",
-        "dsh-prompt-self",
-        "dsh-self-improved"
-      ]
-    },
-    {
       "term": "react",
       "members": 41,
       "leftover": 0,
@@ -315,9 +300,24 @@
       "qualifies": "below-threshold",
       "why": "needs >=25 unclassified (has 0) or >=120 members across >=6 categories (has 41/14)",
       "samples": [
-        "dsh-cc-tui",
+        "dsh-TUI",
         "thoughtdag",
         "dsh-s7r"
+      ]
+    },
+    {
+      "term": "self",
+      "members": 40,
+      "leftover": 1,
+      "spread": 13,
+      "share": 0.025,
+      "channels": [],
+      "qualifies": "below-threshold",
+      "why": "needs >=25 unclassified (has 1) or >=120 members across >=6 categories (has 40/13)",
+      "samples": [
+        "thoughtdag",
+        "dsh-prompt-self",
+        "dsh-self-improved"
       ]
     },
     {
@@ -336,18 +336,18 @@
       ]
     },
     {
-      "term": "evidence",
-      "members": 38,
+      "term": "video",
+      "members": 39,
       "leftover": 2,
-      "spread": 11,
-      "share": 0.053,
+      "spread": 13,
+      "share": 0.051,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 38/11)",
+      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 39/13)",
       "samples": [
-        "Aegis",
-        "dsh-research-report",
-        "dsh-evidence-gate"
+        "dsh-plugin-video-player",
+        "dsh-bili-widget",
+        "dsh-newapi-video"
       ]
     },
     {
@@ -396,29 +396,29 @@
       ]
     },
     {
-      "term": "video",
+      "term": "evidence",
       "members": 37,
       "leftover": 2,
-      "spread": 12,
+      "spread": 11,
       "share": 0.054,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 37/12)",
+      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 37/11)",
       "samples": [
-        "dsh-plugin-video-player",
-        "dsh-bili-widget",
-        "dsh-newapi-video"
+        "Aegis",
+        "dsh-evidence-gate",
+        "qiushi-dsh-evidence-audit"
       ]
     },
     {
       "term": "access",
-      "members": 36,
+      "members": 35,
       "leftover": 5,
       "spread": 7,
-      "share": 0.139,
+      "share": 0.143,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 5) or >=120 members across >=6 categories (has 36/7)",
+      "why": "needs >=25 unclassified (has 5) or >=120 members across >=6 categories (has 35/7)",
       "samples": [
         "dsh-Almost_Full_Access",
         "dsh-cloudflare-access",
@@ -444,11 +444,11 @@
       "term": "effort",
       "members": 35,
       "leftover": 1,
-      "spread": 7,
+      "spread": 9,
       "share": 0.029,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 1) or >=120 members across >=6 categories (has 35/7)",
+      "why": "needs >=25 unclassified (has 1) or >=120 members across >=6 categories (has 35/9)",
       "samples": [
         "dsh-effort-slider",
         "dsh-effort-switcher",
@@ -501,21 +501,6 @@
       ]
     },
     {
-      "term": "bot",
-      "members": 34,
-      "leftover": 0,
-      "spread": 10,
-      "share": 0,
-      "channels": [],
-      "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 0) or >=120 members across >=6 categories (has 34/10)",
-      "samples": [
-        "dsh-sxs-anti-bot-http",
-        "dsh-bot-mode",
-        "dsh-im"
-      ]
-    },
-    {
       "term": "composer",
       "members": 34,
       "leftover": 1,
@@ -528,21 +513,6 @@
         "dsh-composer-expand",
         "dsh-composer-history",
         "dsh-johari-cognition-quadrant-dialog-composer"
-      ]
-    },
-    {
-      "term": "diff",
-      "members": 34,
-      "leftover": 3,
-      "spread": 10,
-      "share": 0.088,
-      "channels": [],
-      "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 3) or >=120 members across >=6 categories (has 34/10)",
-      "samples": [
-        "dsh-session-diff",
-        "dsh-edit-diff",
-        "dsh-mcp-diff"
       ]
     },
     {
@@ -561,18 +531,48 @@
       ]
     },
     {
-      "term": "editor",
+      "term": "bot",
+      "members": 33,
+      "leftover": 0,
+      "spread": 9,
+      "share": 0,
+      "channels": [],
+      "qualifies": "below-threshold",
+      "why": "needs >=25 unclassified (has 0) or >=120 members across >=6 categories (has 33/9)",
+      "samples": [
+        "dsh-sxs-anti-bot-http",
+        "dsh-bot-mode",
+        "dsh-im"
+      ]
+    },
+    {
+      "term": "diff",
+      "members": 33,
+      "leftover": 3,
+      "spread": 10,
+      "share": 0.091,
+      "channels": [],
+      "qualifies": "below-threshold",
+      "why": "needs >=25 unclassified (has 3) or >=120 members across >=6 categories (has 33/10)",
+      "samples": [
+        "dsh-session-diff",
+        "dsh-edit-diff",
+        "dsh-mcp-diff"
+      ]
+    },
+    {
+      "term": "gate",
       "members": 33,
       "leftover": 2,
-      "spread": 16,
+      "spread": 11,
       "share": 0.061,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 33/16)",
+      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 33/11)",
       "samples": [
-        "dock-editor",
-        "dsh-rich-editor",
-        "dsh-agent-instructions-editor"
+        "dsh-model-gate",
+        "dsh-memory-gate",
+        "dsh-stage-gate"
       ]
     },
     {
@@ -591,18 +591,18 @@
       ]
     },
     {
-      "term": "gate",
+      "term": "editor",
       "members": 32,
       "leftover": 2,
-      "spread": 11,
+      "spread": 15,
       "share": 0.063,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 32/11)",
+      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 32/15)",
       "samples": [
-        "dsh-model-gate",
-        "dsh-memory-gate",
-        "dsh-stage-gate"
+        "dock-editor",
+        "dsh-rich-editor",
+        "dsh-agent-instructions-editor"
       ]
     },
     {
@@ -711,21 +711,6 @@
       ]
     },
     {
-      "term": "engine",
-      "members": 30,
-      "leftover": 0,
-      "spread": 12,
-      "share": 0,
-      "channels": [],
-      "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 0) or >=120 members across >=6 categories (has 30/12)",
-      "samples": [
-        "dsh-muv-engine",
-        "dsh-wallpaper-engine",
-        "dsh-wallpaper-engine"
-      ]
-    },
-    {
       "term": "plugins#dsh",
       "members": 30,
       "leftover": 0,
@@ -738,6 +723,21 @@
         "my-dsh-plugins#dsh-think-zh-expand",
         "dsh-plugins#dsh-plugin-setting-mcp",
         "dsh-plugins#dsh-weather"
+      ]
+    },
+    {
+      "term": "engine",
+      "members": 29,
+      "leftover": 0,
+      "spread": 11,
+      "share": 0,
+      "channels": [],
+      "qualifies": "below-threshold",
+      "why": "needs >=25 unclassified (has 0) or >=120 members across >=6 categories (has 29/11)",
+      "samples": [
+        "dsh-muv-engine",
+        "dsh-wallpaper-engine",
+        "dsh-wallpaper-engine"
       ]
     },
     {
@@ -774,11 +774,11 @@
       "term": "thinking",
       "members": 29,
       "leftover": 3,
-      "spread": 9,
+      "spread": 10,
       "share": 0.103,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 3) or >=120 members across >=6 categories (has 29/9)",
+      "why": "needs >=25 unclassified (has 3) or >=120 members across >=6 categories (has 29/10)",
       "samples": [
         "dsh-thinking-quips",
         "dsh-chat-thinking-editor",
@@ -816,18 +816,33 @@
       ]
     },
     {
+      "term": "companion",
+      "members": 28,
+      "leftover": 2,
+      "spread": 12,
+      "share": 0.071,
+      "channels": [],
+      "qualifies": "below-threshold",
+      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 28/12)",
+      "samples": [
+        "dsh-im-companion",
+        "dsh-companion",
+        "dsh-whale-companion"
+      ]
+    },
+    {
       "term": "generation",
       "members": 28,
       "leftover": 1,
-      "spread": 12,
+      "spread": 13,
       "share": 0.036,
       "channels": [],
       "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 1) or >=120 members across >=6 categories (has 28/12)",
+      "why": "needs >=25 unclassified (has 1) or >=120 members across >=6 categories (has 28/13)",
       "samples": [
-        "dsh-codex-subscription",
         "dsh-auxiliary",
-        "dsh-generation"
+        "dsh-generation",
+        "dsh-game-material-master"
       ]
     },
     {
@@ -861,21 +876,6 @@
       ]
     },
     {
-      "term": "companion",
-      "members": 26,
-      "leftover": 2,
-      "spread": 12,
-      "share": 0.077,
-      "channels": [],
-      "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 2) or >=120 members across >=6 categories (has 26/12)",
-      "samples": [
-        "dsh-im-companion",
-        "dsh-companion",
-        "dsh-whale-companion"
-      ]
-    },
-    {
       "term": "enhance",
       "members": 26,
       "leftover": 1,
@@ -891,21 +891,6 @@
       ]
     },
     {
-      "term": "long",
-      "members": 26,
-      "leftover": 0,
-      "spread": 6,
-      "share": 0,
-      "channels": [],
-      "qualifies": "below-threshold",
-      "why": "needs >=25 unclassified (has 0) or >=120 members across >=6 categories (has 26/6)",
-      "samples": [
-        "dsh-memory-gate",
-        "memsearch",
-        "AI-Novel-Writer"
-      ]
-    },
-    {
       "term": "obsidian",
       "members": 26,
       "leftover": 2,
@@ -918,6 +903,21 @@
         "obsidian-dsh-acp",
         "dsh-client-ui-obsidian-memory",
         "dsh-obsidian"
+      ]
+    },
+    {
+      "term": "reader",
+      "members": 26,
+      "leftover": 3,
+      "spread": 13,
+      "share": 0.115,
+      "channels": [],
+      "qualifies": "below-threshold",
+      "why": "needs >=25 unclassified (has 3) or >=120 members across >=6 categories (has 26/13)",
+      "samples": [
+        "dsh-toutiao-reader",
+        "dsh-pdf-reader",
+        "dsh-paper-reader"
       ]
     }
   ]
