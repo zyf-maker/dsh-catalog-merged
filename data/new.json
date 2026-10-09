@@ -1,74 +1,91 @@
 {
-  "updated": "2026-10-09T13:15:27.636Z",
-  "count": 4,
+  "updated": "2026-10-09T22:38:42.324Z",
+  "count": 5,
   "plugins": [
     {
       "rank": 1,
-      "id": "npm:@1agents/session-reader",
-      "name": "@1agents/session-reader",
-      "owner": "scottzx",
-      "url": "git+https://github.com/scottzx/session-reader.git",
-      "category": "memory",
+      "id": "npm:@cowwo/dsh-provider-info",
+      "name": "@cowwo/dsh-provider-info",
+      "owner": "cowwo",
+      "url": "git+https://github.com/cowwo/dsh-provider-info.git",
+      "category": "model",
       "description": {
-        "en": "Read Plane: cross-agent session discovery, turn inspection, workspace aggregation and distillation from raw local session files.",
+        "en": "在模型座左侧显示当前模型所属提供商（显示名称优先，回退 Provider ID）。纯运行时装饰，不改动原生页面源码。",
         "zh": ""
       },
-      "install": "dsh plugin --profile web add @1agents/session-reader",
+      "install": "dsh plugin --profile web add @cowwo/dsh-provider-info",
       "targetKind": "npm",
       "stars": 0,
-      "downloads": 2602,
-      "score": 2602
+      "downloads": 1430,
+      "score": 1430
     },
     {
       "rank": 2,
-      "id": "repo:better-er/dsh-notify-ding",
-      "name": "dsh-notify-ding",
-      "owner": "better-er",
-      "url": "https://github.com/better-er/dsh-notify-ding",
-      "category": "notify",
+      "id": "npm:dsh-browser-harness",
+      "name": "dsh-browser-harness",
+      "owner": "c15858530922",
+      "url": "git+https://github.com/chaserchan/dsh-browser-harness.git",
+      "category": "vision",
       "description": {
-        "en": "「DSH·通知叮咚」：agent 提问或跑完一轮时弹出系统通知并让宿主播放 Windows 内置提示音。标准可安装的 dsh 客户端插件。",
-        "zh": "DSH 等你回复或跑完一轮时弹系统通知加提示音，人切到别的窗口也能被叫回来。"
+        "en": "浏览器控制插件：把 browser-use / browser-harness 的 Browser Harness 注册为 DSH 会话工具，让 agent 直接写 Python 驱动真实 Chrome（导航/点击/输入/取无障碍树/截图），支持独立专用浏览器与附着系统浏览器两种模式；配置 TypeSafe key 后条件启用 browser_autopilot（Jev 目标式自动化）。",
+        "zh": "让 DSH 智能体直接写 Python 操控真实 Chrome，自动导航、点击、填表、截图，本地运行无需 API Key。"
       },
-      "install": "dsh plugin add github:better-er/dsh-notify-ding",
-      "targetKind": "github",
-      "stars": 2,
-      "downloads": 0,
-      "score": 2000
+      "install": "dsh plugin --profile web add dsh-browser-harness",
+      "targetKind": "npm",
+      "stars": 0,
+      "downloads": 1427,
+      "score": 1427
     },
     {
       "rank": 3,
-      "id": "npm:@morlay/dsh-web-search-ollama",
-      "name": "@morlay/dsh-web-search-ollama",
-      "owner": "morlay_null",
-      "url": "https://github.com/morlay/dsh-plugin.git",
-      "category": "model",
+      "id": "npm:@klarkxy/dsh-dev-index",
+      "name": "@klarkxy/dsh-dev-index",
+      "owner": "klarkxy",
+      "url": "git+https://github.com/klarkxy/dsh-plugins.git",
+      "category": "docs",
       "description": {
-        "en": "Ollama-backed search provider for the DeepSeek Harness web seam (ctx.web): one web_search backend calling POST https://ollama.com/api/web_search.",
+        "en": "DSH Docs: read the official DSH documentation in the Plugins page; Creator mode searches docs and checks plugin npm metadata with native tools.",
         "zh": ""
       },
-      "install": "dsh plugin --profile web add @morlay/dsh-web-search-ollama",
+      "install": "dsh plugin --profile web add @klarkxy/dsh-dev-index",
       "targetKind": "npm",
       "stars": 0,
-      "downloads": 1729,
-      "score": 1729
+      "downloads": 1421,
+      "score": 1421
     },
     {
       "rank": 4,
-      "id": "npm:@morlay/dsh-session-mode",
-      "name": "@morlay/dsh-session-mode",
-      "owner": "morlay_null",
-      "url": "https://github.com/morlay/dsh-plugin.git",
-      "category": "session",
+      "id": "repo:goodjin/dsh-superpowers",
+      "name": "dsh-superpowers",
+      "owner": "goodjin",
+      "url": "https://github.com/goodjin/dsh-superpowers",
+      "category": "docs",
       "description": {
-        "en": "Session modes for dsh: coding / chat as data — a mode is a persona plus its tool lists, its upstream policy lists, its instruction / skill-catalog / runtime-context switches and an optional default model. The host applies the current mode to each session,",
-        "zh": ""
+        "en": "Runs Superpowers as an agent preset and gives each skill its own subagent model from a Settings table, so TDD, debugging and verification no longer all inherit the parent model.",
+        "zh": "把 Superpowers 作为 Agent 预设运行，并在设置表里为每个技能单独指定子代理模型，测试、系统调试与收尾验证不再全部沿用父会话的模型。"
       },
-      "install": "dsh plugin --profile web add @morlay/dsh-session-mode",
-      "targetKind": "npm",
+      "install": "dsh plugin --profile web add github:goodjin/dsh-superpowers",
+      "targetKind": "github",
       "stars": 0,
-      "downloads": 1695,
-      "score": 1695
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 5,
+      "id": "repo:johnsonspirit/ocean-wave-theme",
+      "name": "ocean-wave-theme",
+      "owner": "johnsonspirit",
+      "url": "https://github.com/johnsonspirit/ocean-wave-theme",
+      "category": "theme",
+      "description": {
+        "en": "Animated ocean waves with a whale swimming behind the page, plus translucent surfaces.",
+        "zh": "整个应用背景铺设动态海浪特效，一条鲸鱼在页面后面游泳，界面各层变为半透明。"
+      },
+      "install": "dsh plugin --profile web add github:johnsonspirit/ocean-wave-theme",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
     }
   ]
 }
