@@ -1,142 +1,363 @@
 {
-  "updated": "2026-10-24T15:56:58.023Z",
-  "count": 8,
+  "updated": "2026-10-24T20:47:45.129Z",
+  "count": 21,
   "plugins": [
     {
       "rank": 1,
-      "id": "repo:angelky7/dsh-browser-control",
-      "name": "dsh-browser-control",
-      "owner": "angelky7",
-      "url": "https://github.com/angelky7/dsh-browser-control",
-      "category": "agent",
+      "id": "repo:v587d/dsh-anysearch-refs",
+      "name": "dsh-anysearch-refs",
+      "owner": "v587d",
+      "url": "https://github.com/v587d/dsh-anysearch-refs",
+      "category": "browser",
       "description": {
-        "en": "Chrome 浏览器扩展 + DeepSeek Harness 插件，让 AI Agent 直接操控你的真实浏览器。",
-        "zh": "untranslated"
+        "en": "A DSH sidebar plugin that shows AnySearch references as cards, with the search query, source snippets and highlighted keywords in the right sidebar.一个 DSH 侧边栏插件，把 AnySearch 的搜索结果以卡片形式展示在右侧侧边栏中，包括搜索词、来源摘要和关键词高亮。",
+        "zh": ""
       },
-      "install": "dsh plugin add github:angelky7/dsh-browser-control",
+      "install": "dsh plugin add github:v587d/dsh-anysearch-refs",
       "targetKind": "github",
-      "stars": 42,
+      "stars": 3,
       "downloads": 0,
-      "score": 42000
+      "score": 3000
     },
     {
       "rank": 2,
-      "id": "npm:dsh-media-gen",
-      "name": "dsh-media-gen",
-      "owner": "EmberwingAviation",
-      "url": "https://github.com/EmberwingAviation/dsh-media-gen",
-      "category": "desktop",
+      "id": "npm:@logictan/dsh-loop-guard",
+      "name": "@logictan/dsh-loop-guard",
+      "owner": "GitHub Actions",
+      "url": "git+https://github.com/dale0525/dsh-plugins.git",
+      "category": "model",
       "description": {
-        "en": "DeepSeek Harness 生图+生视频整合插件：统一供应商目录、三个工具、中转站实测的异步视频契约、 限流退避纪律、设置页+画廊+快车道 CLI。MIT，fork 合并自 dsh-image-generation 与 dsh-video-gen。| Unified image+video generation plugin for DeepSeek Harness (MIT, fork-merge of dsh-image-generation & dsh-video-gen)",
-        "zh": "一个插件搞定 AI 生图和生视频，统一供应商配置，自带画廊和命令行，开箱即用。"
+        "en": "Thinking-loop guard for dsh: observes the llm/stream waterfall and breaks a model that degrades into a loop. Detects two per-call shapes (reasoning-only calls, restated-material calls) and re-fires instead of latching; plus two mid-stream breakers that en",
+        "zh": ""
       },
-      "install": "dsh plugin add github:EmberwingAviation/dsh-media-gen",
-      "targetKind": "github",
-      "stars": 5,
-      "downloads": 0,
-      "score": 5000
+      "install": "dsh plugin --profile web add @logictan/dsh-loop-guard",
+      "targetKind": "npm",
+      "stars": 0,
+      "downloads": 1701,
+      "score": 1701
     },
     {
       "rank": 3,
-      "id": "repo:zslzxy/aitoubiaoling-bid-review",
-      "name": "aitoubiaoling-bid-review",
-      "owner": "zslzxy",
-      "url": "https://github.com/zslzxy/aitoubiaoling-bid-review",
-      "category": "agent",
+      "id": "npm:dsh-liao-sidebar",
+      "name": "dsh-liao-sidebar",
+      "owner": "liao710",
+      "url": "git+https://github.com/oliblue-evan/dsh-liao-sidebar.git",
+      "category": "ui",
       "description": {
-        "en": "AI投标灵标书审核 Skill：稳定审核非扫描 PDF/DOCX 的商务标、技术标与通用文档风险",
+        "en": "侧栏管家：整理侧栏入口、设置快捷键并添加自定义链接。",
         "zh": ""
       },
-      "install": "dsh plugin add github:zslzxy/aitoubiaoling-bid-review",
-      "targetKind": "github",
-      "stars": 4,
-      "downloads": 0,
-      "score": 4000
+      "install": "dsh plugin --profile web add dsh-liao-sidebar",
+      "targetKind": "npm",
+      "stars": 0,
+      "downloads": 1551,
+      "score": 1551
     },
     {
       "rank": 4,
-      "id": "repo:heath96/dsh-heath-mcp",
-      "name": "dsh-heath-mcp",
-      "owner": "Heath96",
-      "url": "https://github.com/Heath96/dsh-heath-mcp",
-      "category": "agent",
+      "id": "repo:hongxin-y/codex-pet-astra-yao",
+      "name": "codex-pet-Astra-Yao",
+      "owner": "hongxin-y",
+      "url": "https://github.com/hongxin-y/codex-pet-Astra-Yao",
+      "category": "fun",
       "description": {
-        "en": "MCP server bridge for DeepSeek Harness: stdio / streamable-http / legacy-SSE transports, web settings UI (form + JSON), tools as mcp__<server>__<tool>. Burp Suite ready out of the box.",
-        "zh": ""
+        "en": "An Astra Yao desktop pet for the DeepSeek Harness web GUI that renders the Codex v2 8x11 sprite atlas, follows session state through thinking, running, waiting and failed, shows a status bubble with the running tool and a DeepSeek balance readout (on by default, can be switched off), and quotes her own voice lines while idle.",
+        "zh": "把 Astra Yao（耀嘉音）的 Codex 桌宠图集搬进 DSH Web 界面：随会话状态切换到构思、执行、候场、破音等动作，头顶气泡显示正在跑的工具和余额（默认开启，可关），空闲时轮播她的官方台词。"
       },
-      "install": "dsh plugin add github:Heath96/dsh-heath-mcp",
+      "install": "dsh plugin --profile web add github:hongxin-y/codex-pet-Astra-Yao",
       "targetKind": "github",
-      "stars": 4,
+      "stars": 0,
       "downloads": 0,
-      "score": 4000
+      "score": 0
     },
     {
       "rank": 5,
-      "id": "repo:catnebulaaaa/wps-dsh-plugin",
-      "name": "wps-dsh-plugin",
-      "owner": "CatNebulaaaa",
-      "url": "https://github.com/CatNebulaaaa/wps-dsh-plugin",
-      "category": "ui",
+      "id": "repo:sheep1x/dsh-aimy",
+      "name": "dsh-aimy",
+      "owner": "Sheep1x",
+      "url": "https://github.com/Sheep1x/dsh-aimy",
+      "category": "model",
       "description": {
-        "en": "",
-        "zh": ""
+        "en": "Manages a relay station's many groups and rates for DSH, switching the station's billing group in place and refreshing the model list and rate on stations that expose /v1/token/group; stations without it fall back to read-only and keep serving models.",
+        "zh": "解决中转站多分组多倍率不方便管理的问题：在提供 /v1/token/group 的站点上就地切换分组并同步刷新模型列表与计费倍率；缺少该接口的站点自动降级为只读，模型仍可正常拉取与调用。"
       },
-      "install": "dsh plugin add github:CatNebulaaaa/wps-dsh-plugin",
+      "install": "dsh plugin --profile web add github:Sheep1x/dsh-aimy",
       "targetKind": "github",
-      "stars": 4,
+      "stars": 0,
       "downloads": 0,
-      "score": 4000
+      "score": 0
     },
     {
       "rank": 6,
-      "id": "repo:shawnren57/dsh-whale-trail",
-      "name": "dsh-whale-trail",
-      "owner": "ShawnRen57",
-      "url": "https://github.com/ShawnRen57/dsh-whale-trail",
-      "category": "theme",
+      "id": "repo:bai-2008/dsh-better-panel",
+      "name": "dsh-better-panel",
+      "owner": "Bai-2008",
+      "url": "https://github.com/Bai-2008/dsh-better-panel",
+      "category": "ui",
       "description": {
-        "en": "Whale Trail · 鲸迹 — automatic local achievement badges for DeepSeek Harness, with whale-themed evolving artwork.",
-        "zh": ""
+        "en": "Replaces the model button in the DSH composer with its own two-level panel (provider list, then a searchable model list) built around a continuous draggable reasoning-effort slider: blue-to-violet fill, nebula and star particles on higher levels, and a distinct color per level. Picking a model keeps the panel open and moves the slider to that model's middle level. The implementation started from Microqian2th/dsh-codex-effort-slider 1.0.0 (credited in the README); the panel, the seat takeover, the offline test suite and the docs are new here.",
+        "zh": "接管 DSH 输入框的模型按钮，点开是自建的两级面板（provider 列表 → 模型列表，带搜索），核心是一条连续可拖动的推理等级滑条：填充由蓝渐变到紫罗兰，高档位带星云与星尘粒子，一档一色。点模型不关面板，滑条落到该模型的中间档。实现起点是 Microqian2th/dsh-codex-effort-slider 1.0.0（README 中有致谢），面板、接管、离线测试与文档为新增。"
       },
-      "install": "dsh plugin add github:ShawnRen57/dsh-whale-trail",
+      "install": "dsh plugin --profile web add github:Bai-2008/dsh-better-panel",
       "targetKind": "github",
-      "stars": 3,
+      "stars": 0,
       "downloads": 0,
-      "score": 3000
+      "score": 0
     },
     {
       "rank": 7,
-      "id": "repo:mukiyou/dsh-music-analyze",
-      "name": "dsh-music-analyze",
-      "owner": "MukiyoU",
-      "url": "https://github.com/MukiyoU/dsh-music-analyze",
-      "category": "vision",
+      "id": "repo:hualuo520-h/dsh-connect-scnet",
+      "name": "dsh-connect-scnet",
+      "owner": "hualuo520-h",
+      "url": "https://github.com/hualuo520-h/dsh-connect-scnet",
+      "category": "model",
       "description": {
-        "en": "给 DeepSeek Harness 加一个工具：把音频变成四张图 + 一组数字，模型看图看数字，就能和你讨论这首曲子。",
-        "zh": ""
+        "en": "Brings the models of the SCNet (超算互联网) Computing Service desktop client into DSH by reusing the API key that client already wrote, with a 30-model catalog and a per-model default thinking level.",
+        "zh": "复用超算互联网（SCNet）计算服务客户端已写入的 API key，把它的模型接入 DSH，带 30 个模型的目录与逐模型默认思考档位。"
       },
-      "install": "dsh plugin add github:MukiyoU/dsh-music-analyze",
+      "install": "dsh plugin --profile web add github:hualuo520-h/dsh-connect-scnet",
       "targetKind": "github",
-      "stars": 3,
+      "stars": 0,
       "downloads": 0,
-      "score": 3000
+      "score": 0
     },
     {
       "rank": 8,
-      "id": "npm:dsh-webcode-bridge",
-      "name": "dsh-webcode-bridge",
-      "owner": "rsyhn",
-      "url": "git+https://github.com/RSLN-creator/dsh-web-bridge.git",
+      "id": "repo:liujianqiao701/dsh-context-radar",
+      "name": "dsh-context-radar",
+      "owner": "liujianqiao701",
+      "url": "https://github.com/liujianqiao701/dsh-context-radar",
+      "category": "session",
+      "description": {
+        "en": "Estimates what is filling the context window — per instruction file, per skill and per tool result — with a bloat verdict and actionable suggestions.",
+        "zh": "估算上下文里谁在吃 token —— 逐文件、逐 skill、逐条工具结果列出占比，并给出膨胀判定与可执行建议。"
+      },
+      "install": "dsh plugin --profile web add github:liujianqiao701/dsh-context-radar",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 9,
+      "id": "repo:chenweiqi12345/dsh-deepy-pet",
+      "name": "dsh-deepy-pet",
+      "owner": "ChenWeiqi12345",
+      "url": "https://github.com/ChenWeiqi12345/dsh-deepy-pet",
+      "category": "fun",
+      "description": {
+        "en": "A two-eyed royal-blue pixel whale that perches on the DSH composer, changes expression with the live agent state, watches you type, and makes a short dive across the composer every 30 seconds while idle.",
+        "zh": "趴在 DSH 输入框上沿的双眼宝蓝色像素小鲸鱼，表情跟随智能体实时状态，打字时会停下来注视，空闲时每 30 秒横穿输入框巡游一次。"
+      },
+      "install": "dsh plugin --profile web add github:ChenWeiqi12345/dsh-deepy-pet",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 10,
+      "id": "repo:qiyunqv-jxd/dsh-desktop-autostart",
+      "name": "dsh-desktop-autostart",
+      "owner": "QiYunqv-jxd",
+      "url": "https://github.com/QiYunqv-jxd/dsh-desktop-autostart",
       "category": "security",
       "description": {
-        "en": "Use your logged-in web AI (DeepSeek, GLM, Kimi, Qwen, Doubao...) as model providers in DeepSeek Harness. Web models emit tool calls, DSH runs them under its native permission system, and results return to the same web session. No API keys.",
-        "zh": ""
+        "en": "Adds a logon autostart switch for the DeepSeek Harness desktop app on Windows. It manages a single shortcut in the user Startup folder: no registry writes, no admin rights, no extra background process.",
+        "zh": "给 DeepSeek Harness 桌面版加一个登录自启开关：只管理用户启动文件夹里的一个快捷方式，不写注册表、不需要管理员权限、不额外常驻进程。"
       },
-      "install": "dsh plugin --profile web add dsh-webcode-bridge",
-      "targetKind": "npm",
+      "install": "dsh plugin --profile web add github:QiYunqv-jxd/dsh-desktop-autostart",
+      "targetKind": "github",
       "stars": 0,
-      "downloads": 1493,
-      "score": 1493
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 11,
+      "id": "repo:chiffonowo/dsh-diff-review",
+      "name": "dsh-diff-review",
+      "owner": "ChiffonOwO",
+      "url": "https://github.com/ChiffonOwO/dsh-diff-review",
+      "category": "ui",
+      "description": {
+        "en": "Change review for a turn's edited files: a pill above the composer counts this turn's files and lines and floats the file list up on hover, and a right-sidebar page shows each file's diff with syntax highlighting and a one-click revert.",
+        "zh": "本轮改动审查：输入框上方的气泡统计本回合改动文件数与行数，悬停时向上浮出文件清单；右侧边栏按标签页展示逐文件语法高亮 diff，并支持一键还原。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/ChiffonOwO/dsh-diff-review/releases/latest/download/dsh-diff-review.tgz\"",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 12,
+      "id": "repo:indiexiaolong/dsh-enhance",
+      "name": "DSH-Enhance",
+      "owner": "IndieXiaoLong",
+      "url": "https://github.com/IndieXiaoLong/DSH-Enhance",
+      "category": "ui",
+      "description": {
+        "en": "Adds conversation naming, file drag references, edit-and-resend, a message timeline, and a floating settings panel to the DSH Web GUI.",
+        "zh": "为 DSH Web GUI 增加对话命名、文件拖拽引用、编辑重发、消息时间线和悬浮设置面板。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/IndieXiaoLong/DSH-Enhance/releases/download/v0.1.0/dsh-enhance-0.1.0.tgz\"",
+      "targetKind": "tarball",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 13,
+      "id": "repo:135642-163/dsh-knowledge-base",
+      "name": "dsh-knowledge-base",
+      "owner": "135642-163",
+      "url": "https://github.com/135642-163/dsh-knowledge-base",
+      "category": "memory",
+      "description": {
+        "en": "Local-first knowledge base for DeepSeek Harness: imports Word/PPT/Excel/PDF (text or scanned), EPUB and MOBI/AZW3, builds Markdown parts with page anchors, OCR quality/confidence and column-aware PDF reading order; adds an LLM-maintained wiki layer (schema.md rules, auto index.md, append-only log.md, typed notes with sources and backlinks), adds source-trust labels (high/medium/low) with trust-aware ranking and low-trust warnings, and supports ranked search, cross-KB query, precise reading/editing, and md/jsonl/zip export. MOBI/AZW3 need Calibre; legacy .doc/.ppt need Word/PowerPoint (Windows) or LibreOffice (Linux); scanned-PDF OCR downloads models on first use.",
+        "zh": "DeepSeek Harness 本地知识库：导入 Word/PPT/Excel/PDF（文字版或扫描版）、EPUB、MOBI/AZW3，生成带页码锚点、OCR 质量/置信度与 PDF 双栏阅读顺序的 Markdown 分块；并提供 LLM 维护的编译层（schema.md 维护规范、自动 index.md 内容索引、只追加 log.md、带来源与反链的 typed 笔记），支持来源可信度标注（高/中/低）与可信度感知检索、低可信提醒，以及排序检索、跨库查询、精读修订与 md/jsonl/zip 导出。MOBI/AZW3 需 Calibre；旧版 .doc/.ppt 需 Word/PowerPoint（Windows）或 LibreOffice（Linux）；扫描版 PDF 的 OCR 首次使用会下载模型。"
+      },
+      "install": "dsh plugin --profile web add github:135642-163/dsh-knowledge-base",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 14,
+      "id": "repo:topkie/dsh-lattice",
+      "name": "dsh-lattice",
+      "owner": "topkie",
+      "url": "https://github.com/topkie/dsh-lattice",
+      "category": "memory",
+      "description": {
+        "en": "Local memory for DeepSeek Harness: what you write is filed under a topic and linked to related entries, recall ranks results by embedding similarity (word matching when no model is installed), and the data stays in a local SQLite database.",
+        "zh": "DeepSeek Harness 的本地记忆插件：写下的内容按主题归档、与相关条目连边，召回按向量相似度排序（没装模型时退回词面匹配），数据存在本地 SQLite 库里。"
+      },
+      "install": "dsh plugin --profile web add github:topkie/dsh-lattice",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 15,
+      "id": "repo:zshqzcn/dsh-plugin-agent-bridge",
+      "name": "dsh-plugin-agent-bridge",
+      "owner": "zshqzcn",
+      "url": "https://github.com/zshqzcn/dsh-plugin-agent-bridge",
+      "category": "notify",
+      "description": {
+        "en": "Two-way agent bridge between two DeepSeek Harness hosts: either side can ask the other agent questions and run bounded dialogues over a PSK-authenticated TCP link, with a chat page on both sides and read-only tool posture by default. Both ends need the same shared key and a nodeId configured.",
+        "zh": "两台 DeepSeek Harness 主机之间的双向 agent 桥：任一侧可向对端 agent 提问并运行有界多轮对话，链路经 PSK 认证；两侧提供聊天页，默认只读工具姿态。两端需配置相同的共享密钥与 nodeId。"
+      },
+      "install": "dsh plugin --profile web add github:zshqzcn/dsh-plugin-agent-bridge",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 16,
+      "id": "repo:sunaono1/dsh-plugin-dual-brain",
+      "name": "dsh-plugin-dual-brain",
+      "owner": "sunaono1",
+      "url": "https://github.com/sunaono1/dsh-plugin-dual-brain",
+      "category": "agent",
+      "description": {
+        "en": "Dual-brain agent presets for DSH: one model plans the framework and delegates execution to a subagent pinned to a second model. Ships brain-ds (DeepSeek-V4.1-Flash plans, MiMo-V2.6-Flash executes) and brain-mimo (the reverse), switchable per session. Needs two providers configured (Xiaomi MiMo and a DeepSeek account), and the main brain must be selected manually.",
+        "zh": "双脑协作 agent 预设：主脑先出框架，再把执行步骤委派给锁定另一模型的子代理。内置 brain-ds（DeepSeek-V4.1-Flash 规划、MiMo-V2.6-Flash 执行）与 brain-mimo（反向），按会话切换。需配置 Xiaomi MiMo 与 DeepSeek 账号两个 provider，主脑须手动选择。"
+      },
+      "install": "dsh plugin --profile web add github:sunaono1/dsh-plugin-dual-brain",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 17,
+      "id": "repo:hanmoxu9/dsh-taskbar-glow",
+      "name": "dsh-taskbar-glow",
+      "owner": "hanmoxu9",
+      "url": "https://github.com/hanmoxu9/dsh-taskbar-glow",
+      "category": "notify",
+      "description": {
+        "en": "Flashes the Windows taskbar icon in the DSH desktop app when a turn finishes in the background or an approval or question is waiting for you.",
+        "zh": "DSH 桌面版在后台跑完一轮、或等你审批 / 回答时，闪烁 Windows 任务栏图标。"
+      },
+      "install": "dsh plugin --profile web add github:hanmoxu9/dsh-taskbar-glow",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 18,
+      "id": "repo:bw741/dsh-video-eyes",
+      "name": "dsh-video-eyes",
+      "owner": "BW741",
+      "url": "https://github.com/BW741/dsh-video-eyes",
+      "category": "vision",
+      "description": {
+        "en": "Lets the model actually see a video: local ffmpeg samples timestamped stills and faster-whisper transcribes the audio track, so the agent reads real pixels frame by frame instead of trusting a text summary. Fully local, nothing uploaded; reports honestly when the audio has no speech. Windows only; needs Python 3.10+ and ffmpeg installed, and the first video_eyes_setup run downloads about 700 MB (faster-whisper and its model).",
+        "zh": "让模型真的「看见」视频：本地 ffmpeg 按时间抽静帧、faster-whisper 转写音轨，模型逐帧读真实像素，而不是只读一段文字摘要。全程本地、不上传画面；音轨没有语音时如实报告而不是硬编。仅限 Windows；需已装 Python 3.10+ 与 ffmpeg，首次运行 video_eyes_setup 约下载 700 MB（faster-whisper 及其模型）。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/BW741/dsh-video-eyes/releases/download/v1.0.0/dsh-video-eyes-1.0.0.tgz\"",
+      "targetKind": "tarball",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 19,
+      "id": "repo:ecbob/dsh-window-size-keeper",
+      "name": "dsh-window-size-keeper",
+      "owner": "ecbob",
+      "url": "https://github.com/ecbob/dsh-window-size-keeper",
+      "category": "ui",
+      "description": {
+        "en": "Keeps the DSH desktop window the size you left it: records the last outer frame of the main window in physical pixels and restores it, centred on the work area, on the next start - and it acts before the window is ever shown, so the boot animation plays at the right size. The settings page offers 12 presets (1024x768 to 3840x2160), free-form custom width and height, a centre-on-restore switch and an apply-now action; a choice takes effect immediately and persists. Resizing goes through a small helper executable compiled on the user's own machine: the C# source ships inside the plugin, is built on first run with the in-box Windows csc.exe (measured ~110 ms once, cached next to the state file, ~90 ms to start), and falls back to a short-lived powershell.exe process when that is not possible. The package ships no binary, declares no npm dependencies and makes no outbound network request. Windows only.",
+        "zh": "让 DSH 桌面端窗口保持你离开时的大小：记录主窗口最后一次的外框尺寸（物理像素），下次启动恢复并居中到工作区，而且赶在窗口露面之前改完，启动动画不会播在错误的分辨率上。设置页有 12 个常用分辨率（1024×768 到 3840×2160）、任意自定义宽高、「恢复时居中」开关与「立即应用」，选中即生效并持久化。改尺寸走一个在使用者本机现编的小助手 exe：C# 源码随插件一起发布，首次运行用 Windows 自带的 csc.exe 编一次（实测约 110 毫秒），产物与同名 .cs 缓存到状态文件同目录，之后起进程约 90 毫秒；编不出来时退回临时 powershell.exe 进程。包里不含二进制、package.json 不声明任何依赖、不发任何外部网络请求。仅限 Windows。"
+      },
+      "install": "dsh plugin --profile web add github:ecbob/dsh-window-size-keeper",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 20,
+      "id": "repo:aidenorz/dsh-workbuddy-connect",
+      "name": "dsh-workbuddy-connect",
+      "owner": "AidenOrz",
+      "url": "https://github.com/AidenOrz/dsh-workbuddy-connect",
+      "category": "model",
+      "description": {
+        "en": "Drop-in successor to the now-deleted corrinehu/dsh-workbuddy-connect, keeping its package name, config row id and provider ids so an existing install upgrades in place. Also fixes the 400/11128 channel check by neutralising the DSH identity sentences and scrubbing the product name from system messages, and reads the real Windows client and bundled CLI versions instead of a compiled constant, unlike the functy and community forks. Verified 2026-10-21 on Windows, WorkBuddy 5.8.3, DSH 0.2.1-rc.2.",
+        "zh": "已 404 的 corrinehu/dsh-workbuddy-connect 的原地接管版，沿用原来的包名、配置行 id 与 provider id，已装用户可直接升级。同时修复 400/11128 渠道校验（归一化 DSH 身份句并清除 system 消息中的产品名），并改为读取真实的 Windows 客户端与内置 CLI 版本，不再使用编译常量，这一点与 functy、community 两个分叉不同。验证环境（2026-10-21）：Windows、WorkBuddy 5.8.3、DSH 0.2.1-rc.2。"
+      },
+      "install": "dsh plugin --profile web add github:AidenOrz/dsh-workbuddy-connect",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 21,
+      "id": "repo:zekaishi/dsh-evo-subagent",
+      "name": "dsh-evo-subagent",
+      "owner": "ZekaiShi",
+      "url": "https://github.com/ZekaiShi/dsh-evo-subagent",
+      "category": "model",
+      "description": {
+        "en": "Independent workspace and conversation personas with adaptive styles, approved communication preferences and role-based routing to registered DSH models, including models supplied by Codex and Claude Code provider plugins.",
+        "zh": "为工作区与对话配置独立人格，支持自适应风格、经确认的通用交流偏好和子代理模型路由；可配合其他 provider 插件使用 Codex、Claude Code 等已注册模型。"
+      },
+      "install": "dsh plugin --profile web add github:ZekaiShi/dsh-evo-subagent",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
     }
   ]
 }
