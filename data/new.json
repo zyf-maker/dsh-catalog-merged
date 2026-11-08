@@ -1,172 +1,1532 @@
 {
-  "updated": "2026-11-08T13:20:56.260Z",
-  "count": 10,
+  "updated": "2026-11-08T22:02:21.269Z",
+  "count": 90,
   "plugins": [
     {
       "rank": 1,
-      "id": "repo:peterpoal134/memory-brain",
-      "name": "memory-brain",
-      "owner": "peterpoal134",
-      "url": "https://github.com/peterpoal134/memory-brain",
-      "category": "memory",
+      "id": "repo:northgatechat/dsh-think-game",
+      "name": "dsh-think-game",
+      "owner": "NorthGateChat",
+      "url": "https://github.com/NorthGateChat/dsh-think-game",
+      "category": "theme",
       "description": {
-        "en": "忆核大脑 / Memory Brain：独立记忆服务 + DSH 插件，原话证据、后台整理、3D 面板、生活与情绪规则。",
-        "zh": ""
+        "en": "Inline mini-game arcade for DSH streaming reasoning / 流式思考下方的轻量小游戏（7 款游戏，自动暂停/淡出，可继续上一局）",
+        "zh": "untranslated"
       },
-      "install": "dsh plugin add github:peterpoal134/memory-brain",
+      "install": "dsh plugin add github:NorthGateChat/dsh-think-game",
       "targetKind": "github",
-      "stars": 148,
+      "stars": 54,
       "downloads": 0,
-      "score": 148000
+      "score": 54000
     },
     {
       "rank": 2,
-      "id": "repo:lizhecome/deepseek-harness-prompt-optimizer",
-      "name": "deepseek-harness-prompt-optimizer",
-      "owner": "lizhecome",
-      "url": "https://github.com/lizhecome/deepseek-harness-prompt-optimizer",
+      "id": "npm:@scotthuang/agent-knock-knock-deepseek-harness",
+      "name": "agent-knock-knock",
+      "owner": "scotthuang",
+      "url": "https://github.com/scotthuang/agent-knock-knock",
+      "category": "tools",
+      "description": {
+        "en": "OpenClaw plugin: control local Codex/Claude Code via shared tmux",
+        "zh": "OpenClaw 插件：共享 tmux 控制本地 Codex/Claude Code"
+      },
+      "install": "dsh plugin --profile web add @scotthuang/agent-knock-knock-deepseek-harness",
+      "targetKind": "npm",
+      "stars": 7,
+      "downloads": 0,
+      "score": 7000
+    },
+    {
+      "rank": 3,
+      "id": "npm:dsh-telegram-bot",
+      "name": "dsh-telegram-bot",
+      "owner": "Boobaw",
+      "url": "https://github.com/Boobaw/dsh-telegram-bot",
+      "category": "notify",
+      "description": {
+        "en": "Telegram DM topics for DeepSeek Harness sessions: streaming, approvals, structured questions and session controls.",
+        "zh": "把 DSH 会话接到 Telegram 机器人上，在聊天里就能看流式输出、审批操作、回答问题并控制会话。"
+      },
+      "install": "dsh plugin add github:Boobaw/dsh-telegram-bot",
+      "targetKind": "github",
+      "stars": 6,
+      "downloads": 0,
+      "score": 6000
+    },
+    {
+      "rank": 4,
+      "id": "repo:sessionhive/dsh-collab",
+      "name": "dsh-collab",
+      "owner": "sessionhive",
+      "url": "https://github.com/sessionhive/dsh-collab",
       "category": "agent",
       "description": {
-        "en": "LLM-backed prompt optimization bundle for DeepSeek Harness",
+        "en": "Unofficial DSH plugin: multi-session collaboration with work orders, handoff, and file-based memory.",
         "zh": ""
       },
-      "install": "dsh plugin add github:lizhecome/deepseek-harness-prompt-optimizer",
+      "install": "dsh plugin add github:sessionhive/dsh-collab",
+      "targetKind": "github",
+      "stars": 4,
+      "downloads": 0,
+      "score": 4000
+    },
+    {
+      "rank": 5,
+      "id": "npm:dsh-mesh-access",
+      "name": "dsh-mesh-access",
+      "owner": "kurali",
+      "url": "git+https://github.com/SilverKurali/dsh-mesh-access.git",
+      "category": "session",
+      "description": {
+        "en": "Control your DSH from your phone: opens a port on the mesh/VPN interface from inside the running server process, so a phone browser gets the same instance and the same session list — no SSH, no second dsh. Also reachable from another PC, a GUI NAS, or a T",
+        "zh": "用手机远程控制电脑上的 DSH：在服务进程内部把端口开到组网网卡上，手机浏览器打开就是你在电脑上用的那个界面，同一实例、同一份会话，不用 SSH、不用第二个 dsh。顺带笔记本、NAS、电视盒子也能开。"
+      },
+      "install": "dsh plugin --profile web add dsh-mesh-access",
+      "targetKind": "npm",
+      "stars": 0,
+      "downloads": 3164,
+      "score": 3164
+    },
+    {
+      "rank": 6,
+      "id": "repo:cruciforms/dsh-socrates",
+      "name": "dsh-socrates",
+      "owner": "Cruciforms",
+      "url": "https://github.com/Cruciforms/dsh-socrates",
+      "category": "vision",
+      "description": {
+        "en": "Socratic clarify-first deep research plugin for DeepSeek Harness: adaptive multi-round research with evidence-closed cited reports, cross-verification, and citation auditing.",
+        "zh": ""
+      },
+      "install": "dsh plugin add github:Cruciforms/dsh-socrates",
       "targetKind": "github",
       "stars": 3,
       "downloads": 0,
       "score": 3000
     },
     {
-      "rank": 3,
-      "id": "npm:dsh-lpipe-chat",
-      "name": "dsh-lpipe-chat",
-      "owner": "kaczev",
-      "url": "git+https://github.com/Kaczev/dsh-life-pipline.git",
-      "category": "session",
-      "description": {
-        "en": "Own WeChat and QQ channels: scan to connect, batch incoming messages, inject them into the main session.",
-        "zh": ""
-      },
-      "install": "dsh plugin --profile web add dsh-lpipe-chat",
-      "targetKind": "npm",
-      "stars": 0,
-      "downloads": 2991,
-      "score": 2991
-    },
-    {
-      "rank": 4,
-      "id": "npm:dsh-log-trim",
-      "name": "dsh-log-trim",
-      "owner": "dddmuc",
-      "url": "git+https://github.com/DDDMUC/dsh-log-trim.git",
-      "category": "session",
-      "description": {
-        "en": "Trim idle DeepSeek Harness session logs at startup: keep the last N windows, cut the ones the model can no longer see, and verify the result with the host's own format, session and projection validators before writing. Not context compaction: this shrinks",
-        "zh": "启动时自动裁掉空闲会话日志里模型早已看不到的旧窗口，先过三层校验再落盘，日志不再只增不减。"
-      },
-      "install": "dsh plugin --profile web add dsh-log-trim",
-      "targetKind": "npm",
-      "stars": 0,
-      "downloads": 2750,
-      "score": 2750
-    },
-    {
-      "rank": 5,
-      "id": "npm:dsh-qqbot-lite",
-      "name": "dsh-qqbot-lite",
-      "owner": "jiuling",
-      "url": "https://www.npmjs.com/package/dsh-qqbot-lite",
-      "category": "notify",
-      "description": {
-        "en": "DSH 的轻量 QQ 机器人插件（零运行时依赖）：WebSocket 收群聊/私聊消息接入 dsh 会话，并提供 qq_message / qq_group / qq_bot 三个工具供 AI 主动调用（发消息、发文件、读消息、按需下载附件、群管理、查状态）。自带「设置 → QQ 机器人」页面，支持手机 QQ 扫码绑定，无需手抄凭据。",
-        "zh": ""
-      },
-      "install": "dsh plugin --profile web add dsh-qqbot-lite",
-      "targetKind": "npm",
-      "stars": 0,
-      "downloads": 2742,
-      "score": 2742
-    },
-    {
-      "rank": 6,
-      "id": "npm:dsh-soe-decision-check",
-      "name": "dsh-soe-decision-check",
-      "owner": "perrylink",
-      "url": "git+https://github.com/PerryLink/dsh-soe-decision-check.git",
-      "category": "other",
-      "description": {
-        "en": "三重一大决策台账核对（按前置研究、会议审议与决议记录核对程序留痕，仅提示差异，不作出定性结论）",
-        "zh": "按中办发〔2010〕17号核对国企\"三重一大\"决策记录，只标出差异，不下定性结论。"
-      },
-      "install": "dsh plugin --profile web add dsh-soe-decision-check",
-      "targetKind": "npm",
-      "stars": 0,
-      "downloads": 2739,
-      "score": 2739
-    },
-    {
       "rank": 7,
-      "id": "npm:@lievclouds/dsh-cortex",
-      "name": "@lievclouds/dsh-cortex",
-      "owner": "lievclouds",
-      "url": "git+https://github.com/Revcloudi/Cortex.git",
-      "category": "memory",
+      "id": "repo:cinewave0/cinewave0-dsh-quick-panel",
+      "name": "cinewave0-dsh-quick-panel",
+      "owner": "cinewave0",
+      "url": "https://github.com/cinewave0/cinewave0-dsh-quick-panel",
+      "category": "ui",
       "description": {
-        "en": "Cortex workbench for DeepSeek Harness: the original Cortex UI (vulnerabilities, assets, internal operations, Memory Nebula, snapshots, retest, Web Fuzzer, mini-program reversing) as a native DSH panel, plus 22 native agent tools so DSH conversations use t",
-        "zh": ""
+        "en": "Windows companion window for DSH Desktop: todos, reminders, live session messages, approval handling and quick input. The standalone window reuses the Electron binary at %USERPROFILE%\\.dsh\\electron\\electron.exe (usually installed by dsh-pet) and fails to open when it is missing.",
+        "zh": "Windows 下的 DSH Desktop 独立伴生窗：待办、提醒、实时会话消息、审批接管和快速输入；独立窗复用 %USERPROFILE%\\.dsh\\electron\\electron.exe（通常由 dsh-pet 下载），缺失时打不开。"
       },
-      "install": "dsh plugin --profile web add @lievclouds/dsh-cortex",
-      "targetKind": "npm",
+      "install": "dsh plugin --profile web add github:cinewave0/cinewave0-dsh-quick-panel",
+      "targetKind": "github",
       "stars": 0,
-      "downloads": 2619,
-      "score": 2619
+      "downloads": 0,
+      "score": 0
     },
     {
       "rank": 8,
-      "id": "npm:@dsh-enhanced/assistant-delivery",
-      "name": "@dsh-enhanced/assistant-delivery",
-      "owner": "22-ai-00",
-      "url": "git+https://github.com/22-ai-00/dsh-enhanced.git",
-      "category": "other",
+      "id": "repo:intelli-jungle/dsh-agentroom",
+      "name": "dsh-agentroom",
+      "owner": "Intelli-Jungle",
+      "url": "https://github.com/Intelli-Jungle/dsh-agentroom",
+      "category": "agent",
       "description": {
-        "en": "A durable, policy-gated inbound/outbound message core for DeepSeek Harness.",
-        "zh": ""
+        "en": "Slack-style shared rooms with independent native DSH sessions, parallel member mentions, bounded agent handoffs, text attachments and conversation export.",
+        "zh": "Slack 风格共享聊天室，支持独立 DSH 原生会话、并行提及、有次数限制的 Agent 接力、文本附件和会话导出。"
       },
-      "install": "dsh plugin --profile web add @dsh-enhanced/assistant-delivery",
-      "targetKind": "npm",
+      "install": "dsh plugin --profile web add \"https://github.com/Intelli-Jungle/dsh-agentroom/releases/latest/download/dsh-agentroom.tgz\"",
+      "targetKind": "github",
       "stars": 0,
-      "downloads": 2184,
-      "score": 2184
+      "downloads": 0,
+      "score": 0
     },
     {
       "rank": 9,
-      "id": "npm:@shellraining/dsh-mermaid",
-      "name": "@shellraining/dsh-mermaid",
-      "owner": "GitHub Actions",
-      "url": "git+https://github.com/omdsh-dev/dsh-mermaid.git",
-      "category": "dev",
+      "id": "repo:bfzdhld/dsh-allinstar",
+      "name": "dsh-allinstar",
+      "owner": "bfzdhld",
+      "url": "https://github.com/bfzdhld/dsh-allinstar",
+      "category": "tools",
       "description": {
-        "en": "Render Mermaid diagrams, switch between code and diagram views, and copy the source.",
-        "zh": ""
+        "en": "Stars the GitHub repositories behind installed DSH plugins from a tab beside Installed on the Plugins page and a control on each plugin detail page; resolves a token from the environment, a saved credential record or the gh CLI, and asks once before the first star because starring is public.",
+        "zh": "在插件页「已安装」旁的标签页和插件详情页给已安装插件对应的 GitHub 仓库点星；令牌依次取自环境变量、已保存的凭据记录或已登录的 gh CLI，因为 star 是公开行为，首次点星前会提示一次。"
       },
-      "install": "dsh plugin --profile web add @shellraining/dsh-mermaid",
-      "targetKind": "npm",
+      "install": "dsh plugin --profile web add github:bfzdhld/dsh-allinstar",
+      "targetKind": "github",
       "stars": 0,
-      "downloads": 2126,
-      "score": 2126
+      "downloads": 0,
+      "score": 0
     },
     {
       "rank": 10,
-      "id": "repo:perrylink/dsh-ghg",
-      "name": "dsh-ghg",
-      "owner": "PerryLink",
-      "url": "https://perrylink.github.io/dsh-plugins/packages/dsh-ghg.html",
-      "category": "other",
+      "id": "repo:verchiel666/dsh-aosp",
+      "name": "dsh-aosp",
+      "owner": "Verchiel666",
+      "url": "https://github.com/Verchiel666/dsh-aosp",
+      "category": "dev",
       "description": {
-        "en": "[FROZEN 2026-10-31] Electricity activity ingest, location-based GHG calculation, row verification, workpaper and partial ESRS pack.",
-        "zh": "把用电活动数据导入后按位置算温室气体排放，还能逐行核验、生成工作底稿和部分 ESRS 报告包。"
+        "en": "Fetches AOSP source snapshots from codeload and searches them on the device with ripgrep through nine tools covering mirror listing, preset bundles, fetch, incremental update, cross-module regex search, a heuristic call-chain trace and line reads, with no git, no root and no build.",
+        "zh": "从 codeload 拉 AOSP 源码快照，在本机用 ripgrep 检索，九个工具覆盖镜像列表、预设包、拉取、增量更新、跨模块正则搜索、启发式调用链追踪与按行读取，不需要 git、root 或编译。"
       },
-      "install": "dsh plugin add github:PerryLink/dsh-ghg",
+      "install": "dsh plugin --profile web add github:Verchiel666/dsh-aosp",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 11,
+      "id": "repo:guicaiyue/dsh-archify-projects",
+      "name": "dsh-archify-projects",
+      "owner": "guicaiyue",
+      "url": "https://github.com/guicaiyue/dsh-archify-projects",
+      "category": "docs",
+      "description": {
+        "en": "Architecture map workbench: register local repos, let a restricted agent read the code with the archify skill, and keep branch-level structure and domain diagrams with concepts, temporary/permanent custom diagrams, and read-only Q&A.",
+        "zh": "代码库架构图册：登记本地仓库，由受限 agent 用 archify skill 读代码，按分支维护结构图与领域图，支持概念提取、临时/永久自定义图与只读追问。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/guicaiyue/dsh-archify-projects/releases/latest/download/dsh-archify-projects.tgz\"",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 12,
+      "id": "repo:elycheng/dsh-article-annotator",
+      "name": "dsh-article-annotator",
+      "owner": "Elycheng",
+      "url": "https://github.com/Elycheng/dsh-article-annotator",
+      "category": "ui",
+      "description": {
+        "en": "Article Review page in DSH's native right sidebar: turns Markdown, Word, PowerPoint and PDF articles into sentence-addressable text, lets you comment on any sentence, and hands the open review to the agent as a composer draft. Six agent tools let the model read every comment, revise the article (in place for Markdown, as a sibling <name>.revised.md for binary formats), resolve the comments, and record recurring wording preferences into a long-term writing-style memory injected into later prompts. Extraction includes a dependency-free DOCX/PPTX reader; PDF text extraction runs locally through the host's Python + pypdf (or poppler's pdftotext) and is unavailable without one of them. No network calls, no telemetry.",
+        "zh": "在 DSH 原生右侧栏做逐句文稿批注：把 Markdown、Word、PowerPoint、PDF 变成可按句点选的文本，给任意一句写意见，并把待处理批注作为草稿交给 Agent。6 个 Agent 工具让模型读取每条意见、改稿（Markdown 直接改原文件，二进制格式写同名 .revised.md）、勾销批注，并把反复出现的表达偏好记入长期写作风格记忆、注入之后的提示。DOCX/PPTX 为零依赖解析；PDF 文本提取在本机走宿主 Python + pypdf（或 poppler 的 pdftotext），两者都没有时 PDF 不可用。不联网、无遥测。"
+      },
+      "install": "dsh plugin --profile web add github:Elycheng/dsh-article-annotator",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 13,
+      "id": "repo:ethan1999991231/dsh-auth-cookie-guard",
+      "name": "dsh-auth-cookie-guard",
+      "owner": "Ethan1999991231",
+      "url": "https://github.com/Ethan1999991231/dsh-auth-cookie-guard",
+      "category": "security",
+      "description": {
+        "en": "Expires the dsh-auth-* cookies that earlier launches bound to other ports once a response already carries more than four of them, and answers an HPE_HEADER_OVERFLOW rejection with a redirect that clears them, so a desktop profile that reached the HTTP header limit opens again without clearing its cookies by hand. Derivative of jitianjiyan/dsh-auth-cookie-guard (already listed); it declares the same npm package name, so the two cannot be installed alongside. Requires DSH 0.2.1-rc.5 or newer.",
+        "zh": "当一次响应里已经带上 4 条以上 dsh-auth-* Cookie 时，把更早启动绑定到其它端口的那些逐条过期；对已经撞上 HTTP 头长度上限的请求回一个顺带清掉它们的跳转，让卡住的桌面端无需手动清 Cookie 也能重新打开。是 jitianjiyan/dsh-auth-cookie-guard 的衍生版本（目录中已收录）；两者声明同名 npm 包，不能同时安装。需要 DSH 0.2.1-rc.5 或更新版本。"
+      },
+      "install": "dsh plugin --profile web add github:Ethan1999991231/dsh-auth-cookie-guard",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 14,
+      "id": "repo:leonlee114514/dsh-better-debug",
+      "name": "dsh-better-debug",
+      "owner": "Leonlee114514",
+      "url": "https://github.com/Leonlee114514/dsh-better-debug",
+      "category": "dev",
+      "description": {
+        "en": "Appends one short user message before the next step when the model is circling: the same absolute path written three times, the same normalised tool error returned twice, or two steps since the last write with neither a verify nor a search. Verification is recognised from four tool names (`ops_bash`, `lsp_diagnostics`, `verify`, `run_tests`), searching from eight. Each signal fires once per turn and only after a new write or error, is silenced for the whole turn when you say not to search, and is skipped in subagent sessions. Ships the `stuck-gate` skill at bundled rank 600, so a user-level copy at rank 400 overrides its wording without touching code, plus a read-only gain panel at `/better-debug` that counts firings, sessions covered and whether the next tool call changed class; it does not estimate tokens saved.",
+        "zh": "模型打转时，在下一步之前追加一条简短用户消息：同一绝对路径写了第三次、归一化后的同一工具报错第二次出现、或最后一次写入后过了两步却既没验证也没搜。验证按四个工具名识别（`ops_bash`、`lsp_diagnostics`、`verify`、`run_tests`），搜索按八个识别。每条信号每回合最多一次且必须出现新的写入或报错，用户说别搜时整回合静音，子会话跳过。自带 `stuck-gate` 技能（bundled rank 600，用户级 rank 400 的同名技能可覆盖措辞），并附只读增益面板 `/better-debug`：数触发次数、覆盖会话、以及下一条工具调用是否换了类别；不估算省下的 token。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/Leonlee114514/dsh-better-debug/releases/download/v0.1.1/dsh-better-debug-0.1.1.tgz\"",
+      "targetKind": "tarball",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 15,
+      "id": "repo:daaaaxianer/dsh-billing-bar",
+      "name": "dsh-billing-bar",
+      "owner": "Daaaaxianer",
+      "url": "https://github.com/Daaaaxianer/dsh-billing-bar",
+      "category": "session",
+      "description": {
+        "en": "Adds a 12-hour peak/off-peak billing strip and the account balance above the composer, with today, 7-day and 30-day spend per model.",
+        "zh": "在输入框上方显示以当前为中心的 12 小时峰谷条形与账户余额，可切换今日、近 7 日、近 30 日查看各模型花费。"
+      },
+      "install": "dsh plugin --profile web add github:Daaaaxianer/dsh-billing-bar",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 16,
+      "id": "repo:liufeicc/dsh-btw-command",
+      "name": "dsh-btw-command",
+      "owner": "liufeicc",
+      "url": "https://github.com/liufeicc/dsh-btw-command",
+      "category": "session",
+      "description": {
+        "en": "Adds a /btw slash command that asks a side question or injects information into a running session without interrupting the main agent.",
+        "zh": "新增 /btw 斜杠命令：主 agent 运行中也能问一个旁支问题或补充一条信息，不打断当前任务。"
+      },
+      "install": "dsh plugin --profile web add github:liufeicc/dsh-btw-command",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 17,
+      "id": "repo:404deepseek/dsh-camera-window",
+      "name": "dsh-camera-window",
+      "owner": "404deepseek",
+      "url": "https://github.com/404deepseek/dsh-camera-window",
+      "category": "vision",
+      "description": {
+        "en": "Connect a webcam so the agent can see your face and the world outside.",
+        "zh": "接入摄像头，让大肥鱼看看你的样子和外面的世界。"
+      },
+      "install": "dsh plugin --profile web add github:404deepseek/dsh-camera-window",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 18,
+      "id": "repo:ljttt0824/dsh-career-kb",
+      "name": "dsh-career-kb",
+      "owner": "ljttt0824",
+      "url": "https://github.com/ljttt0824/dsh-career-kb",
+      "category": "docs",
+      "description": {
+        "en": "Career knowledge base vault with ten agent skills for setup, capture and import, audit, JD resumes, interview prep and review, plus Feishu interop.",
+        "zh": "职业生涯知识库：六大模块 + 十项技能，支持全库巡检、存入与导入、JD 简历、面试准备与复盘，并对接飞书。"
+      },
+      "install": "dsh plugin --profile web add github:ljttt0824/dsh-career-kb",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 19,
+      "id": "repo:liufeicc/dsh-cc-computer-use-mcp",
+      "name": "dsh-cc-computer-use-mcp",
+      "owner": "liufeicc",
+      "url": "https://github.com/liufeicc/dsh-cc-computer-use-mcp",
+      "category": "tools",
+      "description": {
+        "en": "Wires the local cc-computer-use MCP server into DSH with one process per root session, giving each session its own Xephyr sandbox screen and private AT-SPI bus (requires the cc-computer-use MCP server).",
+        "zh": "把本地 cc-computer-use MCP server 接入 DSH：每个根会话各起一个进程，各自拥有独立的 Xephyr 沙箱屏与私有 AT-SPI 总线（需已安装 cc-computer-use MCP server）。"
+      },
+      "install": "dsh plugin --profile web add github:liufeicc/dsh-cc-computer-use-mcp",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 20,
+      "id": "repo:66-zhimeng/dsh-chart-lab",
+      "name": "dsh-chart-lab",
+      "owner": "66-zhimeng",
+      "url": "https://github.com/66-zhimeng/dsh-chart-lab",
+      "category": "ui",
+      "description": {
+        "en": "Interactive chart cards in the conversation: the host loads a workspace dataset, and the browser card switches chart type, dimension, aggregation, filtering, Top-N and colour scheme, then exports CSV or PNG — all locally, with no model round-trips.",
+        "zh": "对话里的可交互图表卡片：数据由宿主从工作区读取，浏览器卡片本地切换图表类型、维度、聚合、筛选、Top-N 与配色，并可导出 CSV / PNG，全程不产生模型往返。"
+      },
+      "install": "dsh plugin --profile web add github:66-zhimeng/dsh-chart-lab",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 21,
+      "id": "repo:yiyunet/dsh-chatgpt-connect",
+      "name": "dsh-chatgpt-connect",
+      "owner": "yiyunet",
+      "url": "https://github.com/yiyunet/dsh-chatgpt-connect",
+      "category": "model",
+      "description": {
+        "en": "DSH plugin: bring your ChatGPT subscription into DeepSeek Harness — Codex models, GPT Image, quota and recovery checks, plus a per-plugin scoped HTTP(S) proxy. Community alpha fork of dsh-codex-connect, published on the alpha dist-tag; it registers the same openai-codex provider, so it cannot be installed alongside the upstream plugin; the image, quota and proxy features are opt-in and off by default.",
+        "zh": "DSH 插件：把你的 ChatGPT 订阅接进 DeepSeek Harness——Codex 模型、GPT Image、额度与恢复检查，以及按插件隔离的 HTTP(S) 代理。dsh-codex-connect 的社区 alpha 分支，npm 走 alpha 通道；它注册同一个 openai-codex provider，不能与上游插件同装；图像、额度与代理功能默认关闭，需在设置里开启。"
+      },
+      "install": "dsh plugin --profile web add github:yiyunet/dsh-chatgpt-connect",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 22,
+      "id": "repo:ll4514dvdvdb/dsh-clash-proxy",
+      "name": "dsh-clash-proxy",
+      "owner": "ll4514dvdvdb",
+      "url": "https://github.com/ll4514dvdvdb/dsh-clash-proxy",
+      "category": "notify",
+      "description": {
+        "en": "On-demand proxy for DeepSeek Harness that leaves the system proxy, WinHTTP and TUN alone: its own Clash-style engine parses vmess, vless, ss, trojan, socks5 and http subscriptions and runs a rule engine (DOMAIN, DOMAIN-SUFFIX, DOMAIN-KEYWORD, IP-CIDR, IP-CIDR6, GEOIP with DIRECT/PROXY/REJECT) so only the requests that are slow when dialled directly take the proxy on the web, search, scripts and browser channels, with per-node latency and bandwidth tests, spoofing options and a loopback panel behind a per-instance token.",
+        "zh": "不接管系统代理、WinHTTP 与 TUN 的按需代理：自带 Clash 风格引擎解析 vmess、vless、ss、trojan、socks5、http 订阅，规则引擎支持 DOMAIN、DOMAIN-SUFFIX、DOMAIN-KEYWORD、IP-CIDR、IP-CIDR6、GEOIP 与 DIRECT/PROXY/REJECT，只有直连偏慢时才让网页抓取、搜索、脚本与浏览器四条通道的请求走代理，并提供节点延迟与带宽测速、伪装选项和带每实例令牌的本地 Web 面板。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/ll4514dvdvdb/dsh-clash-proxy/releases/latest/download/dsh-clash-proxy.tgz\"",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 23,
+      "id": "repo:liufeicc/dsh-clear-command",
+      "name": "dsh-clear-command",
+      "owner": "liufeicc",
+      "url": "https://github.com/liufeicc/dsh-clear-command",
+      "category": "session",
+      "description": {
+        "en": "Adds a /clear command that clears one conversation's model-visible context while keeping the session itself.",
+        "zh": "新增 /clear 命令：清空某个会话的模型可见上下文，同时保留会话本身。"
+      },
+      "install": "dsh plugin --profile web add github:liufeicc/dsh-clear-command",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 24,
+      "id": "repo:xinming-chenniang/dsh-closeout",
+      "name": "dsh-closeout",
+      "owner": "xinming-chenniang",
+      "url": "https://github.com/xinming-chenniang/dsh-closeout",
+      "category": "session",
+      "description": {
+        "en": "Before closing a coding session or the DSH app itself, checks what would be lost — uncommitted work, unpushed commits, scratch files, missing handoff notes, pending restarts, broken profile bundles — and prints a three-level verdict; when a handoff is needed it writes the seven-section handoff file into the workspace ledger. Read-only by default.",
+        "zh": "关会话或关 DSH 之前先查会丢什么：未提交改动、未推提交、临时文件、缺交接件、待重启标记、profile 里重启后装不上的包；给出三档结论，该交接时把七节交接件写进工作区台账。默认只读。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/xinming-chenniang/dsh-closeout/releases/download/v0.7.0/dsh-closeout-0.7.0.tgz\"",
+      "targetKind": "tarball",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 25,
+      "id": "repo:mr-elk/dsh-composer-assistant",
+      "name": "dsh-composer-assistant",
+      "owner": "Mr-Elk",
+      "url": "https://github.com/Mr-Elk/dsh-composer-assistant",
+      "category": "ui",
+      "description": {
+        "en": "Adds next-message prediction, inline draft completion, and prompt optimization to the DSH composer, with a call budget, request stats, and glossary protection in Settings. A fork of Somnus678/dsh-input-assistant; both put their controls on the same composer, so do not install the two together.",
+        "zh": "在 DSH 输入框中提供下一句预测、输入续写和提示词优化，并在设置页提供调用额度、请求统计和术语保护。基于 Somnus678/dsh-input-assistant 改造的分支，两者都在同一个输入框上加控件，不能与上游同装。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/Mr-Elk/dsh-composer-assistant/releases/download/v0.4.1/dsh-composer-assistant-0.4.1.tgz\"",
+      "targetKind": "tarball",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 26,
+      "id": "repo:jason25417/dsh-composer-tweaks",
+      "name": "dsh-composer-tweaks",
+      "owner": "Jason25417",
+      "url": "https://github.com/Jason25417/dsh-composer-tweaks",
+      "category": "ui",
+      "description": {
+        "en": "Composer tweaks for the DSH input box: a Markdown source/view toggle, Markdown rendering for user messages, one mixed file-and-folder picker backed by the macOS open panel, a GenUI prompt switch inside the plus menu, an open-in-new-window action on sidebar Session rows (needs the separate `dsh-popout-window` host plugin), and a collapsible subagent tree. Requires DSH 0.2.x.",
+        "zh": "DSH 输入框增强：Markdown 源码/视图开关、用户消息按 Markdown 渲染、把「添加文件」与「添加文件夹」合并成一个 macOS 原生面板混选入口、把 GenUI 提示词开关收进加号菜单，并在侧栏会话行提供「在新窗口打开」（需另装 `dsh-popout-window` 宿主插件）与可展开的子会话树。需要 DSH 0.2.x。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/Jason25417/dsh-composer-tweaks/releases/latest/download/dsh-composer-tweaks.tgz\"",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 27,
+      "id": "repo:nannan-first/dsh-continuity",
+      "name": "dsh-continuity",
+      "owner": "nannan-first",
+      "url": "https://github.com/nannan-first/dsh-continuity",
+      "category": "session",
+      "description": {
+        "en": "Long-task continuity for DSH: every turn end writes a breakpoint (what it did, which tools it used, and — when the turn did not finish cleanly — what is still unfinished; the manual continuity_breakpoint tool can record the next step), injected as a snapshot when the same workspace starts a fresh session so work resumes instead of restarting. It also stores SHA-256 fingerprints of persona or config files so you can verify afterwards whether anything was altered. Four tools (continuity_breakpoint, continuity_breakpoints, continuity_ledger, continuity_attest), plain JSONL under <workspace>/.dsh-continuity/, zero dependencies, no network calls. Note: nothing writes ledger.jsonl yet — continuity_ledger only reads it.",
+        "zh": "长任务续接：每轮结束自动写一条断点（做了什么、用了哪些工具，这一轮没正常结束时还差什么；下一步需手动调用 continuity_breakpoint 记录），同一工作区的新会话开头会把最近几条注入为快照，接着往下干而不是从头再来。同时给人设卡、配置这类文件存 SHA-256 指纹，事后能验出是否被人改过。四个工具（continuity_breakpoint / continuity_breakpoints / continuity_ledger / continuity_attest），数据是以纯 JSONL 存在 <工作区>/.dsh-continuity/，零依赖、不联网。注意：目前没有任何代码会自动写 ledger.jsonl，continuity_ledger 只能读。"
+      },
+      "install": "dsh plugin --profile web add github:nannan-first/dsh-continuity",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 28,
+      "id": "repo:asalulu/dsh-conversation-trash",
+      "name": "dsh-conversation-trash",
+      "owner": "ASALULU",
+      "url": "https://github.com/ASALULU/dsh-conversation-trash",
+      "category": "session",
+      "description": {
+        "en": "Reversible conversation deletion for DeepSeek Harness: a 30-day trash with undo, restore and permanent purge.",
+        "zh": "可撤销的对话删除：把会话日志与列表缓存移入 30 天回收站，支持撤销、恢复与彻底删除。"
+      },
+      "install": "dsh plugin --profile web add github:ASALULU/dsh-conversation-trash",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 29,
+      "id": "repo:xsnnnnnn/dsh-coros",
+      "name": "dsh-coros",
+      "owner": "xsnnnnnn",
+      "url": "https://github.com/xsnnnnnn/dsh-coros",
+      "category": "tools",
+      "description": {
+        "en": "Bridges the official COROS MCP server into DeepSeek Harness with a self-contained local stdio-to-HTTP bridge and on-device OAuth login, exposing 34 COROS tools on the current endpoint for sleep, HRV, resting heart rate, recovery, training load, activities and FIT files, plus workout and training-plan CRUD and scheduling.",
+        "zh": "把高驰（COROS）官方 MCP 服务接入 DeepSeek Harness：自包含的本机 stdio↔HTTP 桥 + 本机 OAuth 登录，在当前端点上提供 34 个工具，覆盖睡眠、HRV、静息心率、恢复、训练负荷、活动与 FIT 文件，以及训练课程与训练计划的增删改查和排期。"
+      },
+      "install": "dsh plugin --profile web add github:xsnnnnnn/dsh-coros",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 30,
+      "id": "repo:helmsmanofdesire/dsh-countdown",
+      "name": "dsh-countdown",
+      "owner": "HelmsmanOfDesire",
+      "url": "https://github.com/HelmsmanOfDesire/dsh-countdown",
+      "category": "ui",
+      "description": {
+        "en": "A workday countdown shown as an hourglass on every DSH page. The sand volume follows the elapsed fraction of the current work period; periods can be added, removed and edited, including ones that span midnight, and when the clock is outside every period the panel says so instead of counting.",
+        "zh": "常驻 DSH 任意页面的下班倒计时沙漏。沙量按当前时段已过去的比例变化；工作时段可自由增删改，支持跨零点；当前时间不在任何时段内时面板显示未配置，而不是继续倒数。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/HelmsmanOfDesire/dsh-countdown/releases/download/v1.0.0/HelmsmanOfDesire-dsh-countdown-1.0.0.tgz\"",
+      "targetKind": "tarball",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 31,
+      "id": "repo:roilkl/dsh-daicat-pet",
+      "name": "dsh-daicat-pet",
+      "owner": "Roilkl",
+      "url": "https://github.com/Roilkl/dsh-daicat-pet",
+      "category": "ui",
+      "description": {
+        "en": "An animated cat companion for the DSH chat UI. It reacts to session states, shows editable click-to-read lines and per-turn token counts, and supports dragging with a squish effect, left/right flipping and Ctrl+wheel resizing.",
+        "zh": "在 DSH 对话界面显示呆猫桌宠：跟随会话状态切换动画，点击展示可编辑台词，每轮结束显示 token 用量；支持拖动压扁回弹、左右翻转及 Ctrl+滚轮缩放。"
+      },
+      "install": "dsh plugin --profile web add github:Roilkl/dsh-daicat-pet",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 32,
+      "id": "repo:iggypcnfsky/dsh-docs",
+      "name": "dsh-docs",
+      "owner": "iggypcnfsky",
+      "url": "https://github.com/iggypcnfsky/dsh-docs",
+      "category": "docs",
+      "description": {
+        "en": "A Google Docs-style word processor inside DeepSeek Harness with rich text, page setup, tables, images, print, export, and agent editing.",
+        "zh": "A Google Docs-style word processor inside DeepSeek Harness with rich text, page setup, tables, images, print, export, and agent editing."
+      },
+      "install": "dsh plugin --profile web add github:iggypcnfsky/dsh-docs",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 33,
+      "id": "repo:developerye/dsh-doyourweb-remote",
+      "name": "dsh-doyourweb-remote",
+      "owner": "DeveloperYe",
+      "url": "https://github.com/DeveloperYe/dsh-doyourweb-remote",
+      "category": "browser",
+      "description": {
+        "en": "Fork of SheepofSheep/dsh-doyourweb that puts the browser on another machine: the MV3 extension dials out to this plugin over TLS, so DSH reads and acts on a remote Chrome or Edge rather than a local one. It also generates ready-paired extension packages for the current configuration, adds tab open and close tools, writes annotation detail to a file instead of pasting it into the chat, and shows a checklist naming which part of a remote setup is misconfigured. It reuses the same browser-tabs plugin id as the upstream, so do not install both in the same profile. Requires Chrome or Edge 125+ and an unpacked MV3 extension loaded manually on the browser machine; the plugin does not install the extension. With tls: true, trust the generated ca.crt as a root certificate there.",
+        "zh": "SheepofSheep/dsh-doyourweb 的 fork，把浏览器放到另一台机器：MV3 扩展主动经 TLS 出站连接插件，DSH 因此能读取并操作远程的 Chrome/Edge，而不限于本机浏览器。此外按当前配置生成已配对的扩展包、新增开/关标签页工具、把批注明细落盘而不是塞进聊天，并提供远程接入自检表指出配置哪一环不对。 它与上游共用同一个 browser-tabs 插件 id，不能与 SheepofSheep/dsh-doyourweb 同装。需要 Chrome/Edge 125+，并在浏览器所在机器手动加载解包的 MV3 扩展（插件不会自动安装）；走 TLS 时还要把生成的 ca.crt 装进受信任的根证书颁发机构。"
+      },
+      "install": "dsh plugin --profile web add github:DeveloperYe/dsh-doyourweb-remote",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 34,
+      "id": "repo:xsnnnnnn/dsh-endurance-coach",
+      "name": "dsh-endurance-coach",
+      "owner": "xsnnnnnn",
+      "url": "https://github.com/xsnnnnnn/dsh-endurance-coach",
+      "category": "docs",
+      "description": {
+        "en": "Endurance-coaching skill bundle that defaults to Intervals.icu for training data (activities, intervals, streams, training load, HRV, resting heart rate, sleep in-bed hours, eFTP) and uses COROS only for training-plan read/write and for fields Intervals.icu lacks (sleep score, recovery score), with iGPSPORT as a fallback for ride details. It turns that data into readiness gating, VDOT pace and heart-rate zones, periodized weekly plans, session reviews, race-day pacing and fueling, and weather-adjusted workouts. The bundle registers the endurance-coach skill in the profile, ships deterministic helper scripts, reads an athlete profile created by its init script, and requires the agent to state when data is unavailable instead of inventing it. Data comes through separately installed MCP servers — the Intervals.icu MCP server for training data, the dsh-coros plugin for training-plan read/write and sleep/recovery scores, an iGPSPORT MCP server only as a ride-detail fallback — and its bundled scripts need Python 3.10+; with none of them it works only from numbers you type in.",
+        "zh": "耐力训练决策技能包：默认从 Intervals.icu 取训练数据（活动、分圈、秒流、训练负荷、HRV、静息心率、睡眠在床时长、eFTP），COROS 只负责训练计划读写与 ICU 缺的字段（睡眠评分、恢复分），iGPSPORT 兜底骑行明细；据此做恢复闸门、VDOT 配速与心率区间、周期化周计划、单次复盘、赛前配速与补给、按天气修正训练。插件在 profile 里注册 endurance-coach 技能，内置确定性计算脚本，读取初始化脚本生成的运动员档案，并强制「取不到数据就如实说明、不得编造」。数据经另行安装的 MCP 服务获取：训练数据走 Intervals.icu MCP server，训练计划读写与睡眠/恢复评分走 dsh-coros 插件，iGPSPORT MCP 仅在缺骑行明细时兜底；内置脚本需 Python 3.10+；都不装时只能用手工输入的数字。"
+      },
+      "install": "dsh plugin --profile web add github:xsnnnnnn/dsh-endurance-coach",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 35,
+      "id": "repo:jason25417/dsh-external-bridge",
+      "name": "dsh-external-bridge",
+      "owner": "Jason25417",
+      "url": "https://github.com/Jason25417/dsh-external-bridge",
+      "category": "tools",
+      "description": {
+        "en": "Host-side HTTP bridge on 127.0.0.1:39217 with a Bearer token stored at 0600: external processes can create real DSH Desktop sessions that appear in the workspace sidebar, send prompts (queue or steer), read state and the last assistant reply, list workspaces and sessions, and long-poll until a turn finishes. Zero runtime dependencies; fixed loopback port; no outbound network; message bodies are never logged.",
+        "zh": "只在 127.0.0.1:39217 监听的本机 HTTP 桥（Host 半插件），用 0600 落盘的 Bearer token 鉴权：外部进程可创建出现在工作区侧栏的真会话、发消息（queue/steer）、读状态与最后一条助手回复、列工作区/会话，并长轮询到回合结束。零运行时依赖，端口固定，不联网，日志不记消息正文。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/Jason25417/dsh-external-bridge/releases/latest/download/dsh-external-bridge.tgz\"",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 36,
+      "id": "repo:cube-ai/dsh-feishu-channels",
+      "name": "dsh-feishu-channels",
+      "owner": "cube-ai",
+      "url": "https://github.com/cube-ai/dsh-feishu-channels",
+      "category": "notify",
+      "description": {
+        "en": "Connect one or more Feishu bot apps to the local DeepSeek Harness (DSH): each bot app is a channel with its own model, workspace, permissions and private-chat allowlist, and every chat under it gets its own DSH session. Derived from MichengAI/dsh-im-connect (Apache-2.0) with the other IM channels removed and identifiers renamed so both can be installed side by side.",
+        "zh": "把一个或多个飞书机器人应用接入本机 DeepSeek Harness（DSH）：每个机器人应用是一条频道，各自独立的模型、工作区、权限与私聊准入；频道下的每个私聊/群聊各有一条独立的 DSH 会话。基于 MichengAI/dsh-im-connect（Apache-2.0）改造，删去其它 IM 通道并重命名标识，因此可与上游同装。"
+      },
+      "install": "dsh plugin --profile web add github:cube-ai/dsh-feishu-channels",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 37,
+      "id": "repo:cube-ai/dsh-feishu-client",
+      "name": "dsh-feishu-client",
+      "owner": "cube-ai",
+      "url": "https://github.com/cube-ai/dsh-feishu-client",
+      "category": "notify",
+      "description": {
+        "en": "DSH Feishu Client. 1) Users (humans) access remote agents through the UI provided by this plugin; 2) The local DSH accesses remote agents by calling the tools provided by this plugin. Supported remote agents include but are not limited to DSH, OpenClaw, WorkBuddy, Weknora, etc.",
+        "zh": "DSH飞书客户端：1）用户（人）通过本插件提供UI访问远端智能体；2）本地DSH通过调用本插件提供工具访问远端智能体。支持的远端智能体包括且不限于：DSH、OpenClaw、WorkBuddy、Weknora等等。"
+      },
+      "install": "dsh plugin --profile web add github:cube-ai/dsh-feishu-client",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 38,
+      "id": "repo:gemjay118/dsh-file-integrity-check",
+      "name": "dsh-file-integrity-check",
+      "owner": "GEMJay118",
+      "url": "https://github.com/GEMJay118/dsh-file-integrity-check",
+      "category": "security",
+      "description": {
+        "en": "Right-sidebar panel that scans a DSH workspace on Windows for Low integrity labels on files and directories (quick or deep), restores them to Medium with verification, keeps a snapshot and restore script, and handles objects whose DACL does not grant the owner WRITE_OWNER.",
+        "zh": "右侧栏面板：在 Windows 上扫描当前 DSH 工作区文件与目录的 Low 完整性标签（quick / deep），恢复为 Medium 并复扫验证；保留快照与恢复脚本，可处理 DACL 未给 owner WRITE_OWNER 的对象。"
+      },
+      "install": "dsh plugin --profile web add github:GEMJay118/dsh-file-integrity-check",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 39,
+      "id": "repo:lanjunyee/dsh-intelligence-check",
+      "name": "dsh-intelligence-check",
+      "owner": "Lanjunyee",
+      "url": "https://github.com/Lanjunyee/dsh-intelligence-check",
+      "category": "model",
+      "description": {
+        "en": "Model quality testing for DeepSeek Harness Desktop with a question bank, manual and scheduled checks, saved responses, human reviews, and model attribution. Install it into the desktop profile: the shared Go backend is started only by the desktop app, and a web profile can only view an already-running desktop backend.",
+        "zh": "DeepSeek Harness 桌面端模型质量检测插件，提供测试题库、手动与定时检测、回答记录、人工评审和模型归因。需装进 desktop profile：共享 Go 后台只由桌面应用启动，装在 web profile 只能查看桌面端已在运行的后台。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/Lanjunyee/dsh-intelligence-check/releases/latest/download/dsh-intelligence-check.tgz\"",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 40,
+      "id": "repo:xinming-chenniang/dsh-kb-sync",
+      "name": "dsh-kb-sync",
+      "owner": "xinming-chenniang",
+      "url": "https://github.com/xinming-chenniang/dsh-kb-sync",
+      "category": "session",
+      "description": {
+        "en": "Pulls your chat.deepseek.com conversations into a local knowledge base — one Markdown file per conversation, a JSONL transcript and a catalog — and searches them from a control page inside DSH. Daily increments plus a full-history backfill from the official export, an integrity check, and an optional model step that runs through the host llm service and writes only after its JSON passes validation. Reads the web userToken from the DSH credential store and calls chat.deepseek.com only; no install scripts, no runtime dependencies.",
+        "zh": "把 chat.deepseek.com 的对话抓进本地知识库——每条会话一份 Markdown、一份 JSONL 语料和一个目录，并在 DSH 的控制页里检索。日常增量之外，可用官方导出包全量回填历史，带完整性体检；可选的模型整理步走宿主 llm 服务，JSON 校验通过才落盘。网页端 userToken 从 DSH 凭据服务读取，出网只连 chat.deepseek.com；无安装脚本、无运行依赖。"
+      },
+      "install": "dsh plugin --profile web add github:xinming-chenniang/dsh-kb-sync",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 41,
+      "id": "repo:kkmingjun/dsh-kingspeak",
+      "name": "dsh-kingspeak",
+      "owner": "kkmingjun",
+      "url": "https://github.com/kkmingjun/dsh-kingspeak",
+      "category": "voice",
+      "description": {
+        "en": "Voice dictation scratchpad: realtime speech-to-text into timestamped, per-session blocks, with one-click insert into the conversation composer. Requires the official DSH voice-input bundle (@deepseek-ai/dsh-experimental-voice-input-bundle); the speech model downloads on first use.",
+        "zh": "语音听写文本板：边说边出字，生成按会话隔离的时间戳文本块，一键加入会话输入框。 需先安装 DSH 官方语音输入插件 @deepseek-ai/dsh-experimental-voice-input-bundle，语音模型在首次使用时下载。"
+      },
+      "install": "dsh plugin --profile web add github:kkmingjun/dsh-kingspeak",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 42,
+      "id": "repo:ikunua/dsh-live2d-stage",
+      "name": "dsh-live2d-stage",
+      "owner": "ikunua",
+      "url": "https://github.com/ikunua/dsh-live2d-stage",
+      "category": "theme",
+      "description": {
+        "en": "Renders a Live2D Cubism 4 model as the DSH web UI background: a transparent click-through canvas that covers the window without blocking any control. Eyes, head and body follow the pointer; expressions track the agent state (thinking, running a tool, turn finished, error, waiting) and the conversation (message arrives, reply ends, question asked); after an idle delay the character shows speech bubbles and plays motions and expressions drawn at random from pools you tick. Settings list the models under ~/.dsh/live2d-stage/models, expose position, scale, opacity, gaze strength and every interval and probability, and open a resizable live preview of the same canvas. Expressions and motions a model3.json omits are detected from the model folder; one sample model is included.",
+        "zh": "把 Live2D Cubism 4 模型渲染成 DSH 网页界面的背景层：透明画布铺满窗口且不挡任何控件。眼、头、身体跟随鼠标；表情跟着智能体状态（思考、调用工具、回答结束、报错、等待确认）和对话（收到消息、回答结束、向你提问）变化；空闲到设定时间会冒台词气泡，并从你勾选的池子里随机播动作和表情。设置页列出 ~/.dsh/live2d-stage/models 里的模型，开放位置、缩放、透明度、视线强度与每一项间隔和概率，并可拖拽改大小的实时预览窗查看同一块画布。模型清单里没声明的 exp3/motion3 会被自动识别，另附示例模型。"
+      },
+      "install": "dsh plugin --profile web add github:ikunua/dsh-live2d-stage",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 43,
+      "id": "repo:liufeicc/dsh-mcp-workspace-policy",
+      "name": "dsh-mcp-workspace-policy",
+      "owner": "liufeicc",
+      "url": "https://github.com/liufeicc/dsh-mcp-workspace-policy",
+      "category": "tools",
+      "description": {
+        "en": "Decides which MCP server tools each workspace can see, keyed by the session working directory; workspaces without a policy see none.",
+        "zh": "按工作区（会话 cwd）决定哪些 MCP 服务器的工具可见；未配置的工作区默认一个都不显示。"
+      },
+      "install": "dsh plugin --profile web add github:liufeicc/dsh-mcp-workspace-policy",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 44,
+      "id": "repo:whatif146/dsh-memelens",
+      "name": "dsh-memelens",
+      "owner": "whatif146",
+      "url": "https://github.com/whatif146/dsh-memelens",
+      "category": "fun",
+      "description": {
+        "en": "Explains Chinese internet memes to an agent: registers a meme_explain tool that returns the meaning, tone, origin and lifecycle of a sticker, which memes can and cannot be combined, occasions to avoid, and both a meme-version and a plain-version reply. Answers come from a local memory store with spacing-effect decay, falling back to a user-configured OpenAI-compatible vision endpoint (BYOK).",
+        "zh": "给 agent 装一双看懂梗的眼睛：注册 meme_explain 工具，返回表情包的意思、语气、出处与生命周期、能一起用与不能混用的梗、该避开的场合，并给出玩梗版与不玩梗版两种回复。结论来自带间隔效应衰减的本地记忆库，未命中时调用用户自配的 OpenAI 兼容视觉端点（BYOK）。"
+      },
+      "install": "dsh plugin --profile web add github:whatif146/dsh-memelens",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 45,
+      "id": "repo:deciia/dsh-message-pins",
+      "name": "dsh-message-pins",
+      "owner": "deciia",
+      "url": "https://github.com/deciia/dsh-message-pins",
+      "category": "session",
+      "description": {
+        "en": "Bookmark a whole assistant reply with the star on its action row, or bookmark any selected sentence with the icon beside the selection; pins are saved as Markdown to a local folder or an Obsidian vault, and the existing right sidebar lists, tags, searches, exports and jumps back to them.",
+        "zh": "用回答操作行上的星标收藏整条回答，或用选区旁的星标收藏任意句子或段落；收藏以 Markdown 落盘到本地目录或 Obsidian 仓库，在 DSH 现有右侧栏中浏览、加笔记与标签、搜索、导出并跳回原文。"
+      },
+      "install": "dsh plugin --profile web add github:deciia/dsh-message-pins",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 46,
+      "id": "repo:liufeicc/dsh-model-provider-label",
+      "name": "dsh-model-provider-label",
+      "owner": "liufeicc",
+      "url": "https://github.com/liufeicc/dsh-model-provider-label",
+      "category": "ui",
+      "description": {
+        "en": "Shows the provider name in the current-model button and its menu, so same-named models from different providers stay distinguishable.",
+        "zh": "在「当前模型」按钮与菜单里显示供应商名，同名的不同供应商模型不再混淆。"
+      },
+      "install": "dsh plugin --profile web add github:liufeicc/dsh-model-provider-label",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 47,
+      "id": "repo:semonxue/dsh-my-newhome",
+      "name": "dsh-my-newhome",
+      "owner": "Semonxue",
+      "url": "https://github.com/Semonxue/dsh-my-newhome",
+      "category": "ui",
+      "description": {
+        "en": "Replaces the DeepSeek Harness home screen with a configurable palette and background image, a custom hero and sidebar logo, default 3×2 decks of recently used workspaces and quick links (local Chrome history or a custom list), and up to four API-usage widgets (DeepSeek balance, MiniMax, Cline Pass, OpenCode Go) refreshed on a configurable interval. The decks stay on the new-session screen and every option is edited from a built-in settings panel.",
+        "zh": "把 DeepSeek Harness 首屏换成自定义主页：可配置配色与背景图、自定义首屏与侧栏 Logo、默认 3×2 的最近工作区与常用入口（取自本机 Chrome 历史或自定义列表）、最多 4 个 API 用量组件（DeepSeek 余额、MiniMax、Cline Pass、OpenCode Go）且刷新间隔可调；卡片只在新建会话首屏出现，全部选项在自带设置面板里调整。"
+      },
+      "install": "dsh plugin --profile web add github:Semonxue/dsh-my-newhome",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 48,
+      "id": "repo:xsxelricor/dsh-notion-toolkit",
+      "name": "dsh-notion-toolkit",
+      "owner": "xsxElricor",
+      "url": "https://github.com/xsxElricor/dsh-notion-toolkit",
+      "category": "notify",
+      "description": {
+        "en": "Read and edit a Notion workspace from the agent: 10 tools over pages and databases, content handled as Notion-flavored Markdown, and writes guarded by a content-hash version check, a preview diff and one-step undo, so an edit made by hand in Notion is never silently overwritten. Installs with dsh plugin add; no build step. Requires a Notion integration token (or a personal access token) and sharing each target page or database with the integration.",
+        "zh": "在 DSH 里读写 Notion：10 个工具覆盖页面与数据库，正文按 Notion 风味 Markdown 读写；写入带内容哈希版本校验、diff 预览和一键撤销，你在 Notion 里手改的内容不会被静默覆盖。dsh plugin add 即可安装，无需构建。需自备 Notion 集成令牌（或个人访问令牌），并把要读写的页面/数据库共享给该集成。"
+      },
+      "install": "dsh plugin --profile web add github:xsxElricor/dsh-notion-toolkit",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 49,
+      "id": "repo:devome/dsh-panel-layout",
+      "name": "dsh-panel-layout",
+      "owner": "devome",
+      "url": "https://github.com/devome/dsh-panel-layout",
+      "category": "ui",
+      "description": {
+        "en": "Sidebar panel menu layout: switch between a button row and a list, cap the button row at one to three rows, drag any entry to reorder it, hide the entries past the cap and list them in the shell More menu, and absorb Settings, Feedback and Sign in from the bottom-left launcher. Based on ruanimal/dsh-sidebar-panel-buttons; the two cannot be enabled at the same time.",
+        "zh": "侧边栏面板菜单布局：在按钮行与列表之间切换，按钮行可限一到三行，任意项可拖动排序，超出上限的项收进宿主「更多」菜单，并把左下角「更多」里的设置、意见反馈、登录并入面板菜单。基于 ruanimal/dsh-sidebar-panel-buttons；两者不能同时启用。"
+      },
+      "install": "dsh plugin --profile web add github:devome/dsh-panel-layout",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 50,
+      "id": "repo:gpan666/dsh-plugin",
+      "name": "dsh-plugin",
+      "owner": "Gpan666",
+      "url": "https://github.com/Gpan666/dsh-plugin",
+      "category": "model",
+      "description": {
+        "en": "Switches to the next healthy model candidate before the next agent step when the current model has been marked unhealthy.",
+        "zh": "当前模型被判定不可用时，在下一步执行前切换到下一个健康的候选模型。"
+      },
+      "install": "dsh plugin --profile web add github:Gpan666/dsh-plugin",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 51,
+      "id": "repo:boy1141/dsh-plugin-balance-chip",
+      "name": "dsh-plugin-balance-chip",
+      "owner": "boy1141",
+      "url": "https://github.com/boy1141/dsh-plugin-balance-chip",
+      "category": "session",
+      "description": {
+        "en": "Shows the DeepSeek account balance and unused bonus credit in the session header, refreshing every 20 seconds and whenever the window regains focus.",
+        "zh": "在会话标题栏显示 DeepSeek 账户余额与未用完的赠送额度，每 20 秒自动刷新，窗口重新聚焦时立即刷新。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/boy1141/dsh-plugin-balance-chip/releases/latest/download/dsh-plugin-balance-chip.tgz\"",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 52,
+      "id": "repo:zhibaiyingchuan/dsh-plugin-lrc",
+      "name": "dsh-plugin-lrc",
+      "owner": "zhibaiYingChuan",
+      "url": "https://github.com/zhibaiYingChuan/dsh-plugin-lrc",
+      "category": "memory",
+      "description": {
+        "en": "Connects DeepSeek Harness to LRC's local structured memory: distills conclusions every 8 turns, drops near-duplicates by character-level Jaccard similarity (≥ 0.85), and writes them to a local LRC store. Five tools — lrc_recall, lrc_forget, lrc_remember_now, lrc_handoff and lrc_status — cover on-demand recall, retracting wrong entries, immediate writes, session handoff and a status line. On first run it downloads a per-platform LRC binary (win32-x64, darwin-arm64 or linux-x64, SHA256-verified) and starts an isolated instance, so the LRC desktop app is not required; data stays in $DSH_HOME/cache/lrc-plugin/data unless LRC_BASE points at an existing instance.",
+        "zh": "把 DeepSeek Harness 接到 LRC 的本地结构化记忆：每 8 轮提炼一次结论，按字符级 Jaccard 相似度（≥ 0.85）去重后写入本地 LRC 库。五个工具 lrc_recall / lrc_forget / lrc_remember_now / lrc_handoff / lrc_status 分别负责按需召回、撤回错误条目、立即写入、会话交接与状态行。首次运行会按平台下载 LRC 二进制（win32-x64、darwin-arm64、linux-x64，带 SHA256 校验）并启动隔离实例，因此无需先装 LRC 桌面端；数据默认写在 $DSH_HOME/cache/lrc-plugin/data，设置 LRC_BASE 可复用已有实例。"
+      },
+      "install": "dsh plugin --profile web add github:zhibaiYingChuan/dsh-plugin-lrc",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 53,
+      "id": "repo:anjiaqi0926/dsh-plugin-switchboard",
+      "name": "dsh-plugin-switchboard",
+      "owner": "AnJiaqi0926",
+      "url": "https://github.com/AnJiaqi0926/dsh-plugin-switchboard",
+      "category": "ui",
+      "description": {
+        "en": "Toggles installed plugins from a sidebar panel, groups them by origin (official, marketplace, local), flags changes that need a Host restart, and installs curated plugins from a Discover tab.",
+        "zh": "在侧边栏面板里一键启停已安装插件，按来源分组（官方自带、市场安装、本地导入），标出需要重启 Host 才生效的改动，并在「发现」页一键安装精选插件。"
+      },
+      "install": "dsh plugin --profile web add github:AnJiaqi0926/dsh-plugin-switchboard",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 54,
+      "id": "repo:zmd12345/dsh-plugin-thinking-level",
+      "name": "dsh-plugin-thinking-level",
+      "owner": "zmd12345",
+      "url": "https://github.com/zmd12345/dsh-plugin-thinking-level",
+      "category": "session",
+      "description": {
+        "en": "Judges the right reasoning level locally from the current draft and recent turns and switches it in one click; nudges a new session when the conversation grows long — less overthinking on simple tasks, enough reasoning on hard ones.",
+        "zh": "根据当前任务和最近几轮对话在本地判断合适的推理等级，一键切换；会话过长时提醒并可直接新建会话：简单任务不过度思考、节省 token，复杂任务给足推理。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/zmd12345/dsh-plugin-thinking-level/releases/download/v0.4.0/dsh-plugin-thinking-level-0.4.0.tgz\"",
+      "targetKind": "tarball",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 55,
+      "id": "repo:zhangcaiqian/dsh-plugin-zsxq",
+      "name": "dsh-plugin-zsxq",
+      "owner": "zhangcaiqian",
+      "url": "https://github.com/zhangcaiqian/dsh-plugin-zsxq",
+      "category": "tools",
+      "description": {
+        "en": "Knowledge-planet (zsxq) knowledge base toolkit: sync posts and attachments, extract docx/PDF text and images, rebuild an index, search, and self-check — pure JS, no Python. Requires a Knowledge-planet subscription and its Cookie, pasted into config.json.",
+        "zh": "知识星球知识库工具集：同步帖子与附件、抽取 docx/PDF 正文与图片、重建索引、检索与自检，纯 JS 无需 Python。需要知识星球订阅账号，并把订阅 Cookie 写进 config.json。"
+      },
+      "install": "dsh plugin --profile web add github:zhangcaiqian/dsh-plugin-zsxq",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 56,
+      "id": "repo:ralcer-he/dsh-progress-lens",
+      "name": "dsh-progress-lens",
+      "owner": "ralcer-he",
+      "url": "https://github.com/ralcer-he/dsh-progress-lens",
+      "category": "ui",
+      "description": {
+        "en": "A right-side panel that tells you in plain words what a long-running task has finished, what it is doing right now, and what it will most likely do next — read-only, never touches your session, and you can ask it a question or just chat with it while the task keeps running. Requires the dsh-better-sidebar plugin, whose right sidebar hosts the panel.",
+        "zh": "在右侧栏用大白话告诉你长任务做完了什么、现在手头是什么、接下来大概要做什么：不是复述思考链，而是攒一段时间或几件大事压成两三句；工具名和报错码都翻成人话。只读不写会话，跑着的时候也能随时问一句，或者随便聊两句。 需先安装 dsh-better-sidebar（面板借用它的右栏）。"
+      },
+      "install": "dsh plugin --profile web add github:ralcer-he/dsh-progress-lens",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 57,
+      "id": "repo:cibudayi3906/dsh-prompt-trove",
+      "name": "dsh-prompt-trove",
+      "owner": "CIBUDAYI3906",
+      "url": "https://github.com/CIBUDAYI3906/dsh-prompt-trove",
+      "category": "ui",
+      "description": {
+        "en": "Composer prompt library: reusable global and per-project prompts are stored as Markdown files and appended to the draft on click or @ mention; the global library works out of the box, while project groups appear only after \"config.root\" is set in the profile patch.",
+        "zh": "输入框常用提示词库：全局与项目两层的 Markdown 提示词，点一下或 @ 触发追加进草稿、不覆盖已写内容；全局库装好即用，项目库需在 profile 的 cordis.patch.yml 里给该插件配 config.root 后才会出现。"
+      },
+      "install": "dsh plugin --profile web add github:CIBUDAYI3906/dsh-prompt-trove",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 58,
+      "id": "repo:renorai/dsh-renor",
+      "name": "dsh-renor",
+      "owner": "renorai",
+      "url": "https://github.com/renorai/dsh-renor",
+      "category": "memory",
+      "description": {
+        "en": "Connects DeepSeek Harness to the hosted Renor memory MCP server over Streamable HTTP, using a Renor API key from RENOR_API_KEY, so the model can call Renor's recall and save tools. It is a configuration bundle with no code of its own.",
+        "zh": "Connects DeepSeek Harness to the hosted Renor memory MCP server over Streamable HTTP, using a Renor API key from RENOR_API_KEY, so the model can call Renor's recall and save tools. It is a configuration bundle with no code of its own."
+      },
+      "install": "dsh plugin --profile web add github:renorai/dsh-renor",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 59,
+      "id": "repo:daphne999/dsh-safe-restart",
+      "name": "dsh-safe-restart",
+      "owner": "Daphne999",
+      "url": "https://github.com/Daphne999/dsh-safe-restart",
+      "category": "agent",
+      "description": {
+        "en": "Restart DSH and find out whether it actually came back. Windows has no external way to make Electron quit cleanly (WM_CLOSE just minimises the window), so this plugin does not pretend: it terminates the host, relaunches it with retries, then polls the host port until it really serves again, and reports the outcome to a local result file plus a QQ message when qq-notify credentials (appId/clientSecret/openid) are configured in the desktop profile. Verified end to end on 2026-11-08.",
+        "zh": "重启 DSH 并告诉你到底成没成。Windows 上没有「从外部让 Electron 干净退出」的通道（发 WM_CLOSE 只会最小化窗口），所以这个插件不装优雅：强制结束宿主、带重试地重新拉起、再轮询宿主端口确认它真的在服务，最后把结果写进本地文件，并在 desktop profile 配好 qq-notify 凭据（appId/clientSecret/openid）时发一条 QQ 消息。2026-11-08 端到端实测通过。"
+      },
+      "install": "dsh plugin --profile web add github:Daphne999/dsh-safe-restart",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 60,
+      "id": "repo:kcgoofee-jpg/dsh-secret-form",
+      "name": "dsh-secret-form",
+      "owner": "kcgoofee-jpg",
+      "url": "https://github.com/kcgoofee-jpg/dsh-secret-form",
+      "category": "security",
+      "description": {
+        "en": "Collects passwords through a card instead of the conversation: terminal prompts, the DSH sidebar browser, and Ego Lite, with multi-field forms and live strength rules.",
+        "zh": "通过卡片向用户索取密码，而不是让值进入对话：终端提示、DSH 侧边栏浏览器、Ego Lite，支持多字段表单与实时强度校验。"
+      },
+      "install": "dsh plugin --profile web add github:kcgoofee-jpg/dsh-secret-form",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 61,
+      "id": "repo:liufeicc/dsh-session-delete",
+      "name": "dsh-session-delete",
+      "owner": "liufeicc",
+      "url": "https://github.com/liufeicc/dsh-session-delete",
+      "category": "session",
+      "description": {
+        "en": "Adds a Delete session action to the sidebar session menu, with a confirmation dialog and the host operation that permanently removes the session log.",
+        "zh": "在侧边栏会话菜单里新增「删除会话」，带确认弹窗，并由宿主动作彻底移除会话日志。"
+      },
+      "install": "dsh plugin --profile web add github:liufeicc/dsh-session-delete",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 62,
+      "id": "repo:idealclover/dsh-session-title-studio",
+      "name": "dsh-session-title-studio",
+      "owner": "idealclover",
+      "url": "https://github.com/idealclover/dsh-session-title-studio",
+      "category": "session",
+      "description": {
+        "en": "Configurable session titles with custom prompts, refresh policies, local topic-drift detection, and single-session or historical title regeneration.",
+        "zh": "可配置的会话标题生成，支持自定义提示词、刷新策略、本地话题漂移检测，以及单条会话和历史标题重建。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/idealclover/dsh-session-title-studio/releases/latest/download/dsh-session-title-studio.tgz\"",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 63,
+      "id": "repo:xiaolin233-ctrl/dsh-session-transfer",
+      "name": "dsh-session-transfer",
+      "owner": "xiaolin233-ctrl",
+      "url": "https://github.com/xiaolin233-ctrl/dsh-session-transfer",
+      "category": "session",
+      "description": {
+        "en": "Adds a \"Move to another workspace…\" row to every conversation menu: copies the full event log into the target workspace under a new session id (header, title and model preset preserved, delivery markers retargeted), reads the copy back to verify it, attaches it, then archives the original unless you keep it.",
+        "zh": "在每个对话的「⋯」菜单里加一行「转移到其他工作区…」：把完整事件日志复制成目标工作区下的新会话（保留 header、标题与模型预设，并改写投递标记），读回校验后挂载，默认归档原会话（可勾选保留）。"
+      },
+      "install": "dsh plugin --profile web add github:xiaolin233-ctrl/dsh-session-transfer",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 64,
+      "id": "repo:iggypcnfsky/dsh-sheets",
+      "name": "dsh-sheets",
+      "owner": "iggypcnfsky",
+      "url": "https://github.com/iggypcnfsky/dsh-sheets",
+      "category": "docs",
+      "description": {
+        "en": "An agent-writable spreadsheet editor inside DeepSeek Harness with formulas, formatting, CSV/Excel import, and export.",
+        "zh": "An agent-writable spreadsheet editor inside DeepSeek Harness with formulas, formatting, CSV/Excel import, and export."
+      },
+      "install": "dsh plugin --profile web add github:iggypcnfsky/dsh-sheets",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 65,
+      "id": "repo:ethan1999991231/dsh-sidebar-dock",
+      "name": "dsh-sidebar-dock",
+      "owner": "Ethan1999991231",
+      "url": "https://github.com/Ethan1999991231/dsh-sidebar-dock",
+      "category": "ui",
+      "description": {
+        "en": "Docks the workspace and session list to the left, right, top or bottom edge, optionally folding it into a 5px edge band that expands on hover, with the reveal zone and the left rail width adjustable in Settings → General; the plugin rail, brand row and settings button stay where they are.",
+        "zh": "把工作区与会话记录列表停靠到左、右、上、下任意一边，可收成 5px 贴边细条、鼠标靠近再展开，触发范围与左栏宽度都能在设置里的通用项中调整；插件图标条、品牌行和底部设置钮留在原位。"
+      },
+      "install": "dsh plugin --profile web add github:Ethan1999991231/dsh-sidebar-dock",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 66,
+      "id": "repo:aleixrocal/dsh-sidepanel-web",
+      "name": "dsh-sidepanel-web",
+      "owner": "AleixRocal",
+      "url": "https://github.com/AleixRocal/dsh-sidepanel-web",
+      "category": "browser",
+      "description": {
+        "en": "Right-sidebar browser for DSH Web: renders public sites over CDP, local/dev pages through a same-origin proxy, emulates desktop and phone viewports, and turns element picks into chat annotations. Fork of zengxiaolou/dsh-annotate-browser (MIT), install one or the other — both add their own right-sidebar browser tab and drive a separate Chromium. Requires DSH 0.2.1-rc.2 to 0.2.x, Node.js 22.19+ and a Chromium-based browser on the host (auto-detected, or set chromePath).",
+        "zh": "Right-sidebar browser for DSH Web: renders public sites over CDP, local/dev pages through a same-origin proxy, emulates desktop and phone viewports, and turns element picks into chat annotations. Fork of zengxiaolou/dsh-annotate-browser (MIT), install one or the other — both add their own right-sidebar browser tab and drive a separate Chromium. Requires DSH 0.2.1-rc.2 to 0.2.x, Node.js 22.19+ and a Chromium-based browser on the host (auto-detected, or set chromePath)."
+      },
+      "install": "dsh plugin --profile web add github:AleixRocal/dsh-sidepanel-web",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 67,
+      "id": "repo:liufeicc/dsh-skill-workspace",
+      "name": "dsh-skill-workspace",
+      "owner": "liufeicc",
+      "url": "https://github.com/liufeicc/dsh-skill-workspace",
+      "category": "docs",
+      "description": {
+        "en": "Moves skills into a configurable directory and lets each workspace choose which skills it enables, avoiding context spent on unused skills.",
+        "zh": "把技能集中到可配置目录，并按工作区勾选启用的技能，避免每个会话都为用不上的技能付出上下文。"
+      },
+      "install": "dsh plugin --profile web add github:liufeicc/dsh-skill-workspace",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 68,
+      "id": "repo:csbprd/dsh-split-view",
+      "name": "dsh-split-view",
+      "owner": "CsBpRd",
+      "url": "https://github.com/CsBpRd/dsh-split-view",
+      "category": "ui",
+      "description": {
+        "en": "Splits the DSH main area into vertical columns, one live conversation per parallel task, with mouse-wheel paging past four columns, draggable dividers, a split toggle on every session-list row, a progress-only compact view and a one-click exit.",
+        "zh": "把 DSH 主区域竖着分成多列，每个并行任务一列实时对话；超过 4 列用鼠标滚轮整页翻，分隔线可拖拽调宽，侧边栏会话行可直接加入或移出分屏，另有只显示进度与当前步骤的极简视图，并可一键取消分屏。"
+      },
+      "install": "dsh plugin --profile web add github:CsBpRd/dsh-split-view",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 69,
+      "id": "repo:liufeicc/dsh-split-workspaces",
+      "name": "dsh-split-workspaces",
+      "owner": "liufeicc",
+      "url": "https://github.com/liufeicc/dsh-split-workspaces",
+      "category": "ui",
+      "description": {
+        "en": "Tiles several workspaces side by side or stacked in the Web UI, one conversation per pane, with draggable splitters and pane swapping.",
+        "zh": "在 Web UI 主面板里把多个工作区并排或上下平铺，每个窗格一个会话，支持拖拽分隔条与交换窗格。"
+      },
+      "install": "dsh plugin --profile web add github:liufeicc/dsh-split-workspaces",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 70,
+      "id": "repo:kkwalking/dsh-stall-guard",
+      "name": "dsh-stall-guard",
+      "owner": "kkwalking",
+      "url": "https://github.com/kkwalking/dsh-stall-guard",
+      "category": "session",
+      "description": {
+        "en": "Watches the turn endings of the models you select and asks a second model whether the turn was actually finished: if the assistant stopped after text with no tool call, a three-way verdict of continue, finished or uncertain is recorded and shown in a sidebar panel. In suggest mode it only reports; in auto-continue mode it calls agent.followup() once the turn is idle to send a continuation message, up to a per-turn limit. Single-step turns are always rechecked, watched models can be picked exactly or matched by case-insensitive regex, and the resume text is configurable.",
+        "zh": "监测你所选模型每一轮的收尾，交给另一个模型判断这一轮是否真的结束了：如果助手说完话却没有工具调用就停了，会记录 continue / finished / uncertain 三态判定并展示在侧边栏面板。suggest 模式只报告，auto-continue 模式在本轮真正 idle 后调用 agent.followup() 发送续跑消息，且受每轮次数上限约束。单步收尾始终复查，监测模型支持精确多选与不区分大小写的正则匹配，续跑文案可自定义。"
+      },
+      "install": "dsh plugin --profile web add github:kkwalking/dsh-stall-guard",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 71,
+      "id": "repo:golden2002/dsh-teaching-material-workbench",
+      "name": "dsh-teaching-material-workbench",
+      "owner": "Golden2002",
+      "url": "https://github.com/Golden2002/dsh-teaching-material-workbench",
+      "category": "agent",
+      "description": {
+        "en": "Evidence-gated teaching-material workbench with a Web UI: page model, per-page handout and slide editing, PAEG Chinese language checks, layered gates, checks center, version history, handout/deck/storyboard/Manim-script export and rights audit.",
+        "zh": "按证据链生产教学物料的可视化工作台：页模型、逐页改讲义与课件、PAEG 中文检查、三层门禁、检查中心、版本回退、讲义/课件/分镜/Manim 脚本导出与版权审计。"
+      },
+      "install": "dsh plugin --profile web add github:Golden2002/dsh-teaching-material-workbench",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 72,
+      "id": "repo:verchiel666/dsh-termux",
+      "name": "dsh-termux",
+      "owner": "Verchiel666",
+      "url": "https://github.com/Verchiel666/dsh-termux",
+      "category": "dev",
+      "description": {
+        "en": "Installs and runs Android native command-line tools from inside DSH: fetches aarch64 bionic packages from the Termux repository, unpacks them in pure JS and runs them through /system/bin/linker64, with no root, no Shizuku and no external package manager.",
+        "zh": "在 DSH 内部安装并运行 Android 原生命令行工具：从 Termux 仓库取 aarch64 bionic 包、纯 JS 解包，再经 /system/bin/linker64 执行，无需 root、Shizuku 或外部包管理器。"
+      },
+      "install": "dsh plugin --profile web add github:Verchiel666/dsh-termux",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 73,
+      "id": "repo:teanuky/dsh-textbook-parser",
+      "name": "dsh-textbook-parser",
+      "owner": "teanuky",
+      "url": "https://github.com/teanuky/dsh-textbook-parser",
+      "category": "docs",
+      "description": {
+        "en": "Breaks a STEM textbook into a four-level card map (book, chapter, section, knowledge point) in a sidebar panel, where each point names the defect of the previous approach it fixes and each chapter keeps its remaining gap as the motive for the next; marks key points with a star, shows theorems as cards with statement, conditions and symbol table, folds step-by-step derivations, and exports the same map as a self-contained offline HTML file, Word or PDF. Ships a textbook-parser skill and a textbook_archive tool (save_book / save_chapter / list_books / get_book / delete_book) plus a bundled 12-chapter Signals and Systems sample with 116 sections, 263 points and 601 worked examples. No runtime dependencies and no network access.",
+        "zh": "把理工科教材拆成「全书、章、节、知识点」四层卡片知识地图（侧边栏面板）：每个知识点写明它修复了前方案的什么缺陷，每章用「仍存短板」作为下一章的动机；重点知识点标 ★，定理以卡片呈现（结论／适用条件／符号说明），推导过程可折叠，并可将同一张地图导出为离线自包含 HTML、Word 或 PDF。内置 textbook-parser 技能与 textbook_archive 工具（save_book／save_chapter／list_books／get_book／delete_book），附带《信号与系统》12 章示例（116 节、263 个知识点、601 道例题）。零运行时依赖、不联网。"
+      },
+      "install": "dsh plugin --profile web add github:teanuky/dsh-textbook-parser",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 74,
+      "id": "repo:blazenebula/dsh-todo-notes",
+      "name": "dsh-todo-notes",
+      "owner": "BlazeNebula",
+      "url": "https://github.com/BlazeNebula/dsh-todo-notes",
+      "category": "ui",
+      "description": {
+        "en": "A three-scope TODO board for DeepSeek Harness (user, workspace and session) with nested folders that can reference one item from several places, T0–T9 priorities, drag reordering, batch actions, a floating panel that also opens as a right-sidebar tab, Markdown preview windows that can stay open with autosaving title and body editing, and agent read/write tools, with every write gated by DSH approval.",
+        "zh": "DeepSeek Harness 的三区 TODO 便签（用户 / 工作区 / 会话）：支持嵌套文件夹与同一条目多处引用、T0~T9 优先级、拖动排序、批量操作、可浮动也可作为右侧栏页签打开的面板、可保留且自动保存标题与正文的 Markdown 预览，以及智能体读工具与每次写入都经 DSH 审批的写工具。"
+      },
+      "install": "dsh plugin --profile web add github:BlazeNebula/dsh-todo-notes",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 75,
+      "id": "repo:bzsang/dsh-turn-quote",
+      "name": "dsh-turn-quote",
+      "owner": "bzsang",
+      "url": "https://github.com/bzsang/dsh-turn-quote",
+      "category": "session",
+      "description": {
+        "en": "Quote an earlier turn of the current conversation into the composer from the @ menu — by turn, not by selected text — so a chat that drifted can be re-anchored on what was actually asked.",
+        "zh": "在输入框用 @ 按轮次引用本次对话前文（不是选中文字），把跑偏的对话重新锚回当初的需求原文。"
+      },
+      "install": "dsh plugin --profile web add github:bzsang/dsh-turn-quote",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 76,
+      "id": "repo:verchiel666/dsh-usage-android",
+      "name": "dsh-usage-android",
+      "owner": "Verchiel666",
+      "url": "https://github.com/Verchiel666/dsh-usage-android",
+      "category": "session",
+      "description": {
+        "en": "Reports DSH session token usage from the local session logs as a host-side tool: totals, input, output and cache-read split, a per-day timeline, usage grouped by day or session and optional cost estimates.",
+        "zh": "以 host 侧工具统计 DSH 会话 token 用量，数据取自本地会话日志：总量、输入、输出与缓存读取拆分、按天时间线、按天或按会话分组的用量，以及可选成本估算。"
+      },
+      "install": "dsh plugin --profile web add github:Verchiel666/dsh-usage-android",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 77,
+      "id": "repo:tlewa/dsh-utf8-output",
+      "name": "dsh-utf8-output",
+      "owner": "TLEWA",
+      "url": "https://github.com/TLEWA/dsh-utf8-output",
+      "category": "dev",
+      "description": {
+        "en": "Re-decodes collected subprocess bytes with strict UTF-8 then GB18030 before they reach the agent, so GBK/CP936 output from Windows cmd and PowerShell tools stops arriving as U+FFFD mojibake.",
+        "zh": "在字节被解码前接管子进程输出采集，按严格 UTF-8、必要时 GB18030 重新解码，Windows 下 cmd 与 PowerShell 的 GBK/CP936 输出不再变成 U+FFFD 乱码。"
+      },
+      "install": "dsh plugin --profile web add github:TLEWA/dsh-utf8-output",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 78,
+      "id": "repo:liufeicc/dsh-web-search-tavily",
+      "name": "dsh-web-search-tavily",
+      "owner": "liufeicc",
+      "url": "https://github.com/liufeicc/dsh-web-search-tavily",
+      "category": "tools",
+      "description": {
+        "en": "Adds a Tavily search provider to the DSH web search seam, keyless by default so it works without an account or API key.",
+        "zh": "给 DSH 的网页搜索接缝接上 Tavily，默认免注册、免 API key。"
+      },
+      "install": "dsh plugin --profile web add github:liufeicc/dsh-web-search-tavily",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 79,
+      "id": "repo:nhhc-lxr/dsh-web-tool-provider",
+      "name": "dsh-web-tool-provider",
+      "owner": "nhhc-lxr",
+      "url": "https://github.com/nhhc-lxr/dsh-web-tool-provider",
+      "category": "browser",
+      "description": {
+        "en": "Tavily, Exa and Firecrawl behind one normalized web_search and web_fetch seam: a failing vendor falls through a cooled-down chain, and the row is a host Config form the desktop page and dsh-go both edit.",
+        "zh": "把 Tavily、Exa、Firecrawl 归一到同一层 web_search 与 web_fetch：厂商失败时按冷却链回退，配置是宿主的一段 Config 表单，桌面与 dsh-go 读写同一处。"
+      },
+      "install": "dsh plugin --profile web add github:nhhc-lxr/dsh-web-tool-provider",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 80,
+      "id": "repo:wu-hins/dsh-webui-oauth",
+      "name": "dsh-webui-oauth",
+      "owner": "WU-HINS",
+      "url": "https://github.com/WU-HINS/dsh-webui-oauth",
+      "category": "security",
+      "description": {
+        "en": "Fork of Yuuz12/dsh-webui-auth adding a deny-by-default allowlist route gate over resources, plugin bundles, /api and WebSocket upgrades; password and OIDC/SSO login with an SSO-only mode; server-side sessions with HttpOnly cookies plus a per-browser session list and selective revocation; an OAuth 2.1 device authorization flow (RFC 8628) for app and CLI access, with independent device sessions that expire only on explicit revocation; and a core session bridge that exchanges the launch cookie on the server without exposing the launch token. It is a fork of Yuuz12/dsh-webui-auth and cannot be installed alongside it — remove the original from the profile's bundle list first.",
+        "zh": "Yuuz12/dsh-webui-auth 的分支，新增默认拒绝的白名单路由闸门（资源、插件 bundle、/api、WebSocket 升级）；密码与 OIDC/SSO 登录及「仅允许 SSO」模式；服务端会话 + HttpOnly Cookie，浏览器会话列表与单条吊销；面向 App/CLI 的 OAuth 2.1 设备授权（RFC 8628），设备会话独立、仅主动吊销失效；核心会话桥在服务端换取 launch Cookie，不向客户端暴露 launch token。 本插件是 Yuuz12/dsh-webui-auth 的分支，不能与原版同装——安装前请先从 profile 的 bundle 列表移除原版。"
+      },
+      "install": "dsh plugin --profile web add github:WU-HINS/dsh-webui-oauth",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 81,
+      "id": "repo:ghsyes/dsh-whale-girl-pet",
+      "name": "dsh-whale-girl-pet",
+      "owner": "GHSYES",
+      "url": "https://github.com/GHSYES/dsh-whale-girl-pet",
+      "category": "fun",
+      "description": {
+        "en": "A pixel whale-girl desktop pet for DSH on Windows: live agent state from real session events, poke and tickle, Ctrl-drag, 72-480 px resize, and a transparent always-on-top Electron window with 22 bundled animations.",
+        "zh": "把 DSH 会话状态变成 Windows 桌面上的像素鲸娘：按真实会话事件实时换动作，可戳脸、挠痒、按住 Ctrl 拖动，72–480 px 缩放，独立 Electron 透明置顶窗，随包附带 22 个动作。"
+      },
+      "install": "dsh plugin --profile web add github:GHSYES/dsh-whale-girl-pet",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 82,
+      "id": "repo:highwindmx/dsh-win-env-kit",
+      "name": "dsh-win-env-kit",
+      "owner": "highwindmx",
+      "url": "https://github.com/highwindmx/dsh-win-env-kit",
+      "category": "docs",
+      "description": {
+        "en": "Windows host rules for DSH agents: one skill with nine individually switchable rules (UTF-8/BOM, CRLF-LF per file type, build output, SmartScreen, _scratch isolation, screenshot privacy gate, teardown, shared-doc lock, local trust marks) and six bundled dependency-free scripts.",
+        "zh": "为 DSH Agent 提供 Windows 宿主规则：一个九条规则、可逐条开关的技能（UTF-8/BOM、按文件类型的 CRLF/LF、构建产物、SmartScreen、_scratch 隔离、截图隐私门禁、临时产物清理、共享文档锁、本地信任标记），附带六个零依赖脚本。"
+      },
+      "install": "dsh plugin --profile web add github:highwindmx/dsh-win-env-kit",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 83,
+      "id": "repo:wilshi/dsh-workflow-library",
+      "name": "dsh-workflow-library",
+      "owner": "WilShi",
+      "url": "https://github.com/WilShi/dsh-workflow-library",
+      "category": "agent",
+      "description": {
+        "en": "Reusable workflows: orchestration scripts saved as files under .dsh/workflows, discovered from the project, and run by name with arguments, so they live in git and can be shared. Four tools: list, show, run, save.",
+        "zh": "可复用的工作流库：编排脚本存成 .dsh/workflows 下的文件，从项目中自动发现，按名字带参数运行，可进 git、可团队共享。四个工具：list、show、run、save。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/WilShi/dsh-workflow-library/releases/download/v0.2.0/dsh-workflow-library-0.2.0.tgz\"",
+      "targetKind": "tarball",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 84,
+      "id": "repo:root-7-khx/habit-hint",
+      "name": "habit-hint",
+      "owner": "Root-7-KHX",
+      "url": "https://github.com/Root-7-KHX/habit-hint",
+      "category": "model",
+      "description": {
+        "en": "A local small-model habit hint plugin for DeepSeek Harness that reads recent turns, extracts the user habits, key points and hints, and injects them into the conversation system prompt. It needs a Python virtualenv with torch/transformers/peft plus a user-supplied Qwen3-0.6B base model and LoRA adapter, none of which are bundled; its default scope only runs in sessions that companion-memory has enabled, and with the shipped placeholder paths it silently injects nothing.",
+        "zh": "《习惯提示小模型》：本地小模型每隔几轮读一次近期对话，生成「习惯 / 重点 / 提示语」并注入系统提示词，训练与模型数据都在本机。需要带 torch/transformers/peft 的 Python 虚拟环境，以及用户自备的 Qwen3-0.6B 基座与 LoRA 适配器（插件不打包）；默认只在开启伴侣记忆（companion-memory）的会话里工作，路径没配好时静默不注入。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/Root-7-KHX/habit-hint/releases/download/v0.3.0/local-habit-hint-0.3.0.tgz\"",
+      "targetKind": "tarball",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 85,
+      "id": "repo:yinnicoding/momolulu",
+      "name": "momolulu",
+      "owner": "YinniCoding",
+      "url": "https://github.com/YinniCoding/momolulu",
+      "category": "ui",
+      "description": {
+        "en": "Floating photo companion for the DSH Web UI with a 15/25/45/60-minute focus timer, water and stretch reminders, Open-Meteo weather, and a session radar listing running, ended, input-waiting and permission-requesting conversations for one-click navigation.",
+        "zh": "DSH Web UI 的悬浮照片陪伴插件：15/25/45/60 分钟专注计时、喝水与站立提醒、Open-Meteo 天气，以及可一键跳转的会话雷达（运行中、刚结束、等待输入、请求权限）。"
+      },
+      "install": "dsh plugin --profile web add github:YinniCoding/momolulu",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 86,
+      "id": "repo:beckchiang/open-sea-skin",
+      "name": "open-sea-skin",
+      "owner": "BeckChiang",
+      "url": "https://github.com/BeckChiang/open-sea-skin",
+      "category": "theme",
+      "description": {
+        "en": "Realtime ocean skin for DeepSeek Harness, rebuilt from d-dev0101/open-sea-skin 1.2.7 under MIT. Wave height follows the live session load, the sky comes from a local NOAA ephemeris, the star field is a real 2851-star HYG subset with 88 constellations, one boat per running subagent, plus a searchable 11-group settings panel and three quality tiers. It reuses the upstream package name \"open-sea-skin\" and the same bundle id, so uninstall d-dev0101/open-sea-skin first — the two cannot be installed side by side.",
+        "zh": "给 DeepSeek Harness 的实时海洋皮肤，基于 d-dev0101/open-sea-skin 1.2.7（MIT）重新构建。浪高跟随会话负载，天色来自本地 NOAA 星历，星空是 2851 颗真实恒星的 HYG 子集与 88 个星座，每个运行中的子智能体一艘船，另有可搜索的 11 组设置面板与三档画质。它与上游同用 open-sea-skin 包名与同一个 bundle id，安装前须先卸载 d-dev0101/open-sea-skin，两者不能同时安装。"
+      },
+      "install": "dsh plugin --profile web add \"https://github.com/BeckChiang/open-sea-skin/releases/download/v2.0.4/open-sea-skin-2.0.4.tgz\"",
+      "targetKind": "tarball",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 87,
+      "id": "repo:gao2612/relationship-notes",
+      "name": "relationship-notes",
+      "owner": "Gao2612",
+      "url": "https://github.com/Gao2612/relationship-notes",
+      "category": "memory",
+      "description": {
+        "en": "Private relationship notebook: scores each day of chat from message-level evidence and tracks how the relationship develops over time. Chats, profiles and drafts stay in your browser's local IndexedDB and the plugin runs no server of its own, but using model replies, profiling or automatic analysis sends the relevant chat context to the model service configured in DSH.",
+        "zh": "私人关系手记：按消息级证据为每天的聊天打分，并跟踪一段关系的进展。聊天、档案与草稿只存在浏览器本机 IndexedDB，插件自身不运行服务器；但使用模型回复、资料整理或历史自动分析时，相应聊天上下文会交给 DSH 配置的模型服务。"
+      },
+      "install": "dsh plugin --profile web add github:Gao2612/relationship-notes",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 88,
+      "id": "repo:luminousyyh/skill-wb-exec",
+      "name": "wb-exec",
+      "owner": "Luminousyyh",
+      "url": "https://github.com/Luminousyyh/skill-wb-exec",
+      "category": "docs",
+      "description": {
+        "en": "Delegate bounded coding tasks to a headless CLI agent (WorkBuddy by default, or codex, claude, aider or a custom command) and collect a structured result plus the real diff, with a writable-path whitelist, a dispatch lock over overlapping paths, an isolated worktree and a structured needs_human flag. Requires Python 3.10+ (standard library only) and one installed CLI executor (WorkBuddy/CodeBuddy by default, or codex, claude, aider or a custom command).",
+        "zh": "把边界明确的编码任务派给无头 CLI 执行体（默认 WorkBuddy，也可选 codex、claude、aider 或自定义命令），回收结构化结论与真实 diff，并带可写路径白名单、重叠路径派发锁、独立 worktree 隔离与结构化 needs_human 标记。需本机安装 Python 3.10+（仅标准库）与其中一个 CLI 执行体（默认 WorkBuddy/CodeBuddy，也可选 codex、claude、aider 或自定义）。"
+      },
+      "install": "dsh plugin --profile web add github:Luminousyyh/skill-wb-exec",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 89,
+      "id": "repo:perrylink/dsh-protest-deadline",
+      "name": "dsh-protest-deadline",
+      "owner": "PerryLink",
+      "url": "https://perrylink.github.io/checkers/dsh-protest-deadline/",
+      "category": "dev",
+      "description": {
+        "en": "DeepSeek Harness 插件 — 质疑与投诉期限台账核对：依据《政府采购质疑和投诉办法》（财政部令第94号）。仅提示差异，不作出定性结论。",
+        "zh": "按财政部94号令自动核对质疑与投诉期限台账，只提示差异，不替你下结论。"
+      },
+      "install": "dsh plugin add github:PerryLink/dsh-protest-deadline",
+      "targetKind": "github",
+      "stars": 0,
+      "downloads": 0,
+      "score": 0
+    },
+    {
+      "rank": 90,
+      "id": "repo:ckanner/dsh-plugin-lcu",
+      "name": "dsh-plugin-lcu",
+      "owner": "ckanner",
+      "url": "https://github.com/ckanner/dsh-plugin-lcu#readme",
+      "category": "browser",
+      "description": {
+        "en": "Drive the desktop and Chrome from DeepSeek Harness using the computer-use runtime inside the ChatGPT desktop application.",
+        "zh": "让 DeepSeek Harness 通过 LCU 直接操控桌面和 Chrome，不用打开应用就能自动干活。"
+      },
+      "install": "dsh plugin add github:ckanner/dsh-plugin-lcu",
       "targetKind": "github",
       "stars": 0,
       "downloads": 0,
